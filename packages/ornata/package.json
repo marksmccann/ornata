@@ -1,22 +1,16 @@
 {
   "name": "ornata",
-  "private": true,
+  "version": "0.1.0",
   "type": "module",
-  "version": "0.0.0",
   "description": "Ornata is a progressive enhancement framework for server-rendered websites",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
-    "build": "lerna run build",
-    "dev": "lerna run dev",
-    "start:docs": "npm run dev -w ornata-docs",
-    "test": "lerna run test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/marksmccann/ornata.git"
+    "test": "vitest"
   },
   "keywords": [
     "ornata",
@@ -28,11 +22,15 @@
   ],
   "author": "Mark McCann",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marksmccann/ornata.git"
+  },
   "bugs": {
     "url": "https://github.com/marksmccann/ornata/issues"
   },
   "homepage": "https://github.com/marksmccann/ornata#readme",
   "devDependencies": {
-    "lerna": "^9.0.0"
+    "vitest": "^2.0.0"
   }
 }
