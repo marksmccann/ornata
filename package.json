@@ -1,0 +1,27 @@
+{
+  "name": "ornata",
+  "version": "0.0.0",
+  "description": "Ornata is a progressive enhancement framework for server-rendered websites",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marksmccann/ornata.git"
+  },
+  "keywords": [
+    "ornata",
+    "progressive",
+    "enhancement",
+    "framework",
+    "HTML-first",
+    "Server-rendered"
+  ],
+  "author": "Mark McCann",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marksmccann/ornata/issues"
+  },
+  "homepage": "https://github.com/marksmccann/ornata#readme"
+}
