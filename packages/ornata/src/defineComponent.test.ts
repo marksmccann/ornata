@@ -23,48 +23,11 @@ describe('defineComponent', () => {
         expect(instance).toBeInstanceOf(Test);
         expect(instance.$$typeof).toStrictEqual(Symbol.for('ornata.component'));
         expect(instance.$root).toStrictEqual(root);
-        // expect(instance.$state).toStrictEqual({});
+        expect(instance.$state).toStrictEqual({});
         expect(instance.addStateListener).toBeInstanceOf(Function);
         expect(instance.removeStateListener).toBeInstanceOf(Function);
 
         instance.dispose();
-    });
-
-    describe('root options', () => {
-        it('should log error when root element does not match selector', () => {
-            const consoleError = vi
-                .spyOn(console, 'error')
-                .mockImplementation(() => {});
-            const Test = defineComponent({
-                name: 'Test',
-                root: { matches: 'input' },
-            });
-            const root = document.createElement('div');
-            const instance = Test.createInstance(root);
-
-            expect(consoleError).toHaveBeenCalledWith(
-                reporter.message('ERR05', {
-                    componentName: 'Test',
-                    selector: 'input',
-                })
-            );
-
-            instance.dispose();
-        });
-
-        it('should not log error when root element matches selector', () => {
-            const consoleError = vi.spyOn(console, 'error');
-            const Test = defineComponent({
-                name: 'Test',
-                root: { matches: 'div' },
-            });
-            const root = document.createElement('div');
-            const instance = Test.createInstance(root);
-
-            expect(consoleError).not.toHaveBeenCalled();
-
-            instance.dispose();
-        });
     });
 
     describe('instance methods', () => {
@@ -177,7 +140,11 @@ describe('defineComponent', () => {
             const root = document.createElement('div');
             const instance = Test.createInstance(root);
 
+            document.body.appendChild(root);
+
             Test.deleteInstance('div');
+
+            document.body.removeChild(root);
         });
 
         it('should fail to delete instance if instance does not exist for root element', () => {

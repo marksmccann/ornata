@@ -2,6 +2,9 @@ import type Ornata from './index';
 import reporter from './reporter';
 import describeElement from './describeElement';
 import getRootElement from './getRootElement';
+import resolveRootOptions from './resolveRootOptions';
+import resolveStateOptions from './resolveStateOptions';
+import validateState from './validateState';
 
 function defineComponent<T extends Ornata.ComponentInternalInstance>(
     options: Ornata.ComponentOptions<T>
@@ -9,42 +12,48 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
     const {
         name: displayName = 'UnnamedComponent',
         root: rootOptions = {} as Ornata.ComponentRootOptions<T['$root']>,
-        state: stateOptions,
-        elements: elementsOptions,
+        state: stateOptions = {} as Ornata.ComponentStateOptions<T['$state']>,
+        elements: elementsOptions = {} as Ornata.ComponentElementOptions<
+            T['$elements']
+        >,
+        hooks: hookOptions = {} as Ornata.ComponentHookOptions<T>,
     } = options;
     const instances = new WeakMap<Element, Ornata.ComponentInstance<T>>();
 
     return class Component implements Ornata.ComponentInstance<T> {
-        $$typeof: Ornata.ComponentInstance<T>['$$typeof'];
+        readonly $$typeof: Ornata.ComponentInstance<T>['$$typeof'];
 
-        $root: Ornata.ComponentInstance<T>['$root'];
+        readonly $root: Ornata.ComponentInstance<T>['$root'];
 
         $state: Ornata.ComponentInstance<T>['$state'];
 
-        static displayName: Ornata.ComponentConstructor<T>['displayName'] =
+        static readonly displayName: Ornata.ComponentConstructor<T>['displayName'] =
             displayName;
 
         constructor(root: Element, initialState?: Partial<T['$state']>) {
             this.$$typeof = Symbol.for('ornata.component');
             this.$root = root;
 
-            if (rootOptions) {
-                const { matches } = rootOptions;
+            resolveRootOptions(displayName, root, rootOptions);
 
-                if (matches && !root.matches(matches)) {
-                    reporter.error('ERR05', {
-                        componentName: displayName,
-                        selector: matches,
-                    });
-                }
+            this.$state = resolveStateOptions(
+                displayName,
+                root,
+                initialState || {},
+                stateOptions
+            );
+
+            hookOptions.setup?.call(this);
+
+            if (stateOptions) {
+                validateState(displayName, this.$state, stateOptions);
             }
-
-            // console.log(this.$root);
 
             instances.set(root, this);
         }
 
         dispose: Ornata.ComponentInstance<T>['dispose'] = () => {
+            hookOptions.teardown?.call(this);
             instances.delete(this.$root);
         };
 
