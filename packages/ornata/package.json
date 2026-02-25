@@ -1,36 +1,39 @@
 {
-  "name": "ornata",
-  "version": "0.1.0",
-  "type": "module",
-  "description": "Ornata is a progressive enhancement framework for server-rendered websites",
-  "main": "index.js",
-  "files": [
-    "index.js",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "test": "vitest"
-  },
-  "keywords": [
-    "ornata",
-    "progressive",
-    "enhancement",
-    "framework",
-    "HTML-first",
-    "Server-rendered"
-  ],
-  "author": "Mark McCann",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/marksmccann/ornata.git"
-  },
-  "bugs": {
-    "url": "https://github.com/marksmccann/ornata/issues"
-  },
-  "homepage": "https://github.com/marksmccann/ornata#readme",
-  "devDependencies": {
-    "vitest": "^2.0.0"
-  }
+    "name": "ornata",
+    "version": "0.1.0",
+    "type": "module",
+    "description": "Ornata is a progressive enhancement framework for server-rendered websites",
+    "main": "index.js",
+    "files": [
+        "index.js",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "test": "vitest"
+    },
+    "keywords": [
+        "ornata",
+        "progressive",
+        "enhancement",
+        "framework",
+        "HTML-first",
+        "Server-rendered"
+    ],
+    "author": "Mark McCann",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/marksmccann/ornata.git"
+    },
+    "bugs": {
+        "url": "https://github.com/marksmccann/ornata/issues"
+    },
+    "homepage": "https://github.com/marksmccann/ornata#readme",
+    "devDependencies": {
+        "vitest": "^2.0.0"
+    },
+    "dependencies": {
+        "runtime-reporter": "^0.4.2"
+    }
 }
