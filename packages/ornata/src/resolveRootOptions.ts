@@ -8,9 +8,11 @@ import reporter from './reporter.js';
  * @param rootOptions The root options.
  * @private
  */
-export default function resolveRootOptions<T extends Element>(
+export default function resolveRootOptions<
+    T extends Ornata.ComponentInternalInstance,
+>(
     componentName: string,
-    root: T,
+    root: T['$root'],
     rootOptions: Ornata.ComponentRootOptions<T>
 ): void {
     const { matches } = rootOptions;

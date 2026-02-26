@@ -3,11 +3,13 @@ import getStateFromElement from './getStateFromElement.js';
 import getDefaultState from './getDefaultState.js';
 import reporter from './reporter.js';
 
-export default function resolveStateOptions<T extends Ornata.ComponentState>(
+export default function resolveStateOptions<
+    T extends Ornata.ComponentInternalInstance,
+>(
     componentName: string,
     root: Element,
-    initialState: Partial<T>,
-    stateOptions: Ornata.ComponentStateOptions<T>
+    initialState: Partial<T['$state']>,
+    stateOptions: Ornata.ComponentOption<T, 'state'>
 ): T {
     let state = {} as T;
     let stateFromHTML: Partial<T> = {};

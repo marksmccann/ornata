@@ -27,7 +27,6 @@ describe('resolveStateOptions', () => {
         const stateOptions = {};
         const root = document.createElement('div');
 
-        // @ts-expect-error - purposefully invalid state options
         resolveStateOptions('Test', root, state, stateOptions);
 
         expect(consoleError).toHaveBeenCalledWith(

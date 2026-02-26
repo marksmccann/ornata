@@ -28,7 +28,11 @@ namespace Ornata {
 
     // ------------------------------------------------------------
 
-    export interface ComponentRootOptions<T extends Element> {
+    /**
+     * The configuration options for the root element for the `defineComponent` function.
+     * @since v0.1.0
+     */
+    export interface ComponentRootOptions<T extends ComponentInternalInstance> {
         /**
          * Inform the user when the root element they supplied to the constructor
          * does not match the expected type via a CSS selector.
@@ -37,7 +41,14 @@ namespace Ornata {
         matches?: string;
     }
 
-    export interface ComponentStateOption<T> {
+    /**
+     * The configuration options for the state properties for the `defineComponent` function.
+     * @since v0.1.0
+     */
+    export interface ComponentStateOptions<
+        T extends ComponentInternalInstance,
+        K extends keyof T['$state'],
+    > {
         // controls?: T extends (...args: any[]) => any
         //     ? boolean | undefined
         //     : never;
@@ -46,7 +57,7 @@ namespace Ornata {
          * The default value to use for the state property if no value is provided.
          * @since v0.1.0
          */
-        defaultValue?: T;
+        defaultValue?: T['$state'][K];
 
         /**
          * The expected type of the state property. Used to validate
@@ -67,36 +78,125 @@ namespace Ornata {
          * from the HTML if no `defaultValue` is provided.
          * @since v0.1.0
          */
-        parse?: (value: string) => T;
+        parse?: (value: string) => T['$state'][K];
     }
 
-    export type ComponentStateOptions<T extends ComponentState> = {
-        [K in keyof T]: ComponentStateOption<T[K]>;
-    };
+    /**
+     * The configuration options for the elements properties for the `defineComponent` function.
+     * @since v0.1.0
+     */
+    export interface ComponentElementOptions<
+        T extends ComponentInternalInstance,
+        K extends keyof T['$elements'],
+    > {
+        /**
+         * A CSS selector to query all elements within the root element
+         * that match the selector.
+         * @since v0.1.0
+         */
+        queryAll?: string;
 
-    export interface ComponentElementOption<T extends ComponentElement> {}
+        /**
+         * A CSS selector to query the first element within the root element
+         * that matches the selector.
+         * @since v0.1.0
+         */
+        query?: string;
 
-    export type ComponentElementOptions<T extends ComponentElements> = {
-        [K in keyof T]: ComponentElementOption<T[K]>;
-    };
+        /**
+         * The name of the HTML element to create.
+         * @since v0.1.0
+         */
+        create?: keyof HTMLElementTagNameMap;
 
-    export interface ComponentHookOptions<T extends ComponentInternalInstance> {
-        setup?: (this: ComponentInstance<T>) => void;
-        teardown?: (this: ComponentInstance<T>) => void;
-        update?: (
-            this: ComponentInstance<T>,
-            property: keyof T['$state'],
-            value: T['$state'][keyof T['$state']]
-        ) => void;
+        /**
+         * Manually resolve the element. Must return an element or an array of elements.
+         * @since v0.1.0
+         */
+        resolve?: (root: T['$root']) => T['$elements'][K];
+
+        /**
+         * The minimum number of elements that must be found. When provided, the component will log an
+         * error if the number of elements it resolves to is less than the minimum number of elements.
+         * @since v0.1.0
+         */
+        min?: number;
+
+        /**
+         * The maximum number of elements that can be found. When provided, the component will log an
+         * error if the number of elements it resolves to is greater than the maximum number of elements.
+         * @since v0.1.0
+         */
+        max?: number;
     }
+
+    /**
+     * The callback function for the watch property for the `defineComponent` function.
+     * @since v0.1.0
+     */
+    export type ComponentWatchCallback<
+        T extends ComponentInternalInstance,
+        K extends keyof T['$state'],
+    > = (
+        this: T,
+        newValue: T['$state'][K],
+        oldValue: T['$state'][K],
+        initial: boolean
+    ) => void;
+
+    export type ComponentOption<
+        T extends ComponentInternalInstance,
+        K extends keyof ComponentOptions<T>,
+    > = NonNullable<ComponentOptions<T>[K]>;
 
     export interface ComponentOptions<T extends ComponentInternalInstance> {
+        /**
+         * Configure the display name of the component. Defaults to `UnnamedComponent`.
+         * @since v0.1.0
+         */
         name?: string;
-        root?: ComponentRootOptions<T['$root']>;
-        state?: ComponentStateOptions<T['$state']>;
-        elements?: ComponentElementOptions<T['$elements']>;
-        hooks?: ComponentHookOptions<T>;
-        // watch?: any;
+
+        /**
+         * Configure the settings for the root element of the component.
+         * @since v0.1.0
+         */
+        root?: ComponentRootOptions<T>;
+
+        /**
+         * Name and configure the state properties of the component.
+         * @since v0.1.0
+         */
+        state?: {
+            [K in keyof T['$state']]: ComponentStateOptions<T, K>;
+        };
+
+        /**
+         * Name and configure the DOM elements of the component.
+         * @since v0.1.0
+         */
+        elements?: {
+            [K in keyof T['$elements']]: ComponentElementOptions<T, K>;
+        };
+
+        /**
+         * The lifecycle methods for the component.
+         * @since v0.1.0
+         */
+        lifecycle?: {
+            setup?: (this: T) => void;
+            teardown?: (this: T) => void;
+        };
+
+        /**
+         * Respond to value changes in the state properties. Each callback function is called with the
+         * new value, the previous value, and a convenient flag indicating whether the callback is being
+         * called for the first time (during initialization).
+         * @since v0.1.0
+         */
+        watch?: {
+            [K in keyof T['$state']]: ComponentWatchCallback<T, K>;
+        };
+
         // computed?: any;
         // methods?: any;
         // render?: any;

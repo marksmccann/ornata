@@ -29,7 +29,7 @@ type Messages =
       }
     | {
           code: 'ERR06';
-          template: '{{ componentName }}: State option missing required property. The state option for "{{ property }}" must have at least one of the following defined: "defaultValue", "type", or "parse".';
+          template: '{{ componentName }}: State option missing required property. The state option for "{{ property }}" must have at least one of the following: "defaultValue", "type", or "parse".';
           tokens: 'componentName' | 'property';
       }
     | {
@@ -46,6 +46,31 @@ type Messages =
           code: 'ERR09';
           template: '{{ componentName }}: Invalid state type. The value "{{ value }}" for property "{{ property }}" is not of type "{{ type }}".';
           tokens: 'componentName' | 'value' | 'property' | 'type';
+      }
+    | {
+          code: 'ERR10';
+          template: '{{ componentName }}: Missing minimum number of elements. The property "{{ property }}" must have at least {{ min }} elements.';
+          tokens: 'componentName' | 'property' | 'min';
+      }
+    | {
+          code: 'ERR11';
+          template: '{{ componentName }}: Failed to resolve element. The property "{{ property }}" requires one of the following: "queryAll", "query", "create", or "resolve".';
+          tokens: 'componentName' | 'property';
+      }
+    | {
+          code: 'ERR12';
+          template: '{{ componentName }}: Missing minimum number of elements. The property "{{ property }}" must have at least {{ min }} elements.';
+          tokens: 'componentName' | 'property' | 'min';
+      }
+    | {
+          code: 'ERR13';
+          template: '{{ componentName }}: Exceeded maximum number of elements. The property "{{ property }}" must have at most {{ max }} elements.';
+          tokens: 'componentName' | 'property' | 'max';
+      }
+    | {
+          code: 'ERR14';
+          template: '{{ componentName }}: Found too many element resolution methods. The property "{{ property }}" was provided "{{ provided }}" but, only "{{ used }}" was used.';
+          tokens: 'componentName' | 'property' | 'provided' | 'used';
       };
 
 const messages: RuntimeReporterMessages<Messages> = {
@@ -54,10 +79,15 @@ const messages: RuntimeReporterMessages<Messages> = {
     ERR03: '{{ componentName }}: Failed to {{ action }} instance. Instance already exists for root element: "{{ root }}"',
     ERR04: '{{ componentName }}: Failed to {{ action }} instance. Instance does not exists for root element: "{{ root }}"',
     ERR05: '{{ componentName }}: Invalid root element. The root element does not match the selector: "{{ selector }}".',
-    ERR06: '{{ componentName }}: State option missing required property. The state option for "{{ property }}" must have at least one of the following defined: "defaultValue", "type", or "parse".',
+    ERR06: '{{ componentName }}: State option missing required property. The state option for "{{ property }}" must have at least one of the following: "defaultValue", "type", or "parse".',
     ERR07: '{{ componentName }}: Unknown state property. The property "{{ property }}" was provided, but it does not have a state option.',
     ERR08: '{{ componentName }}: Failed to parse state from HTML. The value "{{ value }}" for property "{{ property }}" from the root element is not valid.',
     ERR09: '{{ componentName }}: Invalid state type. The value "{{ value }}" for property "{{ property }}" is not of type "{{ type }}".',
+    ERR10: '{{ componentName }}: Missing minimum number of elements. The property "{{ property }}" must have at least {{ min }} elements.',
+    ERR11: '{{ componentName }}: Failed to resolve element. The property "{{ property }}" requires one of the following: "queryAll", "query", "create", or "resolve".',
+    ERR12: '{{ componentName }}: Missing minimum number of elements. The property "{{ property }}" must have at least {{ min }} elements.',
+    ERR13: '{{ componentName }}: Exceeded maximum number of elements. The property "{{ property }}" must have at most {{ max }} elements.',
+    ERR14: '{{ componentName }}: Found too many element resolution methods. The property "{{ property }}" was provided "{{ provided }}" but, only "{{ used }}" was used.',
 };
 
 /**

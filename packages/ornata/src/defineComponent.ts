@@ -5,20 +5,30 @@ import getRootElement from './getRootElement';
 import resolveRootOptions from './resolveRootOptions';
 import resolveStateOptions from './resolveStateOptions';
 import validateState from './validateState';
+import resolveElementsOptions from './resolveElementsOptions';
 
 function defineComponent<T extends Ornata.ComponentInternalInstance>(
     options: Ornata.ComponentOptions<T>
 ): Ornata.ComponentConstructor<T> {
     const {
         name: displayName = 'UnnamedComponent',
-        root: rootOptions = {} as Ornata.ComponentRootOptions<T['$root']>,
-        state: stateOptions = {} as Ornata.ComponentStateOptions<T['$state']>,
-        elements: elementsOptions = {} as Ornata.ComponentElementOptions<
-            T['$elements']
+        root: rootOptions = {},
+        state: stateOptions = {} as Ornata.ComponentOption<T, 'state'>,
+        elements: elementsOptions = {} as Ornata.ComponentOption<T, 'elements'>,
+        lifecycle: lifecycleOptions = {} as Ornata.ComponentOption<
+            T,
+            'lifecycle'
         >,
-        hooks: hookOptions = {} as Ornata.ComponentHookOptions<T>,
+        // watch: watchOptions = {} as Ornata.ComponentOption<T, 'watch'>,
     } = options;
-    const instances = new WeakMap<Element, Ornata.ComponentInstance<T>>();
+    const externalInstances = new WeakMap<
+        Element,
+        Ornata.ComponentInstance<T>
+    >();
+    const internalInstances = new WeakMap<
+        Ornata.ComponentInstance<T>,
+        Ornata.ComponentInternalInstance
+    >();
 
     return class Component implements Ornata.ComponentInstance<T> {
         readonly $$typeof: Ornata.ComponentInstance<T>['$$typeof'];
@@ -36,25 +46,38 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
             resolveRootOptions(displayName, root, rootOptions);
 
-            this.$state = resolveStateOptions(
+            const state = resolveStateOptions(
                 displayName,
                 root,
                 initialState || {},
                 stateOptions
             );
 
-            hookOptions.setup?.call(this);
+            const elements = resolveElementsOptions(
+                displayName,
+                root,
+                elementsOptions
+            );
+
+            internalInstances.set(this, {
+                $root: root,
+                $state: state,
+                $elements: elements,
+                $methods: {},
+            });
+
+            lifecycleOptions.setup?.call(this);
 
             if (stateOptions) {
                 validateState(displayName, this.$state, stateOptions);
             }
 
-            instances.set(root, this);
+            externalInstances.set(root, this);
         }
 
         dispose: Ornata.ComponentInstance<T>['dispose'] = () => {
-            hookOptions.teardown?.call(this);
-            instances.delete(this.$root);
+            lifecycleOptions.teardown?.call(this);
+            externalInstances.delete(this.$root);
         };
 
         addStateListener: Ornata.ComponentInstance<T>['addStateListener'] = (
@@ -77,7 +100,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                     'create'
                 );
 
-                if (instances.has(root)) {
+                if (externalInstances.has(root)) {
                     throw reporter.fail('ERR03', {
                         componentName: displayName,
                         action: 'create',
@@ -97,7 +120,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                 'get'
             );
 
-            const instance = instances.get(root);
+            const instance = externalInstances.get(root);
 
             if (!instance) {
                 throw reporter.fail('ERR04', {
@@ -127,7 +150,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                     'delete'
                 );
 
-                const instance = instances.get(root);
+                const instance = externalInstances.get(root);
 
                 if (!instance) {
                     throw reporter.fail('ERR04', {

@@ -8,13 +8,15 @@ import reporter from './reporter';
  * @param stateOptions The state options to use to validate the state.
  * @private
  */
-export default function validateState<T extends Ornata.ComponentState>(
+export default function validateState<
+    T extends Ornata.ComponentInternalInstance,
+>(
     componentName: string,
-    state: T,
-    stateOptions: Ornata.ComponentStateOptions<T>
+    state: T['$state'],
+    stateOptions: Ornata.ComponentOption<T, 'state'>
 ): void {
     Object.keys(state).forEach((property) => {
-        if (stateOptions[property as keyof T]) return;
+        if (stateOptions[property]) return;
 
         reporter.error('ERR07', {
             componentName,
@@ -23,8 +25,11 @@ export default function validateState<T extends Ornata.ComponentState>(
     });
 
     Object.entries(stateOptions).forEach(([property, option]) => {
-        const { type } = option as Ornata.ComponentStateOption<T[keyof T]>;
-        const value = state[property as keyof T];
+        const { type } = option as Ornata.ComponentStateOptions<
+            T,
+            keyof T['$state']
+        >;
+        const value = state[property as keyof T['$state']];
         let invalid = false;
         let expectedType;
 
@@ -49,7 +54,7 @@ export default function validateState<T extends Ornata.ComponentState>(
         }
 
         if (invalid) {
-            reporter.warn('ERR09', {
+            reporter.error('ERR09', {
                 componentName,
                 value,
                 property,

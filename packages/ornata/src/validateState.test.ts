@@ -24,7 +24,6 @@ describe('validateState', () => {
         const state = { name: 'test' };
         const stateOptions = {};
 
-        // @ts-expect-error - purposely invalid state options
         validateState('Test', state, stateOptions);
 
         expect(consoleError).toHaveBeenCalledWith(
@@ -36,15 +35,15 @@ describe('validateState', () => {
     });
 
     it('should validate state if the value does not match the expected type: string', () => {
-        const consoleWarn = vi
-            .spyOn(console, 'warn')
+        const consoleError = vi
+            .spyOn(console, 'error')
             .mockImplementation(() => {});
         const state = { name: 123 };
         const stateOptions = { name: { type: String } };
 
         validateState('Test', state, stateOptions);
 
-        expect(consoleWarn).toHaveBeenCalledWith(
+        expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
                 componentName: 'Test',
                 value: 123,
@@ -55,15 +54,15 @@ describe('validateState', () => {
     });
 
     it('should validate state if the value does not match the expected type: number', () => {
-        const consoleWarn = vi
-            .spyOn(console, 'warn')
+        const consoleError = vi
+            .spyOn(console, 'error')
             .mockImplementation(() => {});
         const state = { name: 'test' };
         const stateOptions = { name: { type: Number } };
 
         validateState('Test', state, stateOptions);
 
-        expect(consoleWarn).toHaveBeenCalledWith(
+        expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
                 componentName: 'Test',
                 value: 'test',
@@ -74,15 +73,15 @@ describe('validateState', () => {
     });
 
     it('should validate state if the value does not match the expected type: boolean', () => {
-        const consoleWarn = vi
-            .spyOn(console, 'warn')
+        const consoleError = vi
+            .spyOn(console, 'error')
             .mockImplementation(() => {});
         const state = { name: 123 };
         const stateOptions = { name: { type: Boolean } };
 
         validateState('Test', state, stateOptions);
 
-        expect(consoleWarn).toHaveBeenCalledWith(
+        expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
                 componentName: 'Test',
                 value: 123,
@@ -93,15 +92,15 @@ describe('validateState', () => {
     });
 
     it('should validate state if the value does not match the expected type: array', () => {
-        const consoleWarn = vi
-            .spyOn(console, 'warn')
+        const consoleError = vi
+            .spyOn(console, 'error')
             .mockImplementation(() => {});
         const state = { name: 'test' };
         const stateOptions = { name: { type: Array } };
 
         validateState('Test', state, stateOptions);
 
-        expect(consoleWarn).toHaveBeenCalledWith(
+        expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
                 componentName: 'Test',
                 value: 'test',
@@ -112,15 +111,15 @@ describe('validateState', () => {
     });
 
     it('should validate state if the value does not match the expected type: object', () => {
-        const consoleWarn = vi
-            .spyOn(console, 'warn')
+        const consoleError = vi
+            .spyOn(console, 'error')
             .mockImplementation(() => {});
         const state = { name: 'test' };
         const stateOptions = { name: { type: Object } };
 
         validateState('Test', state, stateOptions);
 
-        expect(consoleWarn).toHaveBeenCalledWith(
+        expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
                 componentName: 'Test',
                 value: 'test',
@@ -131,15 +130,15 @@ describe('validateState', () => {
     });
 
     it('should validate state if the value does not match the expected type: function', () => {
-        const consoleWarn = vi
-            .spyOn(console, 'warn')
+        const consoleError = vi
+            .spyOn(console, 'error')
             .mockImplementation(() => {});
         const state = { name: 'test' };
         const stateOptions = { name: { type: Function } };
 
         validateState('Test', state, stateOptions);
 
-        expect(consoleWarn).toHaveBeenCalledWith(
+        expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
                 componentName: 'Test',
                 value: 'test',
