@@ -11,7 +11,7 @@ import reporter from './reporter';
 export default function getRootElement<T extends Element>(
     componentName: string,
     elementOrQuery: string | Element | null | undefined,
-    actionLabel: 'create' | 'get' | 'query' | 'delete'
+    actionLabel: 'create' | 'get' | 'query' | 'delete' | 'update'
 ): T {
     let root: Element;
 

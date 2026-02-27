@@ -7,6 +7,7 @@ import resolveStateOptions from './resolveStateOptions';
 import validateState from './validateState';
 import resolveElementsOptions from './resolveElementsOptions';
 import resolveMethodsOptions from './resolveMethodsOptions';
+import renderComponent from './renderComponent';
 
 function defineComponent<T extends Ornata.ComponentInternalInstance>(
     options: Ornata.ComponentOptions<T>
@@ -16,12 +17,11 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         root: rootOptions = {},
         state: stateOptions = {} as Ornata.ComponentOption<T, 'state'>,
         elements: elementsOptions = {} as Ornata.ComponentOption<T, 'elements'>,
-        lifecycle: lifecycleOptions = {} as Ornata.ComponentOption<
-            T,
-            'lifecycle'
-        >,
+        // prettier-ignore
+        lifecycle: lifecycleOptions = {} as Ornata.ComponentOption<T, 'lifecycle'>,
         methods: methodsOptions = {} as Ornata.ComponentOption<T, 'methods'>,
         data: dataOptions = {} as Ornata.ComponentOption<T, 'data'>,
+        render: renderOptions = {} as Ornata.ComponentOption<T, 'render'>,
         // watch: watchOptions = {} as Ornata.ComponentOption<T, 'watch'>,
     } = options;
     const externalInstances = new WeakMap<
@@ -71,10 +71,10 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                     return target[property];
                 },
                 set(target, property, value) {
-                    // Run render methods
-                    // Run watchers
-                    // Run state listeners
                     target[property] = value;
+
+                    renderComponent(displayName, elements, renderOptions);
+                    // Run state watchers
 
                     return true;
                 },
@@ -154,10 +154,10 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
             };
 
         static createInstance: Ornata.ComponentConstructor<T>['createInstance'] =
-            (elementOrSelector, initialState) => {
+            (instanceRoot, initialState) => {
                 const root = getRootElement<T['root']>(
                     displayName,
-                    elementOrSelector,
+                    instanceRoot,
                     'create'
                 );
 
@@ -173,11 +173,11 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
             };
 
         static getInstance: Ornata.ComponentConstructor<T>['getInstance'] = (
-            elementOrSelector
+            instanceRoot
         ) => {
             const root = getRootElement<T['root']>(
                 displayName,
-                elementOrSelector,
+                instanceRoot,
                 'get'
             );
 
@@ -195,19 +195,19 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         };
 
         static queryInstance: Ornata.ComponentConstructor<T>['queryInstance'] =
-            (elementOrSelector) => {
+            (instanceRoot) => {
                 try {
-                    return this.getInstance(elementOrSelector);
+                    return this.getInstance(instanceRoot);
                 } catch (error) {
                     return null;
                 }
             };
 
         static deleteInstance: Ornata.ComponentConstructor<T>['deleteInstance'] =
-            (elementOrSelector) => {
+            (instanceRoot) => {
                 const root = getRootElement<T['root']>(
                     displayName,
-                    elementOrSelector,
+                    instanceRoot,
                     'delete'
                 );
 
@@ -222,6 +222,29 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                 }
 
                 instance.dispose();
+            };
+
+        static updateInstance: Ornata.ComponentConstructor<T>['updateInstance'] =
+            (instanceRoot, stateChanges) => {
+                const root = getRootElement<T['root']>(
+                    displayName,
+                    instanceRoot,
+                    'update'
+                );
+
+                const instance = externalInstances.get(root);
+
+                if (!instance) {
+                    throw reporter.fail('ERR04', {
+                        componentName: displayName,
+                        action: 'update',
+                        root: describeElement(root),
+                    });
+                }
+
+                Object.entries(stateChanges).forEach(([property, value]) => {
+                    instance.$state[property as keyof T['state']] = value;
+                });
             };
     };
 }
