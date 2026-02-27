@@ -44,17 +44,28 @@ function parseDatasetValue(
  * @returns The state object.
  * @private
  */
-export default function getStateFromElement<T extends Ornata.ComponentState>(
-    stateOptions: Ornata.ComponentStateOptions<T>,
+export default function getStateFromElement<
+    T extends Ornata.ComponentInternalInstance,
+>(
+    stateOptions: Ornata.ComponentOption<T, 'state'>,
     componentName: string,
     element: HTMLElement
-): Partial<T> {
-    const state = {} as T;
+): Partial<T['state']> {
+    const state = {} as T['state'];
 
     Object.entries(element.dataset).forEach(([property, value]) => {
-        const option = stateOptions[property as keyof T];
+        const option = stateOptions[property as keyof T['state']];
         let expectedType: unknown;
         let parsedValue: unknown;
+
+        if (!option) {
+            reporter.error('ERR07', {
+                componentName,
+                property,
+            });
+
+            return;
+        }
 
         if (!value) {
             reporter.error('ERR08', {
@@ -66,11 +77,11 @@ export default function getStateFromElement<T extends Ornata.ComponentState>(
             return;
         }
 
-        if (option?.parse) {
+        if (option.parse) {
             parsedValue = option.parse(value);
-        } else if (option?.defaultValue) {
-            expectedType = option.defaultValue.constructor;
-        } else if (option?.type) {
+        } else if (option.default !== undefined) {
+            expectedType = (option.default as object).constructor;
+        } else if (option.type) {
             expectedType = option.type;
         }
 
@@ -83,7 +94,8 @@ export default function getStateFromElement<T extends Ornata.ComponentState>(
             );
         }
 
-        state[property as keyof T] = parsedValue as T[keyof T];
+        state[property as keyof T['state']] =
+            parsedValue as T['state'][keyof T['state']];
     });
 
     return state;

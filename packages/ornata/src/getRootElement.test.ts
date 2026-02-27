@@ -14,7 +14,9 @@ describe('getRootElement', () => {
 
     it('should get root element by selector', () => {
         const element = document.createElement('div');
+        document.body.appendChild(element);
         const root = getRootElement('Test', 'div', 'create');
+        document.body.removeChild(element);
 
         expect(root).toStrictEqual(element);
     });

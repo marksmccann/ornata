@@ -69,21 +69,20 @@ export default function resolveElementsOptions<
     T extends Ornata.ComponentInternalInstance,
 >(
     componentName: string,
-    root: T['$root'],
+    root: T['root'],
     elementsOptions: Ornata.ComponentOption<T, 'elements'>
-): T['$elements'] {
-    const elements = {} as T['$elements'];
+): T['elements'] {
+    const elements = {} as T['elements'];
 
     Object.entries(elementsOptions).forEach(([property, option]) => {
         const { queryAll, query, create, resolve, min, max } =
-            option as Ornata.ComponentElementOptions<T, keyof T['$elements']>;
+            option as Ornata.ComponentElementOptions<T, keyof T['elements']>;
         const provided = [
             queryAll ? 'queryAll' : null,
             query ? 'query' : null,
             create ? 'create' : null,
             resolve ? 'resolve' : null,
         ].filter(Boolean);
-        console.log(provided);
         let resolved: Ornata.ComponentElement | undefined = undefined;
         let minValid = false;
         let maxValid = false;
@@ -148,8 +147,8 @@ export default function resolveElementsOptions<
         }
 
         if (minValid && maxValid) {
-            elements[property as keyof T['$elements']] =
-                resolved as T['$elements'][keyof T['$elements']];
+            elements[property as keyof T['elements']] =
+                resolved as T['elements'][keyof T['elements']];
         }
     });
 

@@ -71,6 +71,16 @@ type Messages =
           code: 'ERR14';
           template: '{{ componentName }}: Found too many element resolution methods. The property "{{ property }}" was provided "{{ provided }}" but, only "{{ used }}" was used.';
           tokens: 'componentName' | 'property' | 'provided' | 'used';
+      }
+    | {
+          code: 'ERR15';
+          template: '{{ componentName }}: Cannot access private state property. The property "{{ property }}" is private and cannot be accessed externally.';
+          tokens: 'componentName' | 'property';
+      }
+    | {
+          code: 'ERR16';
+          template: '{{ componentName }}: Cannot set {{ type }} state property. The property "{{ property }}" is {{ type }} and cannot be set externally.';
+          tokens: 'componentName' | 'type' | 'property';
       };
 
 const messages: RuntimeReporterMessages<Messages> = {
@@ -88,6 +98,8 @@ const messages: RuntimeReporterMessages<Messages> = {
     ERR12: '{{ componentName }}: Missing minimum number of elements. The property "{{ property }}" must have at least {{ min }} elements.',
     ERR13: '{{ componentName }}: Exceeded maximum number of elements. The property "{{ property }}" must have at most {{ max }} elements.',
     ERR14: '{{ componentName }}: Found too many element resolution methods. The property "{{ property }}" was provided "{{ provided }}" but, only "{{ used }}" was used.',
+    ERR15: '{{ componentName }}: Cannot access private state property. The property "{{ property }}" is private and cannot be accessed externally.',
+    ERR16: '{{ componentName }}: Cannot set {{ type }} state property. The property "{{ property }}" is {{ type }} and cannot be set externally.',
 };
 
 /**

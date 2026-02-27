@@ -12,7 +12,7 @@ export default function resolveRootOptions<
     T extends Ornata.ComponentInternalInstance,
 >(
     componentName: string,
-    root: T['$root'],
+    root: T['root'],
     rootOptions: Ornata.ComponentRootOptions<T>
 ): void {
     const { matches } = rootOptions;

@@ -12,7 +12,7 @@ export default function validateState<
     T extends Ornata.ComponentInternalInstance,
 >(
     componentName: string,
-    state: T['$state'],
+    state: T['state'],
     stateOptions: Ornata.ComponentOption<T, 'state'>
 ): void {
     Object.keys(state).forEach((property) => {
@@ -27,9 +27,9 @@ export default function validateState<
     Object.entries(stateOptions).forEach(([property, option]) => {
         const { type } = option as Ornata.ComponentStateOptions<
             T,
-            keyof T['$state']
+            keyof T['state']
         >;
-        const value = state[property as keyof T['$state']];
+        const value = state[property as keyof T['state']];
         let invalid = false;
         let expectedType;
 

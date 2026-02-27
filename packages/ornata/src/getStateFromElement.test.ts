@@ -5,14 +5,16 @@ import getStateFromElement from './getStateFromElement.js';
 import reporter from './reporter.js';
 
 describe('getStateFromElement', () => {
-    it('should get state from element with defaultValue', () => {
+    it('should get state from element with default', () => {
         const element = document.createElement('div');
         element.dataset.name = 'test';
-        const state = getStateFromElement(
-            { name: { defaultValue: 'test' } },
-            'Test',
-            element
-        );
+        const state = getStateFromElement<{
+            root: Element;
+            state: { name: string };
+            elements: {};
+            methods: {};
+            data: {};
+        }>({ name: { default: 'fallback' } }, 'Test', element);
 
         expect(state).toStrictEqual({ name: 'test' });
     });

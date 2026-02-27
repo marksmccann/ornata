@@ -7,7 +7,7 @@ import reporter from './reporter.js';
 describe('resolveStateOptions', () => {
     it('should resolve state options when property is in state options', () => {
         const state = { name: 'test' };
-        const stateOptions = { name: { defaultValue: 'test' } };
+        const stateOptions = { name: { default: 'test' } };
         const root = document.createElement('div');
         const resolvedState = resolveStateOptions(
             'Test',
@@ -19,15 +19,15 @@ describe('resolveStateOptions', () => {
         expect(resolvedState).toStrictEqual({ name: 'test' });
     });
 
-    it('should log error when property is not in state options', () => {
+    it('should log error when a dataset property is not in state options', () => {
         const consoleError = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
-        const state = { name: 'test' };
         const stateOptions = {};
         const root = document.createElement('div');
+        root.dataset.name = 'test';
 
-        resolveStateOptions('Test', root, state, stateOptions);
+        resolveStateOptions('Test', root, {}, stateOptions);
 
         expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR07', {
@@ -35,5 +35,7 @@ describe('resolveStateOptions', () => {
                 property: 'name',
             })
         );
+
+        consoleError.mockRestore();
     });
 });

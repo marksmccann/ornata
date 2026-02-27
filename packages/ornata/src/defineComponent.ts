@@ -6,6 +6,7 @@ import resolveRootOptions from './resolveRootOptions';
 import resolveStateOptions from './resolveStateOptions';
 import validateState from './validateState';
 import resolveElementsOptions from './resolveElementsOptions';
+import resolveMethodsOptions from './resolveMethodsOptions';
 
 function defineComponent<T extends Ornata.ComponentInternalInstance>(
     options: Ornata.ComponentOptions<T>
@@ -19,6 +20,8 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
             T,
             'lifecycle'
         >,
+        methods: methodsOptions = {} as Ornata.ComponentOption<T, 'methods'>,
+        data: dataOptions = {} as Ornata.ComponentOption<T, 'data'>,
         // watch: watchOptions = {} as Ornata.ComponentOption<T, 'watch'>,
     } = options;
     const externalInstances = new WeakMap<
@@ -40,11 +43,10 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         static readonly displayName: Ornata.ComponentConstructor<T>['displayName'] =
             displayName;
 
-        constructor(root: Element, initialState?: Partial<T['$state']>) {
-            this.$$typeof = Symbol.for('ornata.component');
-            this.$root = root;
-
+        constructor(root: Element, initialState?: Partial<T['state']>) {
             resolveRootOptions(displayName, root, rootOptions);
+
+            const internalInstance = {} as T;
 
             const state = resolveStateOptions(
                 displayName,
@@ -59,14 +61,72 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                 elementsOptions
             );
 
-            internalInstances.set(this, {
-                $root: root,
-                $state: state,
-                $elements: elements,
-                $methods: {},
+            const methods = resolveMethodsOptions(
+                internalInstance,
+                methodsOptions
+            );
+
+            const internalState = new Proxy(state, {
+                get(target, property) {
+                    return target[property];
+                },
+                set(target, property, value) {
+                    // Run render methods
+                    // Run watchers
+                    // Run state listeners
+                    target[property] = value;
+
+                    return true;
+                },
             });
 
-            lifecycleOptions.setup?.call(this);
+            const externalState = new Proxy(state, {
+                get(target, property) {
+                    const options = stateOptions[property as keyof T['state']];
+
+                    if (options?.private) {
+                        reporter.error('ERR15', {
+                            componentName: displayName,
+                            property: property as string,
+                        });
+
+                        return undefined;
+                    }
+
+                    return internalState[property];
+                },
+                set(target, property, value) {
+                    const options = stateOptions[property as keyof T['state']];
+
+                    if (options?.private || options?.readonly) {
+                        reporter.error('ERR16', {
+                            componentName: displayName,
+                            type: options.private ? 'private' : 'readonly',
+                            property: property as string,
+                        });
+
+                        return false;
+                    }
+
+                    internalState[property] = value;
+
+                    return true;
+                },
+            });
+
+            internalInstance.root = root;
+            internalInstance.state = internalState;
+            internalInstance.elements = elements;
+            internalInstance.methods = methods;
+            internalInstance.data = dataOptions;
+
+            this.$$typeof = Symbol.for('ornata.component');
+            this.$root = root;
+            this.$state = externalState;
+
+            internalInstances.set(this, internalInstance);
+
+            lifecycleOptions.setup?.call(internalInstance);
 
             if (stateOptions) {
                 validateState(displayName, this.$state, stateOptions);
@@ -76,7 +136,8 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         }
 
         dispose: Ornata.ComponentInstance<T>['dispose'] = () => {
-            lifecycleOptions.teardown?.call(this);
+            const internalInstance = internalInstances.get(this);
+            lifecycleOptions.teardown?.call(internalInstance);
             externalInstances.delete(this.$root);
         };
 
@@ -94,7 +155,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
         static createInstance: Ornata.ComponentConstructor<T>['createInstance'] =
             (elementOrSelector, initialState) => {
-                const root = getRootElement<T['$root']>(
+                const root = getRootElement<T['root']>(
                     displayName,
                     elementOrSelector,
                     'create'
@@ -114,7 +175,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         static getInstance: Ornata.ComponentConstructor<T>['getInstance'] = (
             elementOrSelector
         ) => {
-            const root = getRootElement<T['$root']>(
+            const root = getRootElement<T['root']>(
                 displayName,
                 elementOrSelector,
                 'get'
@@ -144,7 +205,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
         static deleteInstance: Ornata.ComponentConstructor<T>['deleteInstance'] =
             (elementOrSelector) => {
-                const root = getRootElement<T['$root']>(
+                const root = getRootElement<T['root']>(
                     displayName,
                     elementOrSelector,
                     'delete'

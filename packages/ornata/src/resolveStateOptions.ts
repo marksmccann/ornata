@@ -8,20 +8,21 @@ export default function resolveStateOptions<
 >(
     componentName: string,
     root: Element,
-    initialState: Partial<T['$state']>,
+    initialState: Partial<T['state']>,
     stateOptions: Ornata.ComponentOption<T, 'state'>
 ): T {
     let state = {} as T;
-    let stateFromHTML: Partial<T> = {};
+    let stateFromHTML: Partial<T['state']> = {};
 
     if (root instanceof HTMLElement) {
         stateFromHTML = getStateFromElement(stateOptions, componentName, root);
     }
 
     Object.values(stateOptions).forEach((option) => {
-        const { defaultValue, type, parse } = option;
+        const { type, parse } = option;
+        const defaultValue = option.default;
 
-        if (!defaultValue && !type && !parse) {
+        if (defaultValue === undefined && !type && !parse) {
             reporter.error('ERR06', {
                 componentName,
                 property: 'state',
