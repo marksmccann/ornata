@@ -1,35 +1,58 @@
 import type Ornata from './index';
+import renderElement from './renderElement';
+import type { RenderElementData } from './renderElement';
 
 export default function renderComponent<
     T extends Ornata.ComponentInternalInstance,
 >(
+    this: T,
     componentName: string,
     elements: T['elements'],
     renderOptions: Ornata.ComponentOption<T, 'render'>
-): void {
-    Object.entries(renderOptions).forEach(([property, value]) => {
+): () => void {
+    let elementCleanup: Array<ReturnType<typeof renderElement>> = [];
+
+    Object.entries(renderOptions).forEach(([elementName, value]) => {
         const renderCallback = value as Ornata.ComponentRenderCallback<
             T,
             keyof T['elements']
         >;
-        const elementsToRender: Array<
-            [element: Element, Ornata.ComponentRenderOptions]
-        > = [];
+        const elementsDataToRender: Array<RenderElementData> = [];
 
         if (Array.isArray(elements)) {
             elements.forEach((element, index) => {
                 const result = renderCallback.call(this, index);
-                elementsToRender.push([element, result]);
+                let name = `"${elementName}"`;
+
+                if (typeof index === 'number') {
+                    name = `"${elementName}" at index ${index}`;
+                }
+
+                elementsDataToRender.push({
+                    componentName,
+                    element,
+                    elementName: name,
+                    options: result,
+                });
             });
         } else if (elements instanceof Element) {
             const result = value.call(this);
-            elementsToRender.push([elements, result]);
+
+            elementsDataToRender.push({
+                componentName,
+                element: elements,
+                elementName: `"${elementName}"`,
+                options: result,
+            });
         }
 
-        elementsToRender.forEach(([element, options]) => {
-            Object.entries(options).forEach(([property, value]) => {
-                // Render the element with the options
-            });
+        elementsDataToRender.forEach((data) => {
+            const cleanup = renderElement.call(this, data);
+            elementCleanup.push(cleanup);
         });
     });
+
+    return () => {
+        elementCleanup.forEach((cleanup) => cleanup());
+    };
 }

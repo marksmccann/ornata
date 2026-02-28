@@ -197,10 +197,13 @@ namespace Ornata {
      */
     export interface ComponentRenderOptions {
         /**
-         * The style properties to set on the element.
+         * The style properties to set on the element. The type of value determines the DOM action to perform:
+         * - **string**: Sets value directly (e.g., `style.setProperty(property, value)`)
+         * - **null**: Removes the property (e.g., `style.removeProperty(property)`)
+         * - **undefined**: Ignores the change (no-op)
          * @since v0.1.0
          */
-        style?: Record<string, string>;
+        style?: Record<string, string | null | undefined>;
 
         /**
          * The classes to apply to the element. Set to `true` to add the class, `false` to remove it
@@ -211,23 +214,22 @@ namespace Ornata {
         /**
          * The attributes to set on the element. The type of value determines the DOM action to perform:
          * - **string**: Sets value directly (e.g., `setAttribute(name, value)`)
-         * - **number**: Converts and sets value (e.g., `setAttribute(name, String(value))`)
          * - **true**: Adds a boolean attribute (e.g., `setAttribute(name, '')`)
          * - **false**: Removes a boolean attribute (e.g., `removeAttribute(name)`)
          * - **null**: Removes the attribute (e.g., `removeAttribute(name)`)
          * - **undefined**: Ignores the change (no-op)
          * @since v0.1.0
          */
-        attributes?: Record<
-            string,
-            string | number | boolean | null | undefined
-        >;
+        attributes?: Record<string, string | boolean | null | undefined>;
 
         /**
-         * The dataset properties to set on the element.
+         * The dataset properties to set on the element. The type of value determines the DOM action to perform:
+         * - **string**: Sets value directly (e.g., `dataset.setProperty(property, value)`)
+         * - **null**: Removes the property (e.g., `dataset.removeProperty(property)`)
+         * - **undefined**: Ignores the change (no-op)
          * @since v0.1.0
          */
-        dataset?: Record<string, string>;
+        dataset?: Record<string, string | null | undefined>;
 
         /**
          * The events to attach to the element.

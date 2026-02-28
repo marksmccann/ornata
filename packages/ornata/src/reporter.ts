@@ -19,7 +19,7 @@ type Messages =
       }
     | {
           code: 'ERR04';
-          template: '{{ componentName }}: Failed to {{ action }} instance. Instance does not exists for root element: "{{ root }}"';
+          template: '{{ componentName }}: Failed to {{ action }} instance. Instance does not exist for root element: "{{ root }}"';
           tokens: 'componentName' | 'action' | 'root';
       }
     | {
@@ -81,13 +81,43 @@ type Messages =
           code: 'ERR16';
           template: '{{ componentName }}: Cannot set {{ type }} state property. The property "{{ property }}" is {{ type }} and cannot be set externally.';
           tokens: 'componentName' | 'type' | 'property';
+      }
+    | {
+          code: 'ERR17';
+          template: '{{ componentName }}: Found a duplicate element reference. The DOM element "{{ element }}" referenced by {{ property }} was also referenced by {{ reference }}. Multiple references to the same DOM element will lead to unexpected behaviors when the component is rendered.';
+          tokens: 'componentName' | 'element' | 'property' | 'reference';
+      }
+    | {
+          code: 'ERR18';
+          template: '{{ componentName }}: Failed to set "{{ property }}" on element {{ element }}. The {{ property }} property can only set on elements of type: {{ supportedTypes }}.';
+          tokens: 'componentName' | 'property' | 'element' | 'supportedTypes';
+      }
+    | {
+          code: 'ERR19';
+          template: '{{ componentName }}: Failed to set property "{{ property }}" on element {{ element }}. The value is of type "{{ type }}" but must be one of: {{ supportedTypes }}.';
+          tokens:
+              | 'componentName'
+              | 'property'
+              | 'element'
+              | 'type'
+              | 'supportedTypes';
+      }
+    | {
+          code: 'ERR20';
+          template: '{{ componentName }}: Failed to apply unknown render option "{{ option }}" on element {{ element }}. Expect one of: "attributes", "style", "classes", "dataset", "events", "html", "text".';
+          tokens: 'componentName' | 'option' | 'element';
+      }
+    | {
+          code: 'ERR21';
+          template: '{{ componentName }}: Failed to {{ action }} because component instance does not exist. It was likely disposed or never created.';
+          tokens: 'componentName' | 'action';
       };
 
 const messages: RuntimeReporterMessages<Messages> = {
     ERR01: '{{ componentName }}: Failed to {{ action }} instance. Could not find root element with selector: "{{ selector }}"',
     ERR02: '{{ componentName }}: Failed to {{ action }} instance. Invalid root element of type "{{ element }}" provided.',
     ERR03: '{{ componentName }}: Failed to {{ action }} instance. Instance already exists for root element: "{{ root }}"',
-    ERR04: '{{ componentName }}: Failed to {{ action }} instance. Instance does not exists for root element: "{{ root }}"',
+    ERR04: '{{ componentName }}: Failed to {{ action }} instance. Instance does not exist for root element: "{{ root }}"',
     ERR05: '{{ componentName }}: Invalid root element. The root element does not match the selector: "{{ selector }}".',
     ERR06: '{{ componentName }}: State option missing required property. The state option for "{{ property }}" must have at least one of the following: "defaultValue", "type", or "parse".',
     ERR07: '{{ componentName }}: Unknown state property. The property "{{ property }}" was provided, but it does not have a state option.',
@@ -100,6 +130,11 @@ const messages: RuntimeReporterMessages<Messages> = {
     ERR14: '{{ componentName }}: Found too many element resolution methods. The property "{{ property }}" was provided "{{ provided }}" but, only "{{ used }}" was used.',
     ERR15: '{{ componentName }}: Cannot access private state property. The property "{{ property }}" is private and cannot be accessed externally.',
     ERR16: '{{ componentName }}: Cannot set {{ type }} state property. The property "{{ property }}" is {{ type }} and cannot be set externally.',
+    ERR17: '{{ componentName }}: Found a duplicate element reference. The DOM element "{{ element }}" referenced by {{ property }} was also referenced by {{ reference }}. Multiple references to the same DOM element will lead to unexpected behaviors when the component is rendered.',
+    ERR18: '{{ componentName }}: Failed to set "{{ property }}" on element {{ element }}. The {{ property }} property can only set on elements of type: {{ supportedTypes }}.',
+    ERR19: '{{ componentName }}: Failed to set property "{{ property }}" on element {{ element }}. The value is of type "{{ type }}" but must be one of: {{ supportedTypes }}.',
+    ERR20: '{{ componentName }}: Failed to apply unknown render option "{{ option }}" on element {{ element }}. Expect one of: "attributes", "style", "classes", "dataset", "events", "html", "text".',
+    ERR21: '{{ componentName }}: Failed to {{ action }} because component instance does not exist. It was likely disposed or never created.',
 };
 
 /**

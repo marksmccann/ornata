@@ -2,19 +2,19 @@
 
 import type Ornata from './index.js';
 import { describe, it, expect, vi } from 'vitest';
-import resolveMethodsOptions from './resolveMethodsOptions.js';
+import resolveMethodOptions from './resolveMethodOptions.js';
 
-describe('resolveMethodsOptions', () => {
+describe('resolveMethodOptions', () => {
     it('should return an empty object when no methods are provided', () => {
         const internalInstance = {} as Ornata.ComponentInternalInstance;
-        const methods = resolveMethodsOptions(internalInstance, {});
+        const methods = resolveMethodOptions.call(internalInstance, {});
 
         expect(methods).toStrictEqual({});
     });
 
     it('should return a method for each entry in methodsOptions', () => {
         const internalInstance = {} as Ornata.ComponentInternalInstance;
-        const methods = resolveMethodsOptions(internalInstance, {
+        const methods = resolveMethodOptions.call(internalInstance, {
             greet: vi.fn(),
         });
 
@@ -30,7 +30,7 @@ describe('resolveMethodsOptions', () => {
             methods: {},
             data: {},
         } as Ornata.ComponentInternalInstance;
-        const methods = resolveMethodsOptions(internalInstance, {
+        const methods = resolveMethodOptions.call(internalInstance, {
             capture() {
                 capturedThis = this;
             },
@@ -44,7 +44,7 @@ describe('resolveMethodsOptions', () => {
     it('should forward arguments to the method', () => {
         const spy = vi.fn();
         const internalInstance = {} as Ornata.ComponentInternalInstance;
-        const methods = resolveMethodsOptions(internalInstance, { spy });
+        const methods = resolveMethodOptions.call(internalInstance, { spy });
 
         methods.spy('a', 1, true);
 
@@ -53,7 +53,7 @@ describe('resolveMethodsOptions', () => {
 
     it('should return the value from the method', () => {
         const internalInstance = {} as Ornata.ComponentInternalInstance;
-        const methods = resolveMethodsOptions(internalInstance, {
+        const methods = resolveMethodOptions.call(internalInstance, {
             getValue: () => 42,
         });
 
@@ -70,7 +70,7 @@ describe('resolveMethodsOptions', () => {
             data: {},
         } as Ornata.ComponentInternalInstance;
         let capturedRoot: unknown;
-        const methods = resolveMethodsOptions(internalInstance, {
+        const methods = resolveMethodOptions.call(internalInstance, {
             getRoot() {
                 capturedRoot = this.root;
             },

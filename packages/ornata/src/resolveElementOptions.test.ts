@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { describe, it, expect, vi } from 'vitest';
-import resolveElementsOptions from './resolveElementsOptions.js';
+import resolveElementsOptions from './resolveElementOptions.js';
 import reporter from './reporter.js';
 
 describe('resolveElementsOptions', () => {

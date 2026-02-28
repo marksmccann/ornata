@@ -1,5 +1,6 @@
 import type Ornata from './index.js';
 import reporter from './reporter.js';
+import describeElement from './describeElement.js';
 
 /**
  * Validates that the minimum number of elements is met.
@@ -63,6 +64,53 @@ function validateMaxElements(
     }
 
     return valid;
+}
+
+/**
+ * Validates that the elements are not referenced more than once in `elements`
+ * @param componentName The name of the component.
+ * @param elements The resolved elements.
+ * @private
+ */
+function validateDuplicateElements<T extends Ornata.ComponentInternalInstance>(
+    componentName: string,
+    elements: T['elements']
+): void {
+    const references = new WeakMap<Element, string>();
+
+    Object.entries(elements).forEach(([property, value]) => {
+        if (Array.isArray(value)) {
+            value.forEach((element, index) => {
+                const reference = references.get(element);
+                const text = `"${property}" at index ${index}`;
+
+                if (references.has(element)) {
+                    reporter.error('ERR17', {
+                        componentName,
+                        element: describeElement(element),
+                        property: text,
+                        reference,
+                    });
+                }
+
+                references.set(element, text);
+            });
+        } else if (value instanceof Element) {
+            const reference = references.get(value);
+            const text = `"${property}"`;
+
+            if (references.has(value)) {
+                reporter.error('ERR17', {
+                    componentName,
+                    element: describeElement(value),
+                    property: text,
+                    reference,
+                });
+            }
+
+            references.set(value, text);
+        }
+    });
 }
 
 export default function resolveElementsOptions<
@@ -151,6 +199,8 @@ export default function resolveElementsOptions<
                 resolved as T['elements'][keyof T['elements']];
         }
     });
+
+    validateDuplicateElements(componentName, elements);
 
     return elements;
 }

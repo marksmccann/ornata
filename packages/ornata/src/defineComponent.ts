@@ -5,8 +5,8 @@ import getRootElement from './getRootElement';
 import resolveRootOptions from './resolveRootOptions';
 import resolveStateOptions from './resolveStateOptions';
 import validateState from './validateState';
-import resolveElementsOptions from './resolveElementsOptions';
-import resolveMethodsOptions from './resolveMethodsOptions';
+import resolveElementOptions from './resolveElementOptions';
+import resolveMethodOptions from './resolveMethodOptions';
 import renderComponent from './renderComponent';
 
 function defineComponent<T extends Ornata.ComponentInternalInstance>(
@@ -14,12 +14,12 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 ): Ornata.ComponentConstructor<T> {
     const {
         name: displayName = 'UnnamedComponent',
-        root: rootOptions = {},
+        root: rootOptions = {} as Ornata.ComponentOption<T, 'root'>,
         state: stateOptions = {} as Ornata.ComponentOption<T, 'state'>,
-        elements: elementsOptions = {} as Ornata.ComponentOption<T, 'elements'>,
+        elements: elementOptions = {} as Ornata.ComponentOption<T, 'elements'>,
         // prettier-ignore
         lifecycle: lifecycleOptions = {} as Ornata.ComponentOption<T, 'lifecycle'>,
-        methods: methodsOptions = {} as Ornata.ComponentOption<T, 'methods'>,
+        methods: methodOptions = {} as Ornata.ComponentOption<T, 'methods'>,
         data: dataOptions = {} as Ornata.ComponentOption<T, 'data'>,
         render: renderOptions = {} as Ornata.ComponentOption<T, 'render'>,
         // watch: watchOptions = {} as Ornata.ComponentOption<T, 'watch'>,
@@ -31,6 +31,10 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
     const internalInstances = new WeakMap<
         Ornata.ComponentInstance<T>,
         Ornata.ComponentInternalInstance
+    >();
+    const updateCleanup = new WeakMap<
+        Ornata.ComponentInternalInstance,
+        () => void
     >();
 
     return class Component implements Ornata.ComponentInstance<T> {
@@ -55,15 +59,15 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                 stateOptions
             );
 
-            const elements = resolveElementsOptions(
+            const elements = resolveElementOptions(
                 displayName,
                 root,
-                elementsOptions
+                elementOptions
             );
 
-            const methods = resolveMethodsOptions(
+            const methods = resolveMethodOptions.call(
                 internalInstance,
-                methodsOptions
+                methodOptions
             );
 
             const internalState = new Proxy(state, {
@@ -71,10 +75,31 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                     return target[property];
                 },
                 set(target, property, value) {
+                    const cleanupUpdate = updateCleanup.get(internalInstance);
+                    const key = property as keyof Ornata.ComponentState;
+                    const previousValue = internalInstance.state[key];
+                    const currentValue = target[property];
+
+                    // Ignore the update if the value hasn't changed
+                    if (currentValue === previousValue) {
+                        return true;
+                    }
+
                     target[property] = value;
 
-                    renderComponent(displayName, elements, renderOptions);
+                    // Cleanup the previous update
+                    if (cleanupUpdate) cleanupUpdate();
+
+                    const renderCleanup = renderComponent.call(
+                        internalInstance,
+                        displayName,
+                        elements,
+                        renderOptions
+                    );
+
                     // Run state watchers
+
+                    updateCleanup.set(internalInstance, renderCleanup);
 
                     return true;
                 },
@@ -137,8 +162,22 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
         dispose: Ornata.ComponentInstance<T>['dispose'] = () => {
             const internalInstance = internalInstances.get(this);
+
+            if (!internalInstance) {
+                reporter.error('ERR21', {
+                    componentName: displayName,
+                    action: 'dispose',
+                });
+
+                return;
+            }
+
+            const cleanupUpdate = updateCleanup.get(internalInstance);
+
+            if (cleanupUpdate) cleanupUpdate();
             lifecycleOptions.teardown?.call(internalInstance);
             externalInstances.delete(this.$root);
+            internalInstances.delete(this);
         };
 
         addStateListener: Ornata.ComponentInstance<T>['addStateListener'] = (
