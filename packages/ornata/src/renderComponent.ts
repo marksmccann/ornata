@@ -2,6 +2,15 @@ import type Ornata from './index';
 import renderElement from './renderElement';
 import type { RenderElementData } from './renderElement';
 
+/**
+ * Renders the component by rendering its elements.
+ * @param this The component instance.
+ * @param componentName The display name of the component.
+ * @param elements The elements to render.
+ * @param renderOptions The render options for the elements.
+ * @returns A function to clean up the element cleanup.
+ * @private
+ */
 export default function renderComponent<
     T extends Ornata.ComponentInternalInstance,
 >(
@@ -17,6 +26,7 @@ export default function renderComponent<
             T,
             keyof T['elements']
         >;
+
         const elementsDataToRender: Array<RenderElementData> = [];
 
         if (Array.isArray(elements)) {

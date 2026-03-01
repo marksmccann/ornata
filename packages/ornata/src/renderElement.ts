@@ -4,7 +4,7 @@ import renderAttributes from './renderAttributes';
 import renderStyle from './renderStyle';
 import renderClasses from './renderClasses';
 import renderDataset from './renderDataset';
-import renderEvents from './renderEvents';
+import attachEvents from './attachEvents';
 
 /**
  * The data required to render an element.
@@ -28,7 +28,7 @@ export default function renderElement<
     T extends Ornata.ComponentInternalInstance,
 >(this: T, data: RenderElementData): () => void {
     const { componentName, element, elementName, options } = data;
-    let eventsCleanup: ReturnType<typeof renderEvents> | undefined;
+    let eventsCleanup: ReturnType<typeof attachEvents> | undefined;
 
     Object.entries(options).forEach((entry) => {
         const option = entry[0] as keyof Ornata.ComponentRenderOptions;
@@ -54,7 +54,7 @@ export default function renderElement<
                 data
             );
         } else if (option === 'events') {
-            eventsCleanup = renderEvents.call(
+            eventsCleanup = attachEvents.call(
                 this,
                 entry[1] as Ornata.ComponentRenderOptions['events'],
                 data

@@ -111,6 +111,11 @@ type Messages =
           code: 'ERR21';
           template: '{{ componentName }}: Failed to {{ action }} because component instance does not exist. It was likely disposed or never created.';
           tokens: 'componentName' | 'action';
+      }
+    | {
+          code: 'ERR22';
+          template: '{{ componentName }}: Failed to {{ action }} state property "{{ property }}". The property is not a valid state property defined in the component options.';
+          tokens: 'componentName' | 'action' | 'property';
       };
 
 const messages: RuntimeReporterMessages<Messages> = {
@@ -135,6 +140,7 @@ const messages: RuntimeReporterMessages<Messages> = {
     ERR19: '{{ componentName }}: Failed to set property "{{ property }}" on element {{ element }}. The value is of type "{{ type }}" but must be one of: {{ supportedTypes }}.',
     ERR20: '{{ componentName }}: Failed to apply unknown render option "{{ option }}" on element {{ element }}. Expect one of: "attributes", "style", "classes", "dataset", "events", "html", "text".',
     ERR21: '{{ componentName }}: Failed to {{ action }} because component instance does not exist. It was likely disposed or never created.',
+    ERR22: '{{ componentName }}: Failed to {{ action }} state property "{{ property }}". The property is not a valid state property defined in the component options.',
 };
 
 /**

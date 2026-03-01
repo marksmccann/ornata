@@ -12,7 +12,15 @@ const eventListeners: WeakMap<
     Map<Element, Map<string, () => void>>
 > = new WeakMap();
 
-export default function renderEvents<
+/**
+ * Attaches event listeners to the element.
+ * @param this The component instance.
+ * @param events The events to attach to the element.
+ * @param data The data required to render the element.
+ * @returns A function to remove the event listeners.
+ * @private
+ */
+export default function attachEvents<
     T extends Ornata.ComponentInternalInstance,
 >(
     this: T,

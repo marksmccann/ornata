@@ -46,6 +46,12 @@ namespace Ornata {
     export type ComponentData = Record<string, any>;
 
     /**
+     * The computed data of the component.
+     * @since v0.1.0
+     */
+    export type ComponentComputed = Record<string, any>;
+
+    /**
      * The internal instance of the component.
      * @since v0.1.0
      */
@@ -55,6 +61,7 @@ namespace Ornata {
         elements: ComponentElements;
         methods: ComponentMethods;
         data: ComponentData;
+        computed: ComponentComputed;
     }
 
     /**
@@ -176,9 +183,6 @@ namespace Ornata {
 
     /**
      * The callback function for the watch property for the `defineComponent` function.
-     * @parameter newValue The new value of the state property.
-     * @parameter oldValue The previous value of the state property.
-     * @parameter initial Whether the callback is being called for the first time (during initialization).
      * @since v0.1.0
      */
     export type ComponentWatchCallback<
@@ -186,9 +190,24 @@ namespace Ornata {
         K extends keyof T['state'],
     > = (
         this: T,
-        newValue: T['state'][K],
         oldValue: T['state'][K],
-        initial: boolean
+        newValue: T['state'][K],
+        data: { initial: boolean }
+    ) => void;
+
+    /**
+     * The callback function for the computed property for the `defineComponent` function.
+     * @since v0.1.0
+     */
+    export type ComponentComputedCallback<
+        T extends ComponentInternalInstance,
+        K extends keyof T['computed'],
+    > = (
+        this: T,
+        oldValue: T['computed'][K],
+        oldState: T['state'],
+        newState: T['state'],
+        data: { initial: boolean }
     ) => void;
 
     /**
@@ -256,8 +275,6 @@ namespace Ornata {
 
     /**
      * The callback function for the render method for the `defineComponent` function.
-     * @parameter index The index of the element in the array of elements (only available for element arrays)
-     * @returns The options for the render method.
      * @since v0.1.0
      */
     export type ComponentRenderCallback<
@@ -338,6 +355,14 @@ namespace Ornata {
         };
 
         /**
+         * Define internal and custom computed properties for the component.
+         * @since v0.1.0
+         */
+        computed?: {
+            [K in keyof T['computed']]: ComponentComputedCallback<T, K>;
+        };
+
+        /**
          * Define internal and custom data for the component.
          * @since v0.1.0
          */
@@ -358,8 +383,6 @@ namespace Ornata {
 
     /**
      * The callback function for the state listener for the `defineComponent` function.
-     * @parameter value The new value of the state property.
-     * @parameter previousValue The previous value of the state property.
      * @since v0.1.0
      */
     export type ComponentStateListener<T> = (

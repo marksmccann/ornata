@@ -8,6 +8,7 @@ import validateState from './validateState';
 import resolveElementOptions from './resolveElementOptions';
 import resolveMethodOptions from './resolveMethodOptions';
 import renderComponent from './renderComponent';
+import getWatchCallback from './getWatchCallback';
 
 function defineComponent<T extends Ornata.ComponentInternalInstance>(
     options: Ornata.ComponentOptions<T>
@@ -22,7 +23,8 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         methods: methodOptions = {} as Ornata.ComponentOption<T, 'methods'>,
         data: dataOptions = {} as Ornata.ComponentOption<T, 'data'>,
         render: renderOptions = {} as Ornata.ComponentOption<T, 'render'>,
-        // watch: watchOptions = {} as Ornata.ComponentOption<T, 'watch'>,
+        watch: watchOptions = {} as Ornata.ComponentOption<T, 'watch'>,
+        // computed: computedOptions = {} as Ornata.ComponentOption<T, 'computed'>,
     } = options;
     const externalInstances = new WeakMap<
         Element,
@@ -36,6 +38,55 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         Ornata.ComponentInternalInstance,
         () => void
     >();
+    const initializing = new WeakMap<
+        Ornata.ComponentInternalInstance,
+        boolean
+    >();
+
+    /**
+     * Imperatively performs all actions associated with updating a component related to a specific property.
+     * @param this The component instance.
+     * @param property The property that was updated.
+     * @param oldValue The previous value of the property.
+     * @param newValue The new value of the property.
+     * @private
+     */
+    function updateComponent(
+        this: T,
+        property: keyof T['state'],
+        oldValue: T['state'][keyof T['state']],
+        newValue: T['state'][keyof T['state']]
+    ) {
+        const cleanupUpdate = updateCleanup.get(this);
+
+        // Cleanup the previous update before starting a new one
+        if (cleanupUpdate) cleanupUpdate();
+
+        // Re-render the component
+        const renderCleanup = renderComponent.call(
+            this,
+            displayName,
+            this.elements,
+            renderOptions
+        );
+
+        // Get the watcher callback for the property
+        const watcherCallback = getWatchCallback.call(
+            this,
+            property,
+            watchOptions
+        );
+
+        // Run the watcher callback
+        watcherCallback.call(this, oldValue, newValue, {
+            initial: initializing.get(this),
+        });
+
+        // Computed
+        // state listeners
+
+        updateCleanup.set(this, renderCleanup);
+    }
 
     return class Component implements Ornata.ComponentInstance<T> {
         readonly $$typeof: Ornata.ComponentInstance<T>['$$typeof'];
@@ -51,6 +102,9 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
             resolveRootOptions(displayName, root, rootOptions);
 
             const internalInstance = {} as T;
+
+            // Set the initializing flag to true
+            initializing.set(internalInstance, true);
 
             const state = resolveStateOptions(
                 displayName,
@@ -72,34 +126,51 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
             const internalState = new Proxy(state, {
                 get(target, property) {
+                    if (!Object.hasOwn(stateOptions, property)) {
+                        reporter.error('ERR22', {
+                            action: 'get',
+                            componentName: displayName,
+                            property: property as string,
+                        });
+
+                        return undefined;
+                    }
+
                     return target[property];
                 },
                 set(target, property, value) {
-                    const cleanupUpdate = updateCleanup.get(internalInstance);
+                    if (!Object.hasOwn(stateOptions, property)) {
+                        reporter.error('ERR22', {
+                            action: 'set',
+                            componentName: displayName,
+                            property: property as string,
+                        });
+
+                        return false;
+                    }
+
                     const key = property as keyof Ornata.ComponentState;
-                    const previousValue = internalInstance.state[key];
-                    const currentValue = target[property];
+                    const oldValue = internalInstance.state[key];
+                    const newValue = target[property];
 
                     // Ignore the update if the value hasn't changed
-                    if (currentValue === previousValue) {
+                    if (newValue === oldValue) {
                         return true;
                     }
 
                     target[property] = value;
 
-                    // Cleanup the previous update
-                    if (cleanupUpdate) cleanupUpdate();
+                    // Ignores updates during the initialization phase
+                    if (initializing.get(internalInstance)) {
+                        return true;
+                    }
 
-                    const renderCleanup = renderComponent.call(
+                    updateComponent.call(
                         internalInstance,
-                        displayName,
-                        elements,
-                        renderOptions
+                        property,
+                        oldValue,
+                        newValue
                     );
-
-                    // Run state watchers
-
-                    updateCleanup.set(internalInstance, renderCleanup);
 
                     return true;
                 },
@@ -157,6 +228,32 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                 validateState(displayName, this.$state, stateOptions);
             }
 
+            // Render the component for the first time
+            const renderCleanup = renderComponent.call(
+                internalInstance,
+                displayName,
+                elements,
+                renderOptions
+            );
+
+            // Manually perform the update for every state property
+            Object.keys(stateOptions).forEach((property) => {
+                updateComponent.call(
+                    internalInstance,
+                    property,
+                    internalInstance.state[
+                        property as keyof Ornata.ComponentState
+                    ],
+                    internalInstance.state[
+                        property as keyof Ornata.ComponentState
+                    ]
+                );
+            });
+
+            // Set the initializing flag to false
+            initializing.set(internalInstance, false);
+
+            updateCleanup.set(internalInstance, renderCleanup);
             externalInstances.set(root, this);
         }
 

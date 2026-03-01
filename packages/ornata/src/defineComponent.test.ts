@@ -24,7 +24,7 @@ describe('defineComponent', () => {
         expect(instance).toBeInstanceOf(Test);
         expect(instance.$$typeof).toStrictEqual(Symbol.for('ornata.component'));
         expect(instance.$root).toStrictEqual(root);
-        expect(instance.$state).toStrictEqual({});
+        expect(instance.$state).toEqual({});
         expect(instance.addStateListener).toBeInstanceOf(Function);
         expect(instance.removeStateListener).toBeInstanceOf(Function);
 
@@ -89,7 +89,7 @@ describe('defineComponent', () => {
             const instance = Test.createInstance(root);
 
             expect(capturedThis.root).toBe(root);
-            expect(capturedThis.state).toStrictEqual({});
+            expect(capturedThis.state).toEqual({});
             expect(capturedThis.elements).toStrictEqual({});
             expect(capturedThis.methods).toStrictEqual({});
             expect(capturedThis.data).toStrictEqual({});
@@ -113,7 +113,7 @@ describe('defineComponent', () => {
             instance.dispose();
 
             expect(capturedThis.root).toBe(root);
-            expect(capturedThis.state).toStrictEqual({});
+            expect(capturedThis.state).toEqual({});
             expect(capturedThis.elements).toStrictEqual({});
             expect(capturedThis.methods).toStrictEqual({});
             expect(capturedThis.data).toStrictEqual({});

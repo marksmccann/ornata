@@ -3,7 +3,6 @@ import reporter from './reporter';
 import type { RenderElementData } from './renderElement';
 
 /**
- *
  * Updates the style properties on the element.
  * @param style The style properties to set on the element.
  * @param data The data required to render the element.
