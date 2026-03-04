@@ -12,54 +12,51 @@ export default function validateState<
     T extends Ornata.ComponentInternalInstance,
 >(
     componentName: string,
-    state: T['state'],
+    property: keyof T['state'],
+    value: T['state'][keyof T['state']],
     stateOptions: Ornata.ComponentOption<T, 'state'>
 ): void {
-    Object.keys(state).forEach((property) => {
-        if (stateOptions[property]) return;
+    const option = stateOptions[property];
 
+    if (!option) {
         reporter.error('ERR07', {
             componentName,
-            property,
+            property: property as string,
         });
-    });
 
-    Object.entries(stateOptions).forEach(([property, option]) => {
-        const { type } = option as Ornata.ComponentStateOptions<
-            T,
-            keyof T['state']
-        >;
-        const value = state[property as keyof T['state']];
-        let invalid = false;
-        let expectedType;
+        return;
+    }
 
-        if (type === String && typeof value !== 'string') {
-            expectedType = 'string';
-            invalid = true;
-        } else if (type === Number && typeof value !== 'number') {
-            expectedType = 'number';
-            invalid = true;
-        } else if (type === Boolean && typeof value !== 'boolean') {
-            expectedType = 'boolean';
-            invalid = true;
-        } else if (type === Array && !Array.isArray(value)) {
-            expectedType = 'array';
-            invalid = true;
-        } else if (type === Object && typeof value !== 'object') {
-            expectedType = 'object';
-            invalid = true;
-        } else if (type === Function && typeof value !== 'function') {
-            expectedType = 'function';
-            invalid = true;
-        }
+    const { type } = option;
+    let invalid = false;
+    let expectedType;
 
-        if (invalid) {
-            reporter.error('ERR09', {
-                componentName,
-                value,
-                property,
-                type: expectedType,
-            });
-        }
-    });
+    if (type === String && typeof value !== 'string') {
+        expectedType = 'string';
+        invalid = true;
+    } else if (type === Number && typeof value !== 'number') {
+        expectedType = 'number';
+        invalid = true;
+    } else if (type === Boolean && typeof value !== 'boolean') {
+        expectedType = 'boolean';
+        invalid = true;
+    } else if (type === Array && !Array.isArray(value)) {
+        expectedType = 'array';
+        invalid = true;
+    } else if (type === Object && typeof value !== 'object') {
+        expectedType = 'object';
+        invalid = true;
+    } else if (type === Function && typeof value !== 'function') {
+        expectedType = 'function';
+        invalid = true;
+    }
+
+    if (invalid) {
+        reporter.error('ERR09', {
+            componentName,
+            value,
+            property: property as string,
+            type: expectedType,
+        });
+    }
 }

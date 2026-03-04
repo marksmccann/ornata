@@ -1,51 +1,51 @@
 {
-  "name": "ornata",
-  "version": "0.1.0",
-  "type": "module",
-  "description": "Ornata is a progressive enhancement framework for server-rendered websites",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+    "name": "ornata",
+    "version": "0.1.0",
+    "type": "module",
+    "description": "Ornata is a progressive enhancement framework for server-rendered websites",
+    "main": "dist/index.cjs",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "test": "vitest"
+    },
+    "keywords": [
+        "ornata",
+        "progressive enhancement framework",
+        "HTML-first",
+        "Server rendered"
+    ],
+    "author": "Mark McCann",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/marksmccann/ornata.git"
+    },
+    "bugs": {
+        "url": "https://github.com/marksmccann/ornata/issues"
+    },
+    "homepage": "https://github.com/marksmccann/ornata#readme",
+    "unpkg": "dist/index.global.js",
+    "jsdelivr": "dist/index.global.js",
+    "devDependencies": {
+        "tsup": "^8.0.0",
+        "vitest": "^2.0.0"
+    },
+    "dependencies": {
+        "runtime-reporter": "^0.4.2"
     }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "test": "vitest"
-  },
-  "keywords": [
-    "ornata",
-    "progressive enhancement framework",
-    "HTML-first",
-    "Server rendered"
-  ],
-  "author": "Mark McCann",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/marksmccann/ornata.git"
-  },
-  "bugs": {
-    "url": "https://github.com/marksmccann/ornata/issues"
-  },
-  "homepage": "https://github.com/marksmccann/ornata#readme",
-  "unpkg": "dist/index.global.js",
-  "jsdelivr": "dist/index.global.js",
-  "devDependencies": {
-    "tsup": "^8.0.0",
-    "vitest": "^2.0.0"
-  },
-  "dependencies": {
-    "runtime-reporter": "^0.4.2"
-  }
 }

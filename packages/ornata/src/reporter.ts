@@ -116,6 +116,11 @@ type Messages =
           code: 'ERR22';
           template: '{{ componentName }}: Failed to {{ action }} state property "{{ property }}". The property is not a valid state property defined in the component options.';
           tokens: 'componentName' | 'action' | 'property';
+      }
+    | {
+          code: 'ERR23';
+          template: '{{ componentName }}: Failed to call "{{ property }}" in the "{{ option }}" option because it is not a valid callback function.';
+          tokens: 'componentName' | 'property' | 'option';
       };
 
 const messages: RuntimeReporterMessages<Messages> = {
@@ -141,6 +146,7 @@ const messages: RuntimeReporterMessages<Messages> = {
     ERR20: '{{ componentName }}: Failed to apply unknown render option "{{ option }}" on element {{ element }}. Expect one of: "attributes", "style", "classes", "dataset", "events", "html", "text".',
     ERR21: '{{ componentName }}: Failed to {{ action }} because component instance does not exist. It was likely disposed or never created.',
     ERR22: '{{ componentName }}: Failed to {{ action }} state property "{{ property }}". The property is not a valid state property defined in the component options.',
+    ERR23: '{{ componentName }}: Failed to call "{{ property }}" in the "{{ option }}" option because it is not a valid callback function.',
 };
 
 /**

@@ -9,6 +9,7 @@ import resolveElementOptions from './resolveElementOptions';
 import resolveMethodOptions from './resolveMethodOptions';
 import renderComponent from './renderComponent';
 import getWatchCallback from './getWatchCallback';
+import resolveComputedOptions from './resolveComputedOptions';
 
 function defineComponent<T extends Ornata.ComponentInternalInstance>(
     options: Ornata.ComponentOptions<T>
@@ -24,7 +25,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         data: dataOptions = {} as Ornata.ComponentOption<T, 'data'>,
         render: renderOptions = {} as Ornata.ComponentOption<T, 'render'>,
         watch: watchOptions = {} as Ornata.ComponentOption<T, 'watch'>,
-        // computed: computedOptions = {} as Ornata.ComponentOption<T, 'computed'>,
+        computed: computedOptions = {} as Ornata.ComponentOption<T, 'computed'>,
     } = options;
     const externalInstances = new WeakMap<
         Element,
@@ -37,6 +38,10 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
     const updateCleanup = new WeakMap<
         Ornata.ComponentInternalInstance,
         () => void
+    >();
+    const componentMetadata = new WeakMap<
+        Ornata.ComponentInternalInstance,
+        Ornata.ComponentMetadata
     >();
     const initializing = new WeakMap<
         Ornata.ComponentInternalInstance,
@@ -58,32 +63,36 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         newValue: T['state'][keyof T['state']]
     ) {
         const cleanupUpdate = updateCleanup.get(this);
+        const metadata = componentMetadata.get(
+            this
+        ) as Ornata.ComponentMetadata;
 
         // Cleanup the previous update before starting a new one
         if (cleanupUpdate) cleanupUpdate();
+
+        // validate the state property
+        validateState(displayName, property, newValue, stateOptions);
 
         // Re-render the component
         const renderCleanup = renderComponent.call(
             this,
             displayName,
             this.elements,
+            metadata,
             renderOptions
         );
 
         // Get the watcher callback for the property
-        const watcherCallback = getWatchCallback.call(
+        const watchCallback = getWatchCallback.call(
             this,
             property,
             watchOptions
         );
 
         // Run the watcher callback
-        watcherCallback.call(this, oldValue, newValue, {
-            initial: initializing.get(this),
-        });
+        watchCallback.call(this, oldValue, newValue, metadata);
 
-        // Computed
-        // state listeners
+        // external state listeners
 
         updateCleanup.set(this, renderCleanup);
     }
@@ -103,8 +112,11 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
             const internalInstance = {} as T;
 
-            // Set the initializing flag to true
-            initializing.set(internalInstance, true);
+            const computed = {} as T['computed'];
+
+            const metadata: Ornata.ComponentMetadata = {
+                initialized: false,
+            };
 
             const state = resolveStateOptions(
                 displayName,
@@ -119,7 +131,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                 elementOptions
             );
 
-            const methods = resolveMethodOptions.call(
+            const methods: T['methods'] = resolveMethodOptions.call(
                 internalInstance,
                 methodOptions
             );
@@ -150,8 +162,10 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                     }
 
                     const key = property as keyof Ornata.ComponentState;
-                    const oldValue = internalInstance.state[key];
-                    const newValue = target[property];
+                    const newState = { ...state, [key]: value };
+                    const oldState = { ...state };
+                    const newValue = value;
+                    const oldValue = target[key];
 
                     // Ignore the update if the value hasn't changed
                     if (newValue === oldValue) {
@@ -159,6 +173,16 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                     }
 
                     target[property] = value;
+
+                    // Resolve the computed options after the state has been updated
+                    resolveComputedOptions.call(
+                        internalInstance,
+                        displayName,
+                        oldState,
+                        newState,
+                        metadata,
+                        computedOptions
+                    );
 
                     // Ignores updates during the initialization phase
                     if (initializing.get(internalInstance)) {
@@ -210,50 +234,46 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                 },
             });
 
+            // Set up the internal instance
             internalInstance.root = root;
             internalInstance.state = internalState;
             internalInstance.elements = elements;
             internalInstance.methods = methods;
             internalInstance.data = dataOptions;
+            internalInstance.computed = computed;
 
+            // Set up the external instance
             this.$$typeof = Symbol.for('ornata.component');
             this.$root = root;
             this.$state = externalState;
 
-            internalInstances.set(this, internalInstance);
-
-            lifecycleOptions.setup?.call(internalInstance);
-
-            if (stateOptions) {
-                validateState(displayName, this.$state, stateOptions);
-            }
-
-            // Render the component for the first time
-            const renderCleanup = renderComponent.call(
+            // Resolve the computed options before setup
+            resolveComputedOptions.call(
                 internalInstance,
                 displayName,
-                elements,
-                renderOptions
+                state,
+                state,
+                metadata,
+                computedOptions
             );
 
+            // Run the setup lifecycle method
+            lifecycleOptions.setup?.call(internalInstance);
+
+            // Set the component metadata before updating the component
+            componentMetadata.set(internalInstance, metadata);
+
             // Manually perform the update for every state property
-            Object.keys(stateOptions).forEach((property) => {
-                updateComponent.call(
-                    internalInstance,
-                    property,
-                    internalInstance.state[
-                        property as keyof Ornata.ComponentState
-                    ],
-                    internalInstance.state[
-                        property as keyof Ornata.ComponentState
-                    ]
-                );
+            Object.keys(stateOptions).forEach((key) => {
+                const property = key as keyof Ornata.ComponentState;
+                const value = internalInstance.state[property];
+                updateComponent.call(internalInstance, property, value, value);
             });
 
-            // Set the initializing flag to false
-            initializing.set(internalInstance, false);
+            // Set the initialized flag
+            metadata.initialized = true;
 
-            updateCleanup.set(internalInstance, renderCleanup);
+            internalInstances.set(this, internalInstance);
             externalInstances.set(root, this);
         }
 

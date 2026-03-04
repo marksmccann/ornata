@@ -9,10 +9,9 @@ describe('validateState', () => {
         const consoleError = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
-        const state = { name: 'test' };
         const stateOptions = { name: { type: String } };
 
-        validateState('Test', state, stateOptions);
+        validateState('Test', 'name', 'test', stateOptions);
 
         expect(consoleError).not.toHaveBeenCalled();
     });
@@ -21,10 +20,9 @@ describe('validateState', () => {
         const consoleError = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
-        const state = { name: 'test' };
         const stateOptions = {};
 
-        validateState('Test', state, stateOptions);
+        validateState('Test', 'name', 'test', stateOptions);
 
         expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR07', {
@@ -38,10 +36,9 @@ describe('validateState', () => {
         const consoleError = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
-        const state = { name: 123 };
         const stateOptions = { name: { type: String } };
 
-        validateState('Test', state, stateOptions);
+        validateState('Test', 'name', 123, stateOptions);
 
         expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
@@ -57,10 +54,9 @@ describe('validateState', () => {
         const consoleError = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
-        const state = { name: 'test' };
         const stateOptions = { name: { type: Number } };
 
-        validateState('Test', state, stateOptions);
+        validateState('Test', 'name', 'test', stateOptions);
 
         expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
@@ -76,10 +72,9 @@ describe('validateState', () => {
         const consoleError = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
-        const state = { name: 123 };
         const stateOptions = { name: { type: Boolean } };
 
-        validateState('Test', state, stateOptions);
+        validateState('Test', 'name', 123, stateOptions);
 
         expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
@@ -95,10 +90,9 @@ describe('validateState', () => {
         const consoleError = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
-        const state = { name: 'test' };
         const stateOptions = { name: { type: Array } };
 
-        validateState('Test', state, stateOptions);
+        validateState('Test', 'name', 'test', stateOptions);
 
         expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
@@ -117,7 +111,7 @@ describe('validateState', () => {
         const state = { name: 'test' };
         const stateOptions = { name: { type: Object } };
 
-        validateState('Test', state, stateOptions);
+        validateState('Test', 'name', 'test', stateOptions);
 
         expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {
@@ -133,10 +127,9 @@ describe('validateState', () => {
         const consoleError = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
-        const state = { name: 'test' };
         const stateOptions = { name: { type: Function } };
 
-        validateState('Test', state, stateOptions);
+        validateState('Test', 'name', 'test', stateOptions);
 
         expect(consoleError).toHaveBeenCalledWith(
             reporter.message('ERR09', {

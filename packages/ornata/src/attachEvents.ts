@@ -9,7 +9,7 @@ import reporter from './reporter';
  */
 const eventListeners: WeakMap<
     Ornata.ComponentInternalInstance,
-    Map<Element, Map<string, () => void>>
+    Map<Element, Map<string, (event: Event) => void>>
 > = new WeakMap();
 
 /**
@@ -55,7 +55,7 @@ export default function attachEvents<
 
         if (!elementListeners) {
             elementListeners = new Map();
-            instanceListeners.set(element, new Map());
+            instanceListeners.set(element, elementListeners);
         }
 
         const previousHandler = elementListeners.get(property);
@@ -63,9 +63,11 @@ export default function attachEvents<
         // Remove the previous handler before adding the new one
         if (previousHandler && eventHandler !== previousHandler) {
             element.removeEventListener(property, previousHandler);
+            elementListeners.delete(property);
         }
 
         element.addEventListener(property, eventHandler);
+        elementListeners.set(property, eventHandler);
     });
 
     return () => {

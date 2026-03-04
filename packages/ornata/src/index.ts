@@ -1,9 +1,8 @@
 import defineComponent from './defineComponent';
 
 /**
- * Ornata - a progressive enhancement framework for server-rendered websites
+ * A progressive enhancement framework for server-rendered websites
  */
-
 interface Ornata {
     defineComponent: typeof defineComponent;
 }
@@ -182,6 +181,41 @@ namespace Ornata {
     }
 
     /**
+     * The metadata for a component related to its state and lifecycle; provided to select
+     * callbacks in the component options (e.g., watch, computed).
+     * @since v0.1.0
+     */
+    export interface ComponentMetadata {
+        /**
+         * Whether the component has been fully initialized.
+         * @since v0.1.0
+         */
+        initialized: boolean;
+    }
+
+    /**
+     * The metadata for an element rendered by the component; provided to select callbacks
+     * in the component options (e.g., render).
+     * @since v0.1.0
+     */
+    export interface ComponentElementMetadata<
+        T extends ComponentInternalInstance,
+        K extends keyof T['elements'],
+    > {
+        /**
+         * Whether the corresponding render callback for the element has been called at least once, not necessarily rendered to the DOM.
+         * @since v0.1.0
+         */
+        rendered: boolean;
+
+        /**
+         * The index of the element in the array of elements.
+         * @since v0.1.0
+         */
+        index: T['elements'][K] extends Element[] ? number : never;
+    }
+
+    /**
      * The callback function for the watch property for the `defineComponent` function.
      * @since v0.1.0
      */
@@ -192,7 +226,7 @@ namespace Ornata {
         this: T,
         oldValue: T['state'][K],
         newValue: T['state'][K],
-        data: { initial: boolean }
+        metadata: ComponentMetadata
     ) => void;
 
     /**
@@ -207,7 +241,7 @@ namespace Ornata {
         oldValue: T['computed'][K],
         oldState: T['state'],
         newState: T['state'],
-        data: { initial: boolean }
+        metadata: ComponentMetadata
     ) => void;
 
     /**
@@ -282,7 +316,7 @@ namespace Ornata {
         K extends keyof T['elements'],
     > = (
         this: T,
-        index: T['elements'][K] extends Element[] ? number : never
+        metadata: ComponentElementMetadata<T, K>
     ) => ComponentRenderOptions;
 
     /**
@@ -369,8 +403,6 @@ namespace Ornata {
         data?: {
             [K in keyof T['data']]: T['data'][K];
         };
-
-        // computed?: any;
 
         /**
          * The render method for the elements of the component.

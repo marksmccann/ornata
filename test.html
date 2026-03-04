@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Hello, world!</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="description" content="" />
+    </head>
+    <body>
+        <h1>Ornata Test Demos</h1>
+        <div id="counter">
+            <p>Count: <span data-count>0</span></p>
+            <button data-increment>Increment</button>
+            <button data-decrement>Decrement</button>
+        </div>
+        <script src="./packages/ornata/dist/index.global.dev.js"></script>
+        <script>
+            const Counter = Ornata.defineComponent({
+                name: 'Test',
+                state: {
+                    count: {
+                        default: 0,
+                        type: Number,
+                    },
+                },
+                elements: {
+                    root: {
+                        resolve: (root) => root,
+                    },
+                    count: {
+                        query: '[data-count]',
+                    },
+                    increment: {
+                        query: '[data-increment]',
+                    },
+                    decrement: {
+                        query: '[data-decrement]',
+                    },
+                },
+                computed: {
+                    test() {
+                        return this.state.count + 1;
+                    },
+                },
+                render: {
+                    root() {
+                        return {
+                            classes: {
+                                test: true,
+                            },
+                        };
+                    },
+                    count() {
+                        return {
+                            text: `${this.state.count} ${this.computed.test}`,
+                        };
+                    },
+                    increment() {
+                        return {
+                            events: {
+                                click: () => {
+                                    this.state.count++;
+                                },
+                            },
+                        };
+                    },
+                    decrement() {
+                        return {
+                            events: {
+                                click: () => {
+                                    this.state.count--;
+                                },
+                            },
+                        };
+                    },
+                },
+            });
+
+            const counter = Counter.createInstance('#counter');
+            window.counter = counter;
+        </script>
+    </body>
+</html>
