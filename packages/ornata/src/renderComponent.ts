@@ -19,7 +19,6 @@ export default function renderComponent<
     this: T,
     componentName: string,
     elements: T['elements'],
-    componentMetadata: Ornata.ComponentMetadata,
     renderOptions: Ornata.ComponentOption<T, 'render'>
 ): () => void {
     let elementCleanup: Array<ReturnType<typeof renderElement>> = [];
@@ -30,7 +29,6 @@ export default function renderComponent<
             T,
             keyof T['elements']
         >;
-        const rendered = componentMetadata.initialized;
         const elementsDataToRender: Array<RenderElementData> = [];
         const elementToRender = elements[elementName];
 
@@ -46,7 +44,7 @@ export default function renderComponent<
 
         if (Array.isArray(elementToRender)) {
             elementToRender.forEach((element, index) => {
-                const result = renderCallback.call(this, { rendered });
+                const result = renderCallback.call(this, index);
                 let name = `"${elementName as string}"`;
 
                 if (typeof index === 'number') {
@@ -61,7 +59,7 @@ export default function renderComponent<
                 });
             });
         } else if (elementToRender instanceof Element) {
-            const result = renderCallback.call(this, { rendered });
+            const result = renderCallback.call(this);
 
             elementsDataToRender.push({
                 componentName,

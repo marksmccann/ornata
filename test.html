@@ -38,7 +38,8 @@
                     },
                 },
                 computed: {
-                    test() {
+                    test(currentValue, changedState) {
+                        console.log(currentValue, changedState);
                         return this.state.count + 1;
                     },
                 },

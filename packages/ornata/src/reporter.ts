@@ -121,6 +121,11 @@ type Messages =
           code: 'ERR23';
           template: '{{ componentName }}: Failed to call "{{ property }}" in the "{{ option }}" option because it is not a valid callback function.';
           tokens: 'componentName' | 'property' | 'option';
+      }
+    | {
+          code: 'WRN01';
+          template: '{{ componentName }}: Failed to {{ action }} state listener for property "{{ property }}". The listener {{ status }}.';
+          tokens: 'componentName' | 'action' | 'property' | 'status';
       };
 
 const messages: RuntimeReporterMessages<Messages> = {
@@ -147,6 +152,7 @@ const messages: RuntimeReporterMessages<Messages> = {
     ERR21: '{{ componentName }}: Failed to {{ action }} because component instance does not exist. It was likely disposed or never created.',
     ERR22: '{{ componentName }}: Failed to {{ action }} state property "{{ property }}". The property is not a valid state property defined in the component options.',
     ERR23: '{{ componentName }}: Failed to call "{{ property }}" in the "{{ option }}" option because it is not a valid callback function.',
+    WRN01: '{{ componentName }}: Failed to {{ action }} state listener for property "{{ property }}". The listener {{ status }}.',
 };
 
 /**

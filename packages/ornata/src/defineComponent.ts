@@ -39,13 +39,12 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         Ornata.ComponentInternalInstance,
         () => void
     >();
-    const componentMetadata = new WeakMap<
+    const stateListeners = new WeakMap<
         Ornata.ComponentInternalInstance,
-        Ornata.ComponentMetadata
-    >();
-    const initializing = new WeakMap<
-        Ornata.ComponentInternalInstance,
-        boolean
+        Map<
+            keyof T['state'],
+            Set<Ornata.ComponentStateListener<T['state'][keyof T['state']]>>
+        >
     >();
 
     /**
@@ -63,36 +62,43 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
         newValue: T['state'][keyof T['state']]
     ) {
         const cleanupUpdate = updateCleanup.get(this);
-        const metadata = componentMetadata.get(
-            this
-        ) as Ornata.ComponentMetadata;
+        const externalInstance = externalInstances.get(this.root);
+        const listeners = stateListeners.get(this);
+        const handlers = listeners?.get(property);
 
         // Cleanup the previous update before starting a new one
         if (cleanupUpdate) cleanupUpdate();
 
-        // validate the state property
         validateState(displayName, property, newValue, stateOptions);
+
+        resolveComputedOptions.call(
+            this,
+            displayName,
+            property,
+            computedOptions
+        );
 
         // Re-render the component
         const renderCleanup = renderComponent.call(
             this,
             displayName,
             this.elements,
-            metadata,
             renderOptions
         );
 
-        // Get the watcher callback for the property
         const watchCallback = getWatchCallback.call(
             this,
             property,
             watchOptions
         );
 
-        // Run the watcher callback
-        watchCallback.call(this, oldValue, newValue, metadata);
+        watchCallback.call(this, { newValue, oldValue });
 
-        // external state listeners
+        if (externalInstance && handlers) {
+            handlers.forEach((handler) => {
+                handler.call(externalInstance, newValue, oldValue);
+            });
+        }
 
         updateCleanup.set(this, renderCleanup);
     }
@@ -100,23 +106,21 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
     return class Component implements Ornata.ComponentInstance<T> {
         readonly $$typeof: Ornata.ComponentInstance<T>['$$typeof'];
 
-        readonly $root: Ornata.ComponentInstance<T>['$root'];
+        readonly root: Ornata.ComponentInstance<T>['root'];
 
-        $state: Ornata.ComponentInstance<T>['$state'];
+        state: Ornata.ComponentInstance<T>['state'];
 
         static readonly displayName: Ornata.ComponentConstructor<T>['displayName'] =
             displayName;
 
         constructor(root: Element, initialState?: Partial<T['state']>) {
+            let initializing = true;
+
             resolveRootOptions(displayName, root, rootOptions);
 
             const internalInstance = {} as T;
 
             const computed = {} as T['computed'];
-
-            const metadata: Ornata.ComponentMetadata = {
-                initialized: false,
-            };
 
             const state = resolveStateOptions(
                 displayName,
@@ -162,8 +166,6 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                     }
 
                     const key = property as keyof Ornata.ComponentState;
-                    const newState = { ...state, [key]: value };
-                    const oldState = { ...state };
                     const newValue = value;
                     const oldValue = target[key];
 
@@ -174,18 +176,8 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
                     target[property] = value;
 
-                    // Resolve the computed options after the state has been updated
-                    resolveComputedOptions.call(
-                        internalInstance,
-                        displayName,
-                        oldState,
-                        newState,
-                        metadata,
-                        computedOptions
-                    );
-
                     // Ignores updates during the initialization phase
-                    if (initializing.get(internalInstance)) {
+                    if (initializing) {
                         return true;
                     }
 
@@ -244,34 +236,21 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
             // Set up the external instance
             this.$$typeof = Symbol.for('ornata.component');
-            this.$root = root;
-            this.$state = externalState;
-
-            // Resolve the computed options before setup
-            resolveComputedOptions.call(
-                internalInstance,
-                displayName,
-                state,
-                state,
-                metadata,
-                computedOptions
-            );
+            this.root = root;
+            this.state = externalState;
 
             // Run the setup lifecycle method
             lifecycleOptions.setup?.call(internalInstance);
 
-            // Set the component metadata before updating the component
-            componentMetadata.set(internalInstance, metadata);
-
-            // Manually perform the update for every state property
+            // Manually perform the initial update for every state property
             Object.keys(stateOptions).forEach((key) => {
                 const property = key as keyof Ornata.ComponentState;
                 const value = internalInstance.state[property];
                 updateComponent.call(internalInstance, property, value, value);
             });
 
-            // Set the initialized flag
-            metadata.initialized = true;
+            // Set the initializing flag
+            initializing = false;
 
             internalInstances.set(this, internalInstance);
             externalInstances.set(root, this);
@@ -293,7 +272,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
             if (cleanupUpdate) cleanupUpdate();
             lifecycleOptions.teardown?.call(internalInstance);
-            externalInstances.delete(this.$root);
+            externalInstances.delete(this.root);
             internalInstances.delete(this);
         };
 
@@ -301,12 +280,107 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
             property,
             listener
         ) => {
-            console.log('addStateListener', property, listener);
+            const internalInstance = internalInstances.get(this);
+            const handler = listener as Ornata.ComponentStateListener<
+                T['state'][keyof T['state']]
+            >;
+
+            if (!internalInstance) {
+                reporter.error('ERR21', {
+                    componentName: displayName,
+                    action: `add state listener for property "${property as string}"`,
+                });
+
+                return;
+            }
+
+            if (!Object.hasOwn(stateOptions, property)) {
+                reporter.error('ERR22', {
+                    componentName: displayName,
+                    action: 'add state listener for',
+                    property: property as string,
+                });
+
+                return;
+            }
+
+            let listeners = stateListeners.get(internalInstance);
+
+            if (!listeners) {
+                listeners = new Map();
+                stateListeners.set(internalInstance, listeners);
+            }
+
+            let handlers = listeners.get(property);
+
+            if (!handlers) {
+                handlers = new Set();
+                listeners.set(property, new Set());
+            }
+
+            if (handlers.has(handler)) {
+                reporter.warn('WRN01', {
+                    componentName: displayName,
+                    action: 'add',
+                    property: property as string,
+                    status: 'already exists',
+                });
+
+                return;
+            }
+
+            handlers.add(handler);
         };
 
         removeStateListener: Ornata.ComponentInstance<T>['removeStateListener'] =
             (property, listener) => {
-                console.log('removeStateListener', property, listener);
+                const internalInstance = internalInstances.get(this);
+                const handler = listener as Ornata.ComponentStateListener<
+                    T['state'][keyof T['state']]
+                >;
+
+                if (!internalInstance) {
+                    reporter.error('ERR21', {
+                        componentName: displayName,
+                        action: `remove state listener for property "${property as string}"`,
+                    });
+
+                    return;
+                }
+
+                if (!Object.hasOwn(stateOptions, property)) {
+                    reporter.error('ERR22', {
+                        componentName: displayName,
+                        action: 'remove state listener for',
+                        property: property as string,
+                    });
+
+                    return;
+                }
+
+                const listeners = stateListeners.get(internalInstance);
+                const handlers = listeners?.get(property);
+
+                if (!listeners || !handlers || !handlers.has(handler)) {
+                    reporter.warn('WRN01', {
+                        componentName: displayName,
+                        action: `remove`,
+                        property: property as string,
+                        status: 'does not exist',
+                    });
+
+                    return;
+                }
+
+                handlers.delete(handler);
+
+                if (handlers.size === 0) {
+                    listeners.delete(property);
+                }
+
+                if (listeners.size === 0) {
+                    stateListeners.delete(internalInstance);
+                }
             };
 
         static createInstance: Ornata.ComponentConstructor<T>['createInstance'] =
@@ -399,7 +473,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
                 }
 
                 Object.entries(stateChanges).forEach(([property, value]) => {
-                    instance.$state[property as keyof T['state']] = value;
+                    instance.state[property as keyof T['state']] = value;
                 });
             };
     };

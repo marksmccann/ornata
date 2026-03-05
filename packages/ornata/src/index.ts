@@ -84,8 +84,14 @@ namespace Ornata {
         T extends ComponentInternalInstance,
         K extends keyof T['state'],
     > {
+        // /**
+        //  * The name of another state property that this state property controls. This property must be a callback
+        //  * function (e.g., `onChange: (value: string) => void`). When provided by the user, the named property
+        //  * will not update automatically. Instead, it must be updated manually via this callback function.
+        //  * @since v0.1.0
+        //  */
         // controls?: T extends (...args: any[]) => any
-        //     ? boolean | undefined
+        //     ? Exclude<keyof T['state'], K>
         //     : never;
 
         /**
@@ -181,8 +187,7 @@ namespace Ornata {
     }
 
     /**
-     * The metadata for a component related to its state and lifecycle; provided to select
-     * callbacks in the component options (e.g., watch, computed).
+     * The metadata for a component related to its state and lifecycle; used internally by the component.
      * @since v0.1.0
      */
     export interface ComponentMetadata {
@@ -194,40 +199,13 @@ namespace Ornata {
     }
 
     /**
-     * The metadata for an element rendered by the component; provided to select callbacks
-     * in the component options (e.g., render).
-     * @since v0.1.0
-     */
-    export interface ComponentElementMetadata<
-        T extends ComponentInternalInstance,
-        K extends keyof T['elements'],
-    > {
-        /**
-         * Whether the corresponding render callback for the element has been called at least once, not necessarily rendered to the DOM.
-         * @since v0.1.0
-         */
-        rendered: boolean;
-
-        /**
-         * The index of the element in the array of elements.
-         * @since v0.1.0
-         */
-        index: T['elements'][K] extends Element[] ? number : never;
-    }
-
-    /**
      * The callback function for the watch property for the `defineComponent` function.
      * @since v0.1.0
      */
     export type ComponentWatchCallback<
         T extends ComponentInternalInstance,
         K extends keyof T['state'],
-    > = (
-        this: T,
-        oldValue: T['state'][K],
-        newValue: T['state'][K],
-        metadata: ComponentMetadata
-    ) => void;
+    > = (this: T, newValue: T['state'][K], oldValue: T['state'][K]) => void;
 
     /**
      * The callback function for the computed property for the `defineComponent` function.
@@ -238,10 +216,8 @@ namespace Ornata {
         K extends keyof T['computed'],
     > = (
         this: T,
-        oldValue: T['computed'][K],
-        oldState: T['state'],
-        newState: T['state'],
-        metadata: ComponentMetadata
+        currentValue: T['computed'][K],
+        changedState: keyof T['state']
     ) => void;
 
     /**
@@ -316,7 +292,7 @@ namespace Ornata {
         K extends keyof T['elements'],
     > = (
         this: T,
-        metadata: ComponentElementMetadata<T, K>
+        index: T['elements'][K] extends Element[] ? number : never
     ) => ComponentRenderOptions;
 
     /**
@@ -366,7 +342,16 @@ namespace Ornata {
          * @since v0.1.0
          */
         lifecycle?: {
+            /**
+             * A function that is called once when the component is created; useful for performing setup logic.
+             * @since v0.1.0
+             */
             setup?: (this: T) => void;
+
+            /**
+             * A function that is called once when the component is disposed; useful for performing teardown logic.
+             * @since v0.1.0
+             */
             teardown?: (this: T) => void;
         };
 
@@ -417,10 +402,7 @@ namespace Ornata {
      * The callback function for the state listener for the `defineComponent` function.
      * @since v0.1.0
      */
-    export type ComponentStateListener<T> = (
-        value: T,
-        previousValue: T
-    ) => void;
+    export type ComponentStateListener<T> = (newValue: T, oldValue: T) => void;
 
     /**
      * The instance of the component. The primary interface for interacting with the component externally.
@@ -433,14 +415,14 @@ namespace Ornata {
          * The resolved root element of the component that was passed to the constructor.
          * @since v0.1.0
          */
-        $root: T['root'];
+        root: T['root'];
 
         /**
          * The resolved and current state of the component. This object is reactive; it will
          * automatically update the component when any of the properties are updated.
          * @since v0.1.0
          */
-        $state: T['state'];
+        state: T['state'];
 
         /**
          * Dispose of the component instance. This will clean up any and all
@@ -449,13 +431,29 @@ namespace Ornata {
          */
         dispose(this: ComponentInstance<T>): void;
 
+        /**
+         * Add a state listener to the component; a function that is called when the state property is updated.
+         * @param this The component instance.
+         * @param property The property to add the state listener to.
+         * @param listener The state listener to add.
+         * @since v0.1.0
+         */
         addStateListener<U extends keyof T['state']>(
-            property: U | U[],
+            this: ComponentInstance<T>,
+            property: U,
             listener: ComponentStateListener<T['state'][U]>
         ): void;
 
+        /**
+         * Remove a state listener from the component; a function that is called when the state property is updated.
+         * @param this The component instance.
+         * @param property The property to remove the state listener from.
+         * @param listener The state listener to remove.
+         * @since v0.1.0
+         */
         removeStateListener<U extends keyof T['state']>(
-            property: U | U[],
+            this: ComponentInstance<T>,
+            property: U,
             listener: ComponentStateListener<T['state'][U]>
         ): void;
     }

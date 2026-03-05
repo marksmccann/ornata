@@ -6,9 +6,7 @@ export default function resolveComputedOptions<
 >(
     this: T,
     componentName: string,
-    oldState: T['state'],
-    newState: T['state'],
-    metadata: Ornata.ComponentMetadata,
+    changedState: keyof T['state'],
     computedOptions: Ornata.ComponentOption<T, 'computed'>
 ): void {
     const computed = this.computed as T['computed'];
@@ -33,9 +31,7 @@ export default function resolveComputedOptions<
         const value = computedCallback.call(
             this,
             computed[property],
-            oldState,
-            newState,
-            metadata
+            changedState
         );
 
         computed[property] = value;

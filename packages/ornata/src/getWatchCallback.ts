@@ -16,9 +16,9 @@ export default function getWatchCallback<
     watchOptions: Ornata.ComponentOption<T, 'watch'>
 ): Ornata.ComponentWatchCallback<T, keyof T['state']> {
     const watchCallback: Ornata.ComponentWatchCallback<T, keyof T['state']> =
-        function watchCallback(oldValue, newValue, data) {
+        function watchCallback(payload) {
             const callback = watchOptions[property];
-            if (callback) callback.call(this, oldValue, newValue, data);
+            if (callback) callback.call(this, payload);
         };
 
     return watchCallback;
