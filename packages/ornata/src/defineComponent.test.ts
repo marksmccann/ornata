@@ -23,8 +23,8 @@ describe('defineComponent', () => {
 
         expect(instance).toBeInstanceOf(Test);
         expect(instance.$$typeof).toStrictEqual(Symbol.for('ornata.component'));
-        expect(instance.$root).toStrictEqual(root);
-        expect(instance.$state).toEqual({});
+        expect(instance.root).toStrictEqual(root);
+        expect(instance.state).toEqual({});
         expect(instance.addStateListener).toBeInstanceOf(Function);
         expect(instance.removeStateListener).toBeInstanceOf(Function);
 
@@ -168,7 +168,7 @@ describe('defineComponent', () => {
             const root = document.createElement('div');
             const instance = Test.createInstance(root);
 
-            void instance.$state.secret;
+            void instance.state.secret;
 
             expect(consoleError).toHaveBeenCalledWith(
                 reporter.message('ERR15', {
@@ -190,7 +190,7 @@ describe('defineComponent', () => {
             const root = document.createElement('div');
             const instance = Test.createInstance(root);
 
-            expect(instance.$state.secret).toBeUndefined();
+            expect(instance.state.secret).toBeUndefined();
 
             vi.restoreAllMocks();
             instance.dispose();
@@ -208,7 +208,7 @@ describe('defineComponent', () => {
             const instance = Test.createInstance(root);
 
             try {
-                instance.$state.secret = 'exposed';
+                instance.state.secret = 'exposed';
             } catch {
                 /* proxy returns false in strict mode */
             }
@@ -235,12 +235,12 @@ describe('defineComponent', () => {
             const instance = Test.createInstance(root);
 
             try {
-                instance.$state.secret = 'exposed';
+                instance.state.secret = 'exposed';
             } catch {
                 /* proxy returns false in strict mode */
             }
 
-            expect(instance.$state.secret).toBeUndefined();
+            expect(instance.state.secret).toBeUndefined();
 
             vi.restoreAllMocks();
             instance.dispose();
@@ -260,7 +260,7 @@ describe('defineComponent', () => {
             const instance = Test.createInstance(root, { count: 0 });
 
             try {
-                instance.$state.count = 99;
+                instance.state.count = 99;
             } catch {
                 /* proxy returns false in strict mode */
             }
@@ -287,12 +287,12 @@ describe('defineComponent', () => {
             const instance = Test.createInstance(root, { count: 0 });
 
             try {
-                instance.$state.count = 99;
+                instance.state.count = 99;
             } catch {
                 /* proxy returns false in strict mode */
             }
 
-            expect(instance.$state.count).toBe(0);
+            expect(instance.state.count).toBe(0);
 
             vi.restoreAllMocks();
             instance.dispose();
@@ -306,7 +306,7 @@ describe('defineComponent', () => {
             const root = document.createElement('div');
             const instance = Test.createInstance(root, { count: 42 });
 
-            expect(instance.$state.count).toBe(42);
+            expect(instance.state.count).toBe(42);
 
             instance.dispose();
         });

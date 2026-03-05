@@ -39,7 +39,7 @@
                 },
                 computed: {
                     test(currentValue, changedState) {
-                        console.log(currentValue, changedState);
+                        // console.log(currentValue, changedState);
                         return this.state.count + 1;
                     },
                 },
@@ -78,6 +78,11 @@
             });
 
             const counter = Counter.createInstance('#counter');
+
+            counter.addStateListener('count', (newValue, oldValue) => {
+                console.log(newValue, oldValue);
+            });
+
             window.counter = counter;
         </script>
     </body>

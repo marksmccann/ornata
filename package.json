@@ -13,6 +13,7 @@
         "dev": "lerna run dev",
         "start:docs": "npm run dev -w ornata-docs",
         "test": "lerna run test",
+        "test:watch": "lerna run test:watch",
         "version": "lerna version",
         "publish": "lerna publish from-package",
         "format": "prettier --write .",

@@ -271,6 +271,8 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
             const cleanupUpdate = updateCleanup.get(internalInstance);
 
             if (cleanupUpdate) cleanupUpdate();
+            stateListeners.delete(internalInstance);
+            updateCleanup.delete(internalInstance);
             lifecycleOptions.teardown?.call(internalInstance);
             externalInstances.delete(this.root);
             internalInstances.delete(this);
@@ -315,7 +317,7 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
             if (!handlers) {
                 handlers = new Set();
-                listeners.set(property, new Set());
+                listeners.set(property, handlers);
             }
 
             if (handlers.has(handler)) {
