@@ -10,6 +10,7 @@ import resolveMethodOptions from './resolveMethodOptions';
 import renderComponent from './renderComponent';
 import getWatchCallback from './getWatchCallback';
 import resolveComputedOptions from './resolveComputedOptions';
+import { ORNATA_COMPONENT_CONSTRUCTOR } from './symbols';
 
 function defineComponent<T extends Ornata.ComponentInternalInstance>(
     options: Ornata.ComponentOptions<T>
@@ -104,7 +105,8 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
     }
 
     return class Component implements Ornata.ComponentInstance<T> {
-        readonly $$typeof: Ornata.ComponentInstance<T>['$$typeof'];
+        static readonly $$typeof: Ornata.ComponentConstructor<T>['$$typeof'] =
+            ORNATA_COMPONENT_CONSTRUCTOR;
 
         readonly root: Ornata.ComponentInstance<T>['root'];
 
@@ -235,7 +237,6 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
             internalInstance.computed = computed;
 
             // Set up the external instance
-            this.$$typeof = Symbol.for('ornata.component');
             this.root = root;
             this.state = externalState;
 

@@ -1,10 +1,9 @@
 import defineComponent from './defineComponent';
+import isComponent from './isComponent';
 
-/**
- * A progressive enhancement framework for server-rendered websites
- */
 interface Ornata {
     defineComponent: typeof defineComponent;
+    isComponent: typeof isComponent;
 }
 
 namespace Ornata {
@@ -84,16 +83,6 @@ namespace Ornata {
         T extends ComponentInternalInstance,
         K extends keyof T['state'],
     > {
-        // /**
-        //  * The name of another state property that this state property controls. This property must be a callback
-        //  * function (e.g., `onChange: (value: string) => void`). When provided by the user, the named property
-        //  * will not update automatically. Instead, it must be updated manually via this callback function.
-        //  * @since v0.1.0
-        //  */
-        // controls?: T extends (...args: any[]) => any
-        //     ? Exclude<keyof T['state'], K>
-        //     : never;
-
         /**
          * The default value to use for the state property if no value is provided.
          * @since v0.1.0
@@ -409,8 +398,6 @@ namespace Ornata {
      * @since v0.1.0
      */
     export interface ComponentInstance<T extends ComponentInternalInstance> {
-        $$typeof: Symbol;
-
         /**
          * The resolved root element of the component that was passed to the constructor.
          * @since v0.1.0
@@ -464,6 +451,12 @@ namespace Ornata {
      */
     export interface ComponentConstructor<T extends ComponentInternalInstance> {
         /**
+         * The symbol that is used to identify the component constructor.
+         * @since v0.1.0
+         */
+        readonly $$typeof: Symbol;
+
+        /**
          * Create a new instance of the component.
          * _Note: This method is typically not called directly by users. Instead, it is called by the `createInstance` method._
          * @parameter root The root element of the instance to create. Can be a CSS selector or the element itself.
@@ -480,7 +473,7 @@ namespace Ornata {
          * The display name of the component; used primarily for debugging and error reporting.
          * @since v0.1.0
          */
-        displayName: string;
+        readonly displayName: string;
 
         /**
          * Create a new instance of the component.
@@ -534,6 +527,14 @@ namespace Ornata {
     }
 }
 
-export { defineComponent };
+/**
+ * A progressive enhancement framework for server-rendered websites
+ */
+const Ornata: Ornata = {
+    defineComponent,
+    isComponent,
+};
+
+export { defineComponent, isComponent };
 
 export default Ornata;

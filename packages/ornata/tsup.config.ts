@@ -1,26 +1,21 @@
 import { defineConfig } from 'tsup';
 
 export default [
-    // ESM, CJS, and IIFE (production): no process ref, messages disabled
+    // ESM and CJS
     defineConfig({
         entry: ['src/index.ts'],
-        format: ['esm', 'cjs', 'iife'],
+        format: ['esm', 'cjs'],
         outDir: 'dist',
         dts: true,
         clean: true,
-        globalName: 'Ornata',
-        define: {
-            'process.env.NODE_ENV': JSON.stringify('production'),
-        },
         outExtension({ format }) {
             if (format === 'cjs') return { js: '.cjs' };
-            if (format === 'iife') return { js: '.global.js' };
             return { js: '.js' };
         },
     }),
-    // IIFE (development): no process ref, full reporter messages
+    // IIFE (development)
     defineConfig({
-        entry: ['src/index.ts'],
+        entry: { 'index.global.dev': 'src/global.ts' },
         format: ['iife'],
         outDir: 'dist',
         clean: false,
@@ -29,7 +24,22 @@ export default [
             'process.env.NODE_ENV': JSON.stringify('development'),
         },
         outExtension() {
-            return { js: '.global.dev.js' };
+            return { js: '.js' };
+        },
+    }),
+    // IIFE (production)
+    defineConfig({
+        entry: { 'index.global': 'src/global.ts' },
+        format: ['iife'],
+        outDir: 'dist',
+        clean: false,
+        minify: true,
+        globalName: 'Ornata',
+        define: {
+            'process.env.NODE_ENV': JSON.stringify('production'),
+        },
+        outExtension() {
+            return { js: '.js' };
         },
     }),
 ];

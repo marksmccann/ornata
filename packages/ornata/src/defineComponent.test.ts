@@ -5,12 +5,14 @@ import { describe, it, expect, vi } from 'vitest';
 import { defineComponent } from './index.js';
 import reporter from './reporter.js';
 import describeElement from './describeElement.js';
+import { ORNATA_COMPONENT_CONSTRUCTOR } from './symbols.js';
 
 describe('defineComponent', () => {
     it('should create component constructor', () => {
         const Test = defineComponent({ name: 'Test' });
 
         expect(Test.displayName).toStrictEqual('Test');
+        expect(Test.$$typeof).toStrictEqual(ORNATA_COMPONENT_CONSTRUCTOR);
         expect(Test.createInstance).toBeInstanceOf(Function);
         expect(Test.getInstance).toBeInstanceOf(Function);
         expect(Test.queryInstance).toBeInstanceOf(Function);
@@ -22,7 +24,6 @@ describe('defineComponent', () => {
         const instance = Test.createInstance(root);
 
         expect(instance).toBeInstanceOf(Test);
-        expect(instance.$$typeof).toStrictEqual(Symbol.for('ornata.component'));
         expect(instance.root).toStrictEqual(root);
         expect(instance.state).toEqual({});
         expect(instance.addStateListener).toBeInstanceOf(Function);
