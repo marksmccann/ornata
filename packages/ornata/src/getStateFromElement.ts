@@ -96,6 +96,8 @@ export default function getStateFromElement<
 
         state[property as keyof T['state']] =
             parsedValue as T['state'][keyof T['state']];
+
+        delete element.dataset[property];
     });
 
     return state;

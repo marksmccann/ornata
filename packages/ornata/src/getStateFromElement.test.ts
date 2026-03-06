@@ -14,6 +14,7 @@ describe('getStateFromElement', () => {
             elements: {};
             methods: {};
             data: {};
+            computed: {};
         }>({ name: { default: 'fallback' } }, 'Test', element);
 
         expect(state).toStrictEqual({ name: 'test' });

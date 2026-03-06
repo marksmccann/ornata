@@ -8,7 +8,7 @@
     </head>
     <body>
         <h1>Ornata Test Demos</h1>
-        <div id="counter">
+        <div id="counter" data-ornata="Counter" data-count="10">
             <p>Count: <span data-count>0</span></p>
             <button data-increment>Increment</button>
             <button data-decrement>Decrement</button>
@@ -77,7 +77,8 @@
                 },
             });
 
-            const counter = Counter.createInstance('#counter');
+            // const counter = Counter.createInstance('#counter');
+            const [counter] = Ornata.createInitializer({ Counter })();
 
             counter.addStateListener('count', (newValue, oldValue) => {
                 console.log(newValue, oldValue);

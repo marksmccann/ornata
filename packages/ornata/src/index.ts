@@ -1,9 +1,11 @@
 import defineComponent from './defineComponent';
 import isComponent from './isComponent';
+import createInitializer from './createInitializer';
 
 interface Ornata {
     defineComponent: typeof defineComponent;
     isComponent: typeof isComponent;
+    createInitializer: typeof createInitializer;
 }
 
 namespace Ornata {
@@ -533,8 +535,9 @@ namespace Ornata {
 const Ornata: Ornata = {
     defineComponent,
     isComponent,
+    createInitializer,
 };
 
-export { defineComponent, isComponent };
+export { defineComponent, isComponent, createInitializer };
 
 export default Ornata;
