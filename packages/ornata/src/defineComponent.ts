@@ -144,6 +144,10 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
             const internalState = new Proxy(state, {
                 get(target, property) {
+                    if (typeof property === 'symbol') {
+                        return target[property as keyof typeof target];
+                    }
+
                     if (!Object.hasOwn(stateOptions, property)) {
                         reporter.error('ERR22', {
                             action: 'get',
@@ -196,6 +200,10 @@ function defineComponent<T extends Ornata.ComponentInternalInstance>(
 
             const externalState = new Proxy(state, {
                 get(target, property) {
+                    if (typeof property === 'symbol') {
+                        return target[property as keyof typeof target];
+                    }
+
                     const options = stateOptions[property as keyof T['state']];
 
                     if (options?.private) {

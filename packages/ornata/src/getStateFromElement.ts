@@ -2,28 +2,87 @@ import type Ornata from './index';
 import reporter from './reporter';
 
 /**
+ * Infers the expected type from a state value.
+ * @param value The value to infer the expected type from.
+ * @returns The expected type from the value.
+ */
+function inferExpectedType<T extends Ornata.ComponentInternalInstance>(
+    value: unknown
+): Ornata.ComponentStateOptions<T, keyof T['state']>['type'] {
+    if (typeof value === 'string') return String;
+    if (typeof value === 'number') return Number;
+    if (typeof value === 'boolean') return Boolean;
+    if (Array.isArray(value)) return Array;
+    if (typeof value === 'object') return Object;
+    if (typeof value === 'function') return Function;
+    return undefined;
+}
+
+/**
  * Parses a value from the dataset of an element.
  * @param componentName The name of the component.
  * @param property The property to parse the value for.
  * @param value The value to parse.
- * @param expectedType The expected type of the value.
+ * @param option The configuration options for the state property.
  * @returns The parsed value.
  */
-function parseDatasetValue(
+function parseDatasetValue<T extends Ornata.ComponentInternalInstance>(
     componentName: string,
     property: string,
     value: string,
-    expectedType: unknown
+    option: Ornata.ComponentStateOptions<T, keyof T['state']>
 ): unknown {
-    if (expectedType === String) return value;
+    const { default: defaultValue, type, parse } = option;
+    const expectedTypes = [
+        type,
+        defaultValue !== undefined ? inferExpectedType<T>(defaultValue) : undefined,
+    ];
 
-    if (expectedType === Number) return Number(value);
+    if (parse) {
+        return parse(value);
+    }
 
-    if (expectedType === Boolean) {
-        return value === 'true' || value === '1';
+    const definedTypes = expectedTypes.filter(
+        (expectedType): expectedType is NonNullable<typeof expectedType> =>
+            expectedType !== undefined
+    );
+
+    // Make sure all the expected types are the same
+    if (
+        definedTypes.length > 1 &&
+        new Set(definedTypes).size !== 1
+    ) {
+        reporter.error('ERR06', {
+            componentName,
+            property,
+        });
+
+        return undefined;
     }
 
     try {
+        const expectedType = definedTypes[0];
+
+        if (expectedType === String) {
+            return value;
+        }
+
+        if (expectedType === Number) {
+            return Number(value);
+        }
+
+        if (expectedType === Boolean) {
+            return value === 'true' || value === '1';
+        }
+
+        if (expectedType === Array || expectedType === Object) {
+            return JSON.parse(value);
+        }
+
+        if (expectedType === Function) {
+            throw new Error('Function values cannot be parsed from HTML.');
+        }
+
         return JSON.parse(value);
     } catch {
         reporter.error('ERR08', {
@@ -55,7 +114,6 @@ export default function getStateFromElement<
 
     Object.entries(element.dataset).forEach(([property, value]) => {
         const option = stateOptions[property as keyof T['state']];
-        let expectedType: unknown;
         let parsedValue: unknown;
 
         if (!option) {
@@ -67,6 +125,7 @@ export default function getStateFromElement<
             return;
         }
 
+        // Make sure the property has a value
         if (!value) {
             reporter.error('ERR08', {
                 componentName,
@@ -77,22 +136,7 @@ export default function getStateFromElement<
             return;
         }
 
-        if (option.parse) {
-            parsedValue = option.parse(value);
-        } else if (option.default !== undefined) {
-            expectedType = (option.default as object).constructor;
-        } else if (option.type) {
-            expectedType = option.type;
-        }
-
-        if (expectedType) {
-            parsedValue = parseDatasetValue(
-                componentName,
-                property,
-                value,
-                expectedType
-            );
-        }
+        parsedValue = parseDatasetValue(componentName, property, value, option);
 
         state[property as keyof T['state']] =
             parsedValue as T['state'][keyof T['state']];

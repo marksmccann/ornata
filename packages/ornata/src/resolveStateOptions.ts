@@ -1,8 +1,15 @@
 import type Ornata from './index.js';
 import getStateFromElement from './getStateFromElement.js';
 import getDefaultState from './getDefaultState.js';
-import reporter from './reporter.js';
 
+/**
+ * Resolves the state options for a component.
+ * @param componentName The name of the component.
+ * @param root The root element of the component.
+ * @param initialState The initial state of the component, provided by the user.
+ * @param stateOptions The state options of the component.
+ * @returns The fully resolved, initial state of the component.
+ */
 export default function resolveStateOptions<
     T extends Ornata.ComponentInternalInstance,
 >(
@@ -10,30 +17,24 @@ export default function resolveStateOptions<
     root: Element,
     initialState: Partial<T['state']>,
     stateOptions: Ornata.ComponentOption<T, 'state'>
-): T {
-    let state = {} as T;
+): T['state'] {
+    let state = {} as T['state'];
     let stateFromHTML: Partial<T['state']> = {};
 
     if (root instanceof HTMLElement) {
-        stateFromHTML = getStateFromElement(stateOptions, componentName, root);
+        stateFromHTML = getStateFromElement<T>(
+            stateOptions,
+            componentName,
+            root
+        );
     }
 
-    Object.values(stateOptions).forEach((option) => {
-        const { type, parse } = option;
-        const defaultValue = option.default;
-
-        if (defaultValue === undefined && !type && !parse) {
-            reporter.error('ERR06', {
-                componentName,
-                property: 'state',
-            });
-        }
-    });
-
-    return {
+    const resolvedState = {
         ...state,
         ...getDefaultState(stateOptions, state),
         ...stateFromHTML,
         ...initialState,
     };
+
+    return resolvedState;
 }

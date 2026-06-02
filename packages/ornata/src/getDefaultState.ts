@@ -10,7 +10,7 @@ export default function getDefaultState<
     T extends Ornata.ComponentInternalInstance,
 >(
     stateOptions: Ornata.ComponentOption<T, 'state'>,
-    state: Partial<T>
+    state: Partial<T['state']>
 ): Partial<T['state']> {
     let defaultState: Partial<T['state']> = {};
 
@@ -18,7 +18,7 @@ export default function getDefaultState<
         const { default: defaultValue } =
             option as Ornata.ComponentStateOptions<T, keyof T['state']>;
 
-        if (state[property as keyof T] === undefined) {
+        if (state[property as keyof T['state']] === undefined) {
             defaultState[property as keyof T['state']] = defaultValue;
         }
     });
