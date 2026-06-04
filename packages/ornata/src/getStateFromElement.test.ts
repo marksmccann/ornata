@@ -29,6 +29,32 @@ describe('getStateFromElement', () => {
         expect(state).toStrictEqual({ name: 'TEST' });
     });
 
+    it('should report conflicting expected types between parse and default', () => {
+        const consoleError = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+        const element = document.createElement('div');
+        element.dataset.count = '123';
+        const state = getStateFromElement(
+            {
+                count: {
+                    default: 0,
+                    parse: (value) => value,
+                },
+            },
+            'Test',
+            element
+        );
+
+        expect(consoleError).toHaveBeenCalledWith(
+            reporter.message('ERR06', {
+                componentName: 'Test',
+                property: 'count',
+            })
+        );
+        expect(state).toStrictEqual({ count: undefined });
+    });
+
     it('should get state from element with type', () => {
         const element = document.createElement('div');
         element.dataset.name = 'test';
@@ -39,6 +65,27 @@ describe('getStateFromElement', () => {
         );
 
         expect(state).toStrictEqual({ name: 'test' });
+    });
+
+    it('should warn when it cannot determine an expected type before parsing', () => {
+        const consoleWarn = vi
+            .spyOn(console, 'warn')
+            .mockImplementation(() => {});
+        const element = document.createElement('div');
+        element.dataset.count = '123';
+        const state = getStateFromElement(
+            { count: {} },
+            'Test',
+            element
+        );
+
+        expect(consoleWarn).toHaveBeenCalledWith(
+            reporter.message('WRN02', {
+                componentName: 'Test',
+                property: 'count',
+            })
+        );
+        expect(state).toStrictEqual({ count: 123 });
     });
 
     it('should parse a number value', () => {
@@ -95,6 +142,7 @@ describe('getStateFromElement', () => {
             .mockImplementation(() => {});
         const element = document.createElement('div');
         element.dataset.name = 'function() { return "test"; }';
+
         const state = getStateFromElement(
             { name: { type: Function } },
             'Test',
@@ -105,6 +153,28 @@ describe('getStateFromElement', () => {
             reporter.message('ERR08', {
                 componentName: 'Test',
                 value: 'function() { return "test"; }',
+                property: 'name',
+            })
+        );
+        expect(state).toStrictEqual({ name: undefined });
+    });
+
+    it('should not parse an object property from an array value', () => {
+        const consoleError = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+        const element = document.createElement('div');
+        element.dataset.name = '[1,2,3]';
+        const state = getStateFromElement(
+            { name: { type: Object } },
+            'Test',
+            element
+        );
+
+        expect(consoleError).toHaveBeenCalledWith(
+            reporter.message('ERR08', {
+                componentName: 'Test',
+                value: '[1,2,3]',
                 property: 'name',
             })
         );

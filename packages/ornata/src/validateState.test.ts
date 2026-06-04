@@ -108,7 +108,6 @@ describe('validateState', () => {
         const consoleError = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
-        const state = { name: 'test' };
         const stateOptions = { name: { type: Object } };
 
         validateState('Test', 'name', 'test', stateOptions);
@@ -139,5 +138,76 @@ describe('validateState', () => {
                 type: 'function',
             })
         );
+    });
+
+    it('should validate state if the invalid value is a non-primitive', () => {
+        const consoleError = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+        const stateOptions = { name: { type: Array } };
+
+        validateState('Test', 'name', { invalid: true }, stateOptions);
+
+        expect(consoleError).toHaveBeenCalledWith(
+            reporter.message('ERR09', {
+                componentName: 'Test',
+                value: '[object Object]',
+                property: 'name',
+                type: 'array',
+            })
+        );
+    });
+
+    it('should infer the expected type from the default value', () => {
+        const consoleError = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+        const stateOptions = { count: { default: 0 } };
+
+        validateState('Test', 'count', 'test', stateOptions);
+
+        expect(consoleError).toHaveBeenCalledWith(
+            reporter.message('ERR09', {
+                componentName: 'Test',
+                value: 'test',
+                property: 'count',
+                type: 'number',
+            })
+        );
+    });
+
+    it('should report conflicting expected types between type and default', () => {
+        const consoleError = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+        const stateOptions = { count: { type: Number, default: '0' } };
+
+        validateState('Test', 'count', 0, stateOptions);
+
+        expect(consoleError).toHaveBeenCalledWith(
+            reporter.message('ERR06', {
+                componentName: 'Test',
+                property: 'count',
+            })
+        );
+        expect(consoleError).not.toHaveBeenCalledWith(
+            reporter.message('ERR09', {
+                componentName: 'Test',
+                value: 0,
+                property: 'count',
+                type: 'number',
+            })
+        );
+    });
+
+    it('should skip type validation when the expected type cannot be determined', () => {
+        const consoleError = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+        const stateOptions = { count: {} };
+
+        validateState('Test', 'count', 'test', stateOptions);
+
+        expect(consoleError).not.toHaveBeenCalled();
     });
 });

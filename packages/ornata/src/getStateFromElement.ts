@@ -1,21 +1,8 @@
 import type Ornata from './index';
 import reporter from './reporter';
+import getExpectedStateType from './getExpectedStateType.js';
+import isStateType from './isStateType.js';
 import type { StateOptions, StatePropertyOptions } from './runtime.js';
-
-/**
- * Infers the expected type from a state value.
- * @param value The value to infer the expected type from.
- * @returns The expected type from the value.
- */
-function inferExpectedType(value: unknown): StatePropertyOptions['type'] {
-    if (typeof value === 'string') return String;
-    if (typeof value === 'number') return Number;
-    if (typeof value === 'boolean') return Boolean;
-    if (Array.isArray(value)) return Array;
-    if (typeof value === 'object') return Object;
-    if (typeof value === 'function') return Function;
-    return undefined;
-}
 
 /**
  * Parses a value from the dataset of an element.
@@ -24,6 +11,7 @@ function inferExpectedType(value: unknown): StatePropertyOptions['type'] {
  * @param value The value to parse.
  * @param option The configuration options for the state property.
  * @returns The parsed value.
+ * @private
  */
 function parseDatasetValue(
     componentName: string,
@@ -31,26 +19,27 @@ function parseDatasetValue(
     value: string,
     option: StatePropertyOptions
 ): unknown {
-    const { default: defaultValue, type, parse } = option;
-    const expectedTypes = [
-        type,
-        defaultValue !== undefined ? inferExpectedType(defaultValue) : undefined,
-    ];
+    const { parse } = option;
 
     if (parse) {
-        return parse(value);
+        const parsedValue = parse(value);
+        const resolution = getExpectedStateType(option, parsedValue);
+
+        if (resolution.hasConflict) {
+            reporter.error('ERR06', {
+                componentName,
+                property,
+            });
+
+            return undefined;
+        }
+
+        return parsedValue;
     }
 
-    const definedTypes = expectedTypes.filter(
-        (expectedType): expectedType is NonNullable<typeof expectedType> =>
-            expectedType !== undefined
-    );
+    const resolution = getExpectedStateType(option);
 
-    // Make sure all the expected types are the same
-    if (
-        definedTypes.length > 1 &&
-        new Set(definedTypes).size !== 1
-    ) {
+    if (resolution.hasConflict) {
         reporter.error('ERR06', {
             componentName,
             property,
@@ -60,29 +49,45 @@ function parseDatasetValue(
     }
 
     try {
-        const expectedType = definedTypes[0];
+        let parsedValue: unknown;
+        const { expectedType } = resolution;
 
-        if (expectedType === String) {
-            return value;
+        if (expectedType === 'string') {
+            parsedValue = value;
+        } else if (expectedType === 'number') {
+            parsedValue = Number(value);
+        } else if (expectedType === 'boolean') {
+            parsedValue = value === 'true' || value === '1';
+        } else if (expectedType === 'array' || expectedType === 'object') {
+            parsedValue = JSON.parse(value);
+        } else if (expectedType === 'function') {
+            reporter.error('ERR08', {
+                componentName,
+                value,
+                property,
+            });
+
+            return undefined;
+        } else {
+            parsedValue = JSON.parse(value);
         }
 
-        if (expectedType === Number) {
-            return Number(value);
+        if (!expectedType) {
+            reporter.warn('WRN02', {
+                componentName,
+                property,
+            });
+        } else if (!isStateType(parsedValue, expectedType)) {
+            reporter.error('ERR08', {
+                componentName,
+                value,
+                property,
+            });
+
+            return undefined;
         }
 
-        if (expectedType === Boolean) {
-            return value === 'true' || value === '1';
-        }
-
-        if (expectedType === Array || expectedType === Object) {
-            return JSON.parse(value);
-        }
-
-        if (expectedType === Function) {
-            throw new Error('Function values cannot be parsed from HTML.');
-        }
-
-        return JSON.parse(value);
+        return parsedValue;
     } catch {
         reporter.error('ERR08', {
             componentName,

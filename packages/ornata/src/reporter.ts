@@ -6,7 +6,7 @@ const messages = {
     ERR03: '{{ componentName }}: Failed to {{ action }} instance. Instance already exists for root element: "{{ root }}"',
     ERR04: '{{ componentName }}: Failed to {{ action }} instance. Instance does not exist for root element: "{{ root }}"',
     ERR05: '{{ componentName }}: Invalid root element. The root element does not match the selector: "{{ selector }}".',
-    ERR06: '{{ componentName }}: Failed to parse state from HTML. The property "{{ property }}" has conflicting expected types between its "default", "type", or "parse" state options.',
+    ERR06: '{{ componentName }}: Invalid state options. The property "{{ property }}" has conflicting expected types between its "default", "type", or "parse" state options.',
     ERR07: '{{ componentName }}: Invalid state property. The property "{{ property }}" is not defined in the component state options.',
     ERR08: '{{ componentName }}: Failed to parse state from HTML. The value "{{ value }}" for property "{{ property }}" from the root element is not valid.',
     ERR09: '{{ componentName }}: Invalid state type. The value "{{ value }}" for property "{{ property }}" is not of type "{{ type }}".',
@@ -26,7 +26,7 @@ const messages = {
     ERR23: '{{ componentName }}: Failed to call "{{ property }}" in the "{{ option }}" option because it is not a valid callback function.',
     ERR24: 'Failed to initialize component for the root element "{{ root }}". The "data-ornata" attribute does not have a valid component name as its value. Found "{{ value }}", but expected one of: {{ expected }}',
     WRN01: '{{ componentName }}: Failed to {{ action }} state listener for property "{{ property }}". The listener {{ status }}.',
-    // WRN02: '{{ componentName }}: Parsed state property from HTML with implicit type. The value "{{ value }}" for property "{{ property }}" was parsed as type "{{ type }}". Provide an explicit type ("defaultValue", "type", or "parse") in the state options for the property to suppress this warning.',
+    WRN02: '{{ componentName }}: Could not determine the expected state type for property "{{ property }}". Provide a "type", "default", or "parse" state option for clearer validation.',
 } as const;
 
 /**

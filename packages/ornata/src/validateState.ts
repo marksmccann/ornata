@@ -1,4 +1,7 @@
 import reporter from './reporter';
+import isStateType from './isStateType.js';
+import inferStateType from './inferStateType.js';
+import getExpectedStateType from './getExpectedStateType.js';
 import type { StateOptions } from './runtime.js';
 
 /**
@@ -25,36 +28,30 @@ export default function validateState(
         return;
     }
 
-    const { type } = option;
-    let invalid = false;
-    let expectedType;
+    let reportedValue: string | number | boolean = 'unknown';
+    const { expectedType, hasConflict } = getExpectedStateType(option);
 
-    if (type === String && typeof value !== 'string') {
-        expectedType = 'string';
-        invalid = true;
-    } else if (type === Number && typeof value !== 'number') {
-        expectedType = 'number';
-        invalid = true;
-    } else if (type === Boolean && typeof value !== 'boolean') {
-        expectedType = 'boolean';
-        invalid = true;
-    } else if (type === Array && !Array.isArray(value)) {
-        expectedType = 'array';
-        invalid = true;
-    } else if (type === Object && typeof value !== 'object') {
-        expectedType = 'object';
-        invalid = true;
-    } else if (type === Function && typeof value !== 'function') {
-        expectedType = 'function';
-        invalid = true;
+    if (hasConflict) {
+        reporter.error('ERR06', {
+            componentName,
+            property: property as string,
+        });
+
+        return;
     }
 
-    if (invalid) {
-        const reportedValue =
-            typeof value === 'string' ||
-            typeof value === 'number' ||
-            typeof value === 'boolean'
-                ? value
+    if (!expectedType) {
+        return;
+    }
+
+    if (!isStateType(value, expectedType)) {
+        const actualType = inferStateType(value);
+
+        reportedValue =
+            actualType === 'string' ||
+            actualType === 'number' ||
+            actualType === 'boolean'
+                ? (value as string | number | boolean)
                 : String(value);
 
         reporter.error('ERR09', {

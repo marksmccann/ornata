@@ -8,12 +8,14 @@ import type Ornata from './index.js';
 
 /**
  * A broad internal component instance shape used by runtime helpers.
+ * @private
  */
 export type InternalInstance = Ornata.InternalInstance;
 
 /**
  * A broad computed callback shape used by runtime helpers after generic
  * component definitions have been erased at the runtime boundary.
+ * @private
  */
 export type ComputedCallback = (
     this: InternalInstance,
@@ -23,12 +25,14 @@ export type ComputedCallback = (
 
 /**
  * A string-keyed record of runtime computed callbacks.
+ * @private
  */
 export type ComputedOptions = Record<string, ComputedCallback>;
 
 /**
  * A broad watch callback shape used by runtime helpers after generic component
  * definitions have been erased at the runtime boundary.
+ * @private
  */
 export type WatchCallback = (
     this: InternalInstance,
@@ -38,12 +42,14 @@ export type WatchCallback = (
 
 /**
  * A string-keyed record of runtime watch callbacks.
+ * @private
  */
 export type WatchOptions = Record<string, WatchCallback>;
 
 /**
  * A broad render callback shape used by runtime helpers after generic
  * component definitions have been erased at the runtime boundary.
+ * @private
  */
 export type RenderCallback = (
     this: InternalInstance,
@@ -52,17 +58,20 @@ export type RenderCallback = (
 
 /**
  * A string-keyed record of runtime render callbacks.
+ * @private
  */
 export type RenderOptions = Record<string, RenderCallback>;
 
 /**
  * A string-keyed record of runtime data values.
+ * @private
  */
 export type DataOptions = Record<string, unknown>;
 
 /**
  * A broad unbound method shape used by runtime helpers after generic
  * component definitions have been erased at the runtime boundary.
+ * @private
  */
 export type MethodCallback = (
     this: InternalInstance,
@@ -72,18 +81,21 @@ export type MethodCallback = (
 /**
  * A string-keyed record of runtime method definitions before they are bound to
  * an internal instance.
+ * @private
  */
 export type MethodOptions = Record<string, MethodCallback>;
 
 /**
  * A string-keyed record of runtime methods after they have been bound to an
  * internal instance.
+ * @private
  */
 export type Methods = Record<string, (...args: unknown[]) => unknown>;
 
 /**
  * Lifecycle callbacks used by runtime helpers after generic component
  * definitions have been erased at the runtime boundary.
+ * @private
  */
 export interface LifecycleOptions {
     setup?: (this: InternalInstance) => void;
@@ -92,6 +104,7 @@ export interface LifecycleOptions {
 
 /**
  * Root configuration used by runtime helpers.
+ * @private
  */
 export interface RootOptions {
     matches?: string;
@@ -99,16 +112,41 @@ export interface RootOptions {
 
 /**
  * State property configuration used by runtime helpers.
+ * @private
+ */
+export type StateTypeConstructor =
+    | StringConstructor
+    | NumberConstructor
+    | BooleanConstructor
+    | ArrayConstructor
+    | ObjectConstructor
+    | FunctionConstructor;
+
+/**
+ * Runtime-friendly state type names used by validation and parsing helpers.
+ * @private
+ */
+export type StateTypeName =
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'array'
+    | 'object'
+    | 'function';
+
+/**
+ * Runtime source names for inferred state type expectations.
+ * @private
+ */
+export type StateTypeSource = 'type' | 'default' | 'parsed';
+
+/**
+ * Runtime configuration for an individual state property.
+ * @private
  */
 export interface StatePropertyOptions {
     default?: unknown;
-    type?:
-        | StringConstructor
-        | NumberConstructor
-        | BooleanConstructor
-        | ArrayConstructor
-        | ObjectConstructor
-        | FunctionConstructor;
+    type?: StateTypeConstructor;
     parse?: (value: string) => unknown;
     private?: boolean;
     readonly?: boolean;
@@ -116,21 +154,25 @@ export interface StatePropertyOptions {
 
 /**
  * A string-keyed record of runtime state property configuration.
+ * @private
  */
 export type StateOptions = Record<string, StatePropertyOptions>;
 
 /**
  * A broad state listener shape used by runtime helpers.
+ * @private
  */
 export type StateListener = (newValue: unknown, oldValue: unknown) => void;
 
 /**
  * A string-keyed map of runtime state listeners by state property.
+ * @private
  */
 export type StateListeners = Map<string, Set<StateListener>>;
 
 /**
  * Element property configuration used by runtime helpers.
+ * @private
  */
 export interface ElementPropertyOptions {
     queryAll?: string;
@@ -143,5 +185,6 @@ export interface ElementPropertyOptions {
 
 /**
  * A string-keyed record of runtime element property configuration.
+ * @private
  */
 export type ElementOptions = Record<string, ElementPropertyOptions>;
