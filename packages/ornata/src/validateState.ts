@@ -29,12 +29,14 @@ export default function validateState(
     }
 
     let reportedValue: string | number | boolean = 'unknown';
-    const { expectedType, hasConflict } = getExpectedStateType(option);
+    const resolution = getExpectedStateType(option);
+    const { expectedType, conflictDetails } = resolution;
 
-    if (hasConflict) {
+    if (conflictDetails) {
         reporter.error('ERR06', {
             componentName,
             property: property as string,
+            ...conflictDetails,
         });
 
         return;

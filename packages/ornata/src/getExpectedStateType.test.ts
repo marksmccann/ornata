@@ -7,24 +7,24 @@ describe('getExpectedStateType', () => {
     it('should resolve the expected type from the type option', () => {
         expect(getExpectedStateType({ type: String })).toStrictEqual({
             expectedType: 'string',
-            hasConflict: false,
-            sources: ['type'],
+            inferredTypes: [{ source: 'type', type: 'string' }],
+            conflictDetails: undefined,
         });
     });
 
     it('should resolve the expected type from the default option', () => {
         expect(getExpectedStateType({ default: 0 })).toStrictEqual({
             expectedType: 'number',
-            hasConflict: false,
-            sources: ['default'],
+            inferredTypes: [{ source: 'default', type: 'number' }],
+            conflictDetails: undefined,
         });
     });
 
     it('should resolve the expected type from the parsed value', () => {
         expect(getExpectedStateType({}, true)).toStrictEqual({
             expectedType: 'boolean',
-            hasConflict: false,
-            sources: ['parsed'],
+            inferredTypes: [{ source: 'parsed', type: 'boolean' }],
+            conflictDetails: undefined,
         });
     });
 
@@ -36,8 +36,11 @@ describe('getExpectedStateType', () => {
             })
         ).toStrictEqual({
             expectedType: 'array',
-            hasConflict: false,
-            sources: ['type', 'default'],
+            inferredTypes: [
+                { source: 'type', type: 'array' },
+                { source: 'default', type: 'array' },
+            ],
+            conflictDetails: undefined,
         });
     });
 
@@ -52,8 +55,12 @@ describe('getExpectedStateType', () => {
             )
         ).toStrictEqual({
             expectedType: 'object',
-            hasConflict: false,
-            sources: ['type', 'default', 'parsed'],
+            inferredTypes: [
+                { source: 'type', type: 'object' },
+                { source: 'default', type: 'object' },
+                { source: 'parsed', type: 'object' },
+            ],
+            conflictDetails: undefined,
         });
     });
 
@@ -65,8 +72,14 @@ describe('getExpectedStateType', () => {
             })
         ).toStrictEqual({
             expectedType: undefined,
-            hasConflict: true,
-            sources: ['type', 'default'],
+            inferredTypes: [
+                { source: 'type', type: 'number' },
+                { source: 'default', type: 'string' },
+            ],
+            conflictDetails: {
+                sources: '"type", "default"',
+                types: '"type" => "number", "default" => "string"',
+            },
         });
     });
 
@@ -80,16 +93,22 @@ describe('getExpectedStateType', () => {
             )
         ).toStrictEqual({
             expectedType: undefined,
-            hasConflict: true,
-            sources: ['default', 'parsed'],
+            inferredTypes: [
+                { source: 'default', type: 'boolean' },
+                { source: 'parsed', type: 'string' },
+            ],
+            conflictDetails: {
+                sources: '"default", "parsed"',
+                types: '"default" => "boolean", "parsed" => "string"',
+            },
         });
     });
 
     it('should return no expected type when no type information is available', () => {
         expect(getExpectedStateType({})).toStrictEqual({
             expectedType: undefined,
-            hasConflict: false,
-            sources: [],
+            inferredTypes: [],
+            conflictDetails: undefined,
         });
     });
 });

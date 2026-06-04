@@ -7,6 +7,38 @@ import type {
 import inferStateType from './inferStateType.js';
 
 /**
+ * Per-source inferred state type data used by runtime validation helpers.
+ * @private
+ */
+export interface InferredStateTypeData {
+    /**
+     * The option source that produced the inferred type.
+     */
+    source: StateTypeSource;
+
+    /**
+     * The runtime state type inferred from the source.
+     */
+    type: StateTypeName;
+}
+
+/**
+ * Reporter-friendly conflict details derived from a state type resolution.
+ * @private
+ */
+export interface ExpectedStateTypeConflictDetails {
+    /**
+     * The conflicting option sources, formatted for reporter tokens.
+     */
+    sources: string;
+
+    /**
+     * The conflicting source-to-type mappings, formatted for reporter tokens.
+     */
+    types: string;
+}
+
+/**
  * The result of resolving an expected state type from runtime state options.
  * @private
  */
@@ -19,14 +51,14 @@ export interface ExpectedStateTypeResolution {
     expectedType?: StateTypeName;
 
     /**
-     * Whether the available type signals disagreed with each other.
+     * The inferred type produced by each contributing option source.
      */
-    hasConflict: boolean;
+    inferredTypes: InferredStateTypeData[];
 
     /**
-     * The option sources that contributed to the resolved type analysis.
+     * Reporter-friendly conflict details when the inferred types disagree.
      */
-    sources: StateTypeSource[];
+    conflictDetails?: ExpectedStateTypeConflictDetails;
 }
 
 /**
@@ -59,27 +91,23 @@ export default function getExpectedStateType(
     option: StatePropertyOptions,
     parsedValue?: unknown
 ): ExpectedStateTypeResolution {
-    const inferredTypes: Array<{
-        source: StateTypeSource;
-        type?: StateTypeName;
-    }> = [];
+    const inferredTypes: InferredStateTypeData[] = [];
+    let conflictDetails: ExpectedStateTypeConflictDetails | undefined;
     let expectedType: StateTypeName | undefined;
-    let hasConflict = false;
-    let sources: StateTypeSource[] = [];
 
     if (option.type) {
         const typeName = getStateTypeName(option.type);
-        inferredTypes.push({ source: 'type', type: typeName });
+        if (typeName) inferredTypes.push({ source: 'type', type: typeName });
     }
 
     if (option.default !== undefined) {
         const typeName = inferStateType(option.default);
-        inferredTypes.push({ source: 'default', type: typeName });
+        if (typeName) inferredTypes.push({ source: 'default', type: typeName });
     }
 
     if (parsedValue !== undefined) {
         const typeName = inferStateType(parsedValue);
-        inferredTypes.push({ source: 'parsed', type: typeName });
+        if (typeName) inferredTypes.push({ source: 'parsed', type: typeName });
     }
 
     if (inferredTypes.length > 0) {
@@ -88,11 +116,16 @@ export default function getExpectedStateType(
         if (uniqueTypes.size === 1) {
             expectedType = inferredTypes[0].type;
         } else {
-            hasConflict = true;
-        }
+            const sources = inferredTypes
+                .map(({ source }) => `"${source}"`)
+                .join(', ');
+            const types = inferredTypes
+                .map(({ source, type }) => `"${source}" => "${type}"`)
+                .join(', ');
 
-        sources = inferredTypes.map(({ source }) => source);
+            conflictDetails = { sources, types };
+        }
     }
 
-    return { expectedType, hasConflict, sources };
+    return { expectedType, inferredTypes, conflictDetails };
 }

@@ -50,6 +50,8 @@ describe('getStateFromElement', () => {
             reporter.message('ERR06', {
                 componentName: 'Test',
                 property: 'count',
+                sources: '"default", "parsed"',
+                types: '"default" => "number", "parsed" => "string"',
             })
         );
         expect(state).toStrictEqual({ count: undefined });

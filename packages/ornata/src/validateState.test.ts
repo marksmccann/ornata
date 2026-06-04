@@ -188,6 +188,8 @@ describe('validateState', () => {
             reporter.message('ERR06', {
                 componentName: 'Test',
                 property: 'count',
+                sources: '"type", "default"',
+                types: '"type" => "number", "default" => "string"',
             })
         );
         expect(consoleError).not.toHaveBeenCalledWith(

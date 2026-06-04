@@ -25,10 +25,11 @@ function parseDatasetValue(
         const parsedValue = parse(value);
         const resolution = getExpectedStateType(option, parsedValue);
 
-        if (resolution.hasConflict) {
+        if (resolution.conflictDetails) {
             reporter.error('ERR06', {
                 componentName,
                 property,
+                ...resolution.conflictDetails,
             });
 
             return undefined;
@@ -39,10 +40,11 @@ function parseDatasetValue(
 
     const resolution = getExpectedStateType(option);
 
-    if (resolution.hasConflict) {
+    if (resolution.conflictDetails) {
         reporter.error('ERR06', {
             componentName,
             property,
+            ...resolution.conflictDetails,
         });
 
         return undefined;

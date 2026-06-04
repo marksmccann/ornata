@@ -6,7 +6,7 @@ const messages = {
     ERR03: '{{ componentName }}: Failed to {{ action }} instance. Instance already exists for root element: "{{ root }}"',
     ERR04: '{{ componentName }}: Failed to {{ action }} instance. Instance does not exist for root element: "{{ root }}"',
     ERR05: '{{ componentName }}: Invalid root element. The root element does not match the selector: "{{ selector }}".',
-    ERR06: '{{ componentName }}: Invalid state options. The property "{{ property }}" has conflicting expected types between its "default", "type", or "parse" state options.',
+    ERR06: '{{ componentName }}: Invalid state options. The property "{{ property }}" has conflicting expected types from {{ sources }}: {{ types }}.',
     ERR07: '{{ componentName }}: Invalid state property. The property "{{ property }}" is not defined in the component state options.',
     ERR08: '{{ componentName }}: Failed to parse state from HTML. The value "{{ value }}" for property "{{ property }}" from the root element is not valid.',
     ERR09: '{{ componentName }}: Invalid state type. The value "{{ value }}" for property "{{ property }}" is not of type "{{ type }}".',
