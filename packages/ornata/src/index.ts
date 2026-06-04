@@ -554,9 +554,7 @@ namespace Ornata {
      * @since v0.2.0
      */
     export type ComponentShape<T extends ComponentShapeOverrides = {}> = {
-        root: T extends { root: infer TRoot extends Element }
-            ? TRoot
-            : Element;
+        root: T extends { root: infer TRoot extends Element } ? TRoot : Element;
         state: T extends { state: infer TState extends ComponentState }
             ? TState
             : {};
@@ -577,7 +575,6 @@ namespace Ornata {
             ? TComputed
             : {};
     };
-
 }
 
 /**

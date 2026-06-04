@@ -27,7 +27,7 @@ export default function renderComponent(
     let elementCleanup: Array<ReturnType<typeof renderElement>> = [];
 
     Object.entries(renderOptions).forEach((entry) => {
-        const elementName = entry[0];
+        const elementName = entry[0] as string;
         const renderCallback = entry[1] as RenderCallback;
         const elementsDataToRender: Array<RenderElementData> = [];
         const elementToRender = elements[elementName];
@@ -35,7 +35,7 @@ export default function renderComponent(
         if (typeof renderCallback !== 'function') {
             reporter.error('ERR23', {
                 componentName,
-                property: elementName as string,
+                property: elementName,
                 option: 'render',
             });
 
@@ -45,16 +45,11 @@ export default function renderComponent(
         if (Array.isArray(elementToRender)) {
             elementToRender.forEach((element, index) => {
                 const result = renderCallback.call(this, index);
-                let name = `"${elementName as string}"`;
-
-                if (typeof index === 'number') {
-                    name = `"${elementName as string}" at index ${index}`;
-                }
 
                 elementsDataToRender.push({
                     componentName,
                     element,
-                    elementName: name,
+                    elementName: `"${elementName}" at index ${index}`,
                     options: result,
                 });
             });
@@ -64,7 +59,7 @@ export default function renderComponent(
             elementsDataToRender.push({
                 componentName,
                 element: elementToRender,
-                elementName: `"${elementName as string}"`,
+                elementName: `"${elementName}"`,
                 options: result,
             });
         }
