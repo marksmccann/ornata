@@ -7,18 +7,19 @@ import isComponent from './isComponent.js';
  * Creates a function that initializes Ornata components from the HTML via the `data-ornata` attribute.
  * @param constructors The constructors to use to initialize the components.
  * @returns A function that initializes the components.
+ * @since v0.2.0
  */
 export default function createInitializer<
-    T extends Ornata.ComponentConstructor<Ornata.ComponentInternalInstance>,
->(constructors: { [K in keyof T]: T[K] }) {
+    T extends Record<
+        string,
+        Ornata.ComponentConstructor<Ornata.InternalInstance>
+    >,
+>(constructors: T) {
+    type InitializedComponent = Ornata.InferComponentInstance<T[keyof T]>;
     const expectedComponentNames = Object.keys(constructors);
 
-    return function initialize(): Array<
-        Ornata.ComponentInstance<Ornata.ComponentInternalInstance>
-    > {
-        const instances = new Set<
-            Ornata.ComponentInstance<Ornata.ComponentInternalInstance>
-        >();
+    return function initialize(): Array<InitializedComponent> {
+        const instances = new Set<InitializedComponent>();
         const rootElements = Array.from(
             document.querySelectorAll<HTMLElement | SVGElement>(`[data-ornata]`)
         );
@@ -36,7 +37,7 @@ export default function createInitializer<
                 return;
             }
 
-            const component = constructors[componentName];
+            const component = constructors[componentName as keyof T];
 
             if (!isComponent(component)) {
                 reporter.error('ERR24', {
@@ -48,7 +49,9 @@ export default function createInitializer<
                 return;
             }
 
-            const instance = component.createInstance(rootElement);
+            const instance = component.createInstance(
+                rootElement
+            ) as InitializedComponent;
 
             delete rootElement.dataset.ornata;
 

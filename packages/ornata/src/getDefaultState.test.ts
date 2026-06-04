@@ -8,7 +8,7 @@ describe('getDefaultState', () => {
     it('should default state when value is undefined', () => {
         const state = {
             name: undefined,
-        } as Partial<Ornata.ComponentInternalInstance>;
+        } as Partial<Ornata.InternalInstance>;
         const stateOptions = { name: { default: 'test' } };
         const defaultState = getDefaultState(stateOptions, state);
 
@@ -18,7 +18,7 @@ describe('getDefaultState', () => {
     it('should not default state when value is defined', () => {
         const state = {
             name: 'test',
-        } as Partial<Ornata.ComponentInternalInstance>;
+        } as Partial<Ornata.InternalInstance>;
         const stateOptions = { name: { default: 'test' } };
         const defaultState = getDefaultState(stateOptions, state);
 

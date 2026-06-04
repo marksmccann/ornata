@@ -7,7 +7,7 @@ import { ORNATA_COMPONENT_CONSTRUCTOR } from './symbols.js';
  * @returns Whether the value is a component constructor.
  */
 export default function isComponent<
-    T extends Ornata.ComponentConstructor<Ornata.ComponentInternalInstance>,
+    T extends Ornata.ComponentConstructor<Ornata.InternalInstance>,
 >(value: unknown): value is T {
     return (
         typeof value === 'function' &&

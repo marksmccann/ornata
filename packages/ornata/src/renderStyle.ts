@@ -9,7 +9,7 @@ import type { RenderElementData } from './renderElement';
  * @private
  */
 export default function renderStyle(
-    style: Ornata.ComponentRenderOptions['style'],
+    style: Ornata.RenderOptions['style'],
     data: RenderElementData
 ): void {
     const { componentName, element, elementName } = data;

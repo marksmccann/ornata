@@ -53,9 +53,9 @@ namespace Ornata {
 
     /**
      * The internal instance of the component.
-     * @since v0.1.0
+     * @since v0.2.0
      */
-    export interface ComponentInternalInstance {
+    export interface InternalInstance {
         root: Element;
         state: ComponentState;
         elements: ComponentElements;
@@ -66,9 +66,9 @@ namespace Ornata {
 
     /**
      * The configuration options for the root element for the `defineComponent` function.
-     * @since v0.1.0
+     * @since v0.2.0
      */
-    export interface ComponentRootOptions<T extends ComponentInternalInstance> {
+    export interface RootOptions<T extends InternalInstance> {
         /**
          * Inform the user when the root element they supplied to the constructor
          * does not match the expected type via a CSS selector.
@@ -79,10 +79,10 @@ namespace Ornata {
 
     /**
      * The configuration options for the state properties for the `defineComponent` function.
-     * @since v0.1.0
+     * @since v0.2.0
      */
-    export interface ComponentStateOptions<
-        T extends ComponentInternalInstance,
+    export interface StateOptions<
+        T extends InternalInstance,
         K extends keyof T['state'],
     > {
         /**
@@ -130,10 +130,10 @@ namespace Ornata {
 
     /**
      * The configuration options for the elements properties for the `defineComponent` function.
-     * @since v0.1.0
+     * @since v0.2.0
      */
-    export interface ComponentElementOptions<
-        T extends ComponentInternalInstance,
+    export interface ElementOptions<
+        T extends InternalInstance,
         K extends keyof T['elements'],
     > {
         /**
@@ -191,31 +191,31 @@ namespace Ornata {
 
     /**
      * The callback function for the watch property for the `defineComponent` function.
-     * @since v0.1.0
+     * @since v0.2.0
      */
-    export type ComponentWatchCallback<
-        T extends ComponentInternalInstance,
+    export type WatchCallback<
+        T extends InternalInstance,
         K extends keyof T['state'],
     > = (this: T, newValue: T['state'][K], oldValue: T['state'][K]) => void;
 
     /**
      * The callback function for the computed property for the `defineComponent` function.
-     * @since v0.1.0
+     * @since v0.2.0
      */
-    export type ComponentComputedCallback<
-        T extends ComponentInternalInstance,
+    export type ComputedCallback<
+        T extends InternalInstance,
         K extends keyof T['computed'],
     > = (
         this: T,
         currentValue: T['computed'][K],
         changedState: keyof T['state']
-    ) => void;
+    ) => T['computed'][K];
 
     /**
      * The configuration options for the render method for the `defineComponent` function.
-     * @since v0.1.0
+     * @since v0.2.0
      */
-    export interface ComponentRenderOptions {
+    export interface RenderOptions {
         /**
          * The style properties to set on the element. The type of value determines the DOM action to perform:
          * - **string**: Sets value directly (e.g., `style.setProperty(property, value)`)
@@ -276,22 +276,22 @@ namespace Ornata {
 
     /**
      * The callback function for the render method for the `defineComponent` function.
-     * @since v0.1.0
+     * @since v0.2.0
      */
-    export type ComponentRenderCallback<
-        T extends ComponentInternalInstance,
+    export type RenderCallback<
+        T extends InternalInstance,
         K extends keyof T['elements'],
     > = (
         this: T,
         index: T['elements'][K] extends Element[] ? number : never
-    ) => ComponentRenderOptions;
+    ) => RenderOptions;
 
     /**
      * A helper type to get the non-nullable options for the component.
      * @since v0.1.0
      */
     export type ComponentOption<
-        T extends ComponentInternalInstance,
+        T extends InternalInstance,
         K extends keyof ComponentOptions<T>,
     > = NonNullable<ComponentOptions<T>[K]>;
 
@@ -299,7 +299,7 @@ namespace Ornata {
      * The configuration options for the component.
      * @since v0.1.0
      */
-    export interface ComponentOptions<T extends ComponentInternalInstance> {
+    export interface ComponentOptions<T extends InternalInstance> {
         /**
          * Configure the display name of the component. Defaults to `UnnamedComponent`.
          * @since v0.1.0
@@ -310,14 +310,14 @@ namespace Ornata {
          * Configure the settings for the root element of the component.
          * @since v0.1.0
          */
-        root?: ComponentRootOptions<T>;
+        root?: RootOptions<T>;
 
         /**
          * Name and configure the state properties of the component.
          * @since v0.1.0
          */
         state?: {
-            [K in keyof T['state']]: ComponentStateOptions<T, K>;
+            [K in keyof T['state']]: StateOptions<T, K>;
         };
 
         /**
@@ -325,7 +325,7 @@ namespace Ornata {
          * @since v0.1.0
          */
         elements?: {
-            [K in keyof T['elements']]: ComponentElementOptions<T, K>;
+            [K in keyof T['elements']]: ElementOptions<T, K>;
         };
 
         /**
@@ -353,7 +353,7 @@ namespace Ornata {
          * @since v0.1.0
          */
         watch?: {
-            [K in keyof T['state']]: ComponentWatchCallback<T, K>;
+            [K in keyof T['state']]: WatchCallback<T, K>;
         };
 
         /**
@@ -369,7 +369,7 @@ namespace Ornata {
          * @since v0.1.0
          */
         computed?: {
-            [K in keyof T['computed']]: ComponentComputedCallback<T, K>;
+            [K in keyof T['computed']]: ComputedCallback<T, K>;
         };
 
         /**
@@ -385,21 +385,21 @@ namespace Ornata {
          * @since v0.1.0
          */
         render?: {
-            [K in keyof T['elements']]: ComponentRenderCallback<T, K>;
+            [K in keyof T['elements']]: RenderCallback<T, K>;
         };
     }
 
     /**
      * The callback function for the state listener for the `defineComponent` function.
-     * @since v0.1.0
+     * @since v0.2.0
      */
-    export type ComponentStateListener<T> = (newValue: T, oldValue: T) => void;
+    export type StateListener<T> = (newValue: T, oldValue: T) => void;
 
     /**
      * The instance of the component. The primary interface for interacting with the component externally.
      * @since v0.1.0
      */
-    export interface ComponentInstance<T extends ComponentInternalInstance> {
+    export interface ComponentInstance<T extends InternalInstance> {
         /**
          * The resolved root element of the component that was passed to the constructor.
          * @since v0.1.0
@@ -430,7 +430,7 @@ namespace Ornata {
         addStateListener<U extends keyof T['state']>(
             this: ComponentInstance<T>,
             property: U,
-            listener: ComponentStateListener<T['state'][U]>
+            listener: StateListener<T['state'][U]>
         ): void;
 
         /**
@@ -443,7 +443,7 @@ namespace Ornata {
         removeStateListener<U extends keyof T['state']>(
             this: ComponentInstance<T>,
             property: U,
-            listener: ComponentStateListener<T['state'][U]>
+            listener: StateListener<T['state'][U]>
         ): void;
     }
 
@@ -451,7 +451,7 @@ namespace Ornata {
      * The constructor for the component. This is the object that is returned when the component is defined.
      * @since v0.1.0
      */
-    export interface ComponentConstructor<T extends ComponentInternalInstance> {
+    export interface ComponentConstructor<T extends InternalInstance> {
         /**
          * The symbol that is used to identify the component constructor.
          * @since v0.1.0
@@ -527,6 +527,57 @@ namespace Ornata {
             stateChanges: Partial<T['state']>
         ): void;
     }
+
+    /**
+     * Infers the public instance type from a component constructor.
+     * @since v0.2.0
+     */
+    export type InferComponentInstance<
+        T extends ComponentConstructor<InternalInstance>,
+    > = T extends ComponentConstructor<infer U> ? ComponentInstance<U> : never;
+
+    /**
+     * A partial set of internal instance overrides used to build a component-specific shape.
+     * @since v0.2.0
+     */
+    export interface ComponentShapeOverrides {
+        root?: Element;
+        state?: ComponentState;
+        elements?: ComponentElements;
+        methods?: ComponentMethods;
+        data?: ComponentData;
+        computed?: ComponentComputed;
+    }
+
+    /**
+     * Builds a fully-typed internal instance shape from only the parts a component needs.
+     * @since v0.2.0
+     */
+    export type ComponentShape<T extends ComponentShapeOverrides = {}> = {
+        root: T extends { root: infer TRoot extends Element }
+            ? TRoot
+            : Element;
+        state: T extends { state: infer TState extends ComponentState }
+            ? TState
+            : {};
+        elements: T extends {
+            elements: infer TElements extends ComponentElements;
+        }
+            ? TElements
+            : {};
+        methods: T extends { methods: infer TMethods extends ComponentMethods }
+            ? TMethods
+            : {};
+        data: T extends { data: infer TData extends ComponentData }
+            ? TData
+            : {};
+        computed: T extends {
+            computed: infer TComputed extends ComponentComputed;
+        }
+            ? TComputed
+            : {};
+    };
+
 }
 
 /**

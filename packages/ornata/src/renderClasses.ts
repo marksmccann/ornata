@@ -9,7 +9,7 @@ import type { RenderElementData } from './renderElement';
  * @private
  */
 export default function renderClasses(
-    classes: Ornata.ComponentRenderOptions['classes'],
+    classes: Ornata.RenderOptions['classes'],
     data: RenderElementData
 ): void {
     const { componentName, element, elementName } = data;

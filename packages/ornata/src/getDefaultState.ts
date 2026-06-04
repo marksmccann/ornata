@@ -1,4 +1,5 @@
 import type Ornata from './index';
+import type { StateOptions } from './runtime.js';
 
 /**
  * Gets the default state from the state options.
@@ -6,20 +7,17 @@ import type Ornata from './index';
  * @param state The state to get the default state from.
  * @returns The default state.
  */
-export default function getDefaultState<
-    T extends Ornata.ComponentInternalInstance,
->(
-    stateOptions: Ornata.ComponentOption<T, 'state'>,
-    state: Partial<T['state']>
-): Partial<T['state']> {
-    let defaultState: Partial<T['state']> = {};
+export default function getDefaultState(
+    stateOptions: StateOptions,
+    state: Partial<Ornata.ComponentState>
+): Partial<Ornata.ComponentState> {
+    let defaultState: Partial<Ornata.ComponentState> = {};
 
     Object.entries(stateOptions).forEach(([property, option]) => {
-        const { default: defaultValue } =
-            option as Ornata.ComponentStateOptions<T, keyof T['state']>;
+        const { default: defaultValue } = option;
 
-        if (state[property as keyof T['state']] === undefined) {
-            defaultState[property as keyof T['state']] = defaultValue;
+        if (state[property] === undefined) {
+            defaultState[property] = defaultValue;
         }
     });
 

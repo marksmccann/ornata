@@ -6,7 +6,7 @@ export default [
         entry: ['src/index.ts'],
         format: ['esm', 'cjs'],
         outDir: 'dist',
-        dts: true,
+        dts: false,
         clean: true,
         outExtension({ format }) {
             if (format === 'cjs') return { js: '.cjs' };

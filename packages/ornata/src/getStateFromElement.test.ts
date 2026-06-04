@@ -8,14 +8,11 @@ describe('getStateFromElement', () => {
     it('should get state from element with default', () => {
         const element = document.createElement('div');
         element.dataset.name = 'test';
-        const state = getStateFromElement<{
-            root: Element;
-            state: { name: string };
-            elements: {};
-            methods: {};
-            data: {};
-            computed: {};
-        }>({ name: { default: 'fallback' } }, 'Test', element);
+        const state = getStateFromElement(
+            { name: { default: 'fallback' } },
+            'Test',
+            element
+        );
 
         expect(state).toStrictEqual({ name: 'test' });
     });
@@ -134,5 +131,37 @@ describe('getStateFromElement', () => {
             })
         );
         expect(state).toStrictEqual({});
+    });
+
+    it('should ignore unknown dataset properties on the root element', () => {
+        const consoleError = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+        const element = document.createElement('div');
+        element.dataset.ornata = 'Counter';
+        element.dataset.analyticsId = 'abc123';
+        element.dataset.count = '10';
+        const state = getStateFromElement(
+            { count: { type: Number } },
+            'Test',
+            element
+        );
+
+        expect(consoleError).not.toHaveBeenCalledWith(
+            reporter.message('ERR07', {
+                componentName: 'Test',
+                property: 'ornata',
+            })
+        );
+        expect(consoleError).not.toHaveBeenCalledWith(
+            reporter.message('ERR07', {
+                componentName: 'Test',
+                property: 'analyticsId',
+            })
+        );
+        expect(state).toStrictEqual({ count: 10 });
+        expect(element.dataset.ornata).toBe('Counter');
+        expect(element.dataset.analyticsId).toBe('abc123');
+        expect(element.dataset.count).toBeUndefined();
     });
 });

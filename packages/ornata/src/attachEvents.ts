@@ -1,6 +1,7 @@
 import type Ornata from './index';
 import type { RenderElementData } from './renderElement';
 import reporter from './reporter';
+import type { InternalInstance } from './runtime.js';
 
 /**
  * A map of active event listeners for each component instance. Used to
@@ -8,7 +9,7 @@ import reporter from './reporter';
  * @private
  */
 const eventListeners: WeakMap<
-    Ornata.ComponentInternalInstance,
+    InternalInstance,
     Map<Element, Map<string, (event: Event) => void>>
 > = new WeakMap();
 
@@ -20,11 +21,9 @@ const eventListeners: WeakMap<
  * @returns A function to remove the event listeners.
  * @private
  */
-export default function attachEvents<
-    T extends Ornata.ComponentInternalInstance,
->(
-    this: T,
-    events: Ornata.ComponentRenderOptions['events'],
+export default function attachEvents(
+    this: InternalInstance,
+    events: Ornata.RenderOptions['events'],
     data: RenderElementData
 ): () => void {
     const { componentName, element, elementName } = data;

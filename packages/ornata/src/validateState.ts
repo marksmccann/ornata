@@ -1,5 +1,5 @@
-import type Ornata from './index';
 import reporter from './reporter';
+import type { StateOptions } from './runtime.js';
 
 /**
  * Validates the state property by checking if it has a state option and if the type is valid.
@@ -8,13 +8,11 @@ import reporter from './reporter';
  * @param stateOptions The state options to use to validate the state.
  * @private
  */
-export default function validateState<
-    T extends Ornata.ComponentInternalInstance,
->(
+export default function validateState(
     componentName: string,
-    property: keyof T['state'],
-    value: T['state'][keyof T['state']],
-    stateOptions: Ornata.ComponentOption<T, 'state'>
+    property: string,
+    value: unknown,
+    stateOptions: StateOptions
 ): void {
     const option = stateOptions[property];
 
@@ -52,9 +50,16 @@ export default function validateState<
     }
 
     if (invalid) {
+        const reportedValue =
+            typeof value === 'string' ||
+            typeof value === 'number' ||
+            typeof value === 'boolean'
+                ? value
+                : String(value);
+
         reporter.error('ERR09', {
             componentName,
-            value,
+            value: reportedValue,
             property: property as string,
             type: expectedType,
         });

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import type Ornata from './index.js';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, expectTypeOf, vi } from 'vitest';
 import { defineComponent } from './index.js';
 import reporter from './reporter.js';
 import describeElement from './describeElement.js';
@@ -28,6 +28,70 @@ describe('defineComponent', () => {
         expect(instance.state).toEqual({});
         expect(instance.addStateListener).toBeInstanceOf(Function);
         expect(instance.removeStateListener).toBeInstanceOf(Function);
+
+        instance.dispose();
+    });
+
+    it('should infer typed state for createInstance and instance.state', () => {
+        const Test = defineComponent({
+            name: 'Test',
+            state: {
+                count: {
+                    default: 0,
+                },
+                label: {
+                    default: '',
+                },
+            },
+        });
+
+        const instance = Test.createInstance(document.createElement('div'), {
+            count: 1,
+            label: 'ready',
+        });
+        const elementOrQuery: string | Element | null | undefined =
+            document.createElement('div');
+
+        Test.createInstance(elementOrQuery, {
+            count: 2,
+        });
+
+        Test.createInstance(document.createElement('div'), {
+            // @ts-expect-error - count must be a number
+            count: 'wrong',
+        });
+
+        Test.createInstance(document.createElement('div'), {
+            // @ts-expect-error - label must be a string
+            label: 123,
+        });
+
+        expectTypeOf(instance.state.count).toEqualTypeOf<number>();
+        expectTypeOf(instance.state.label).toEqualTypeOf<string>();
+
+        instance.dispose();
+    });
+
+    it('should preserve explicit component shape typing on the returned constructor', () => {
+        type TestInstance = Ornata.ComponentShape<{
+            state: { count: number };
+        }>;
+
+        const Test: Ornata.ComponentConstructor<TestInstance> = defineComponent(
+            {
+                name: 'Test',
+                state: {
+                    count: {
+                        default: 0,
+                    },
+                },
+            }
+        );
+        const instance = Test.createInstance(document.createElement('div'), {
+            count: 1,
+        });
+
+        expectTypeOf(instance.state.count).toEqualTypeOf<number>();
 
         instance.dispose();
     });
@@ -77,7 +141,7 @@ describe('defineComponent', () => {
         });
 
         it('should call setup with the internal component instance as this', () => {
-            let capturedThis = {} as Ornata.ComponentInternalInstance;
+            let capturedThis = {} as Ornata.InternalInstance;
             const Test = defineComponent({
                 name: 'Test',
                 lifecycle: {
@@ -99,7 +163,7 @@ describe('defineComponent', () => {
         });
 
         it('should call teardown with the internal component instance as this', () => {
-            let capturedThis = {} as Ornata.ComponentInternalInstance;
+            let capturedThis = {} as Ornata.InternalInstance;
             const Test = defineComponent({
                 name: 'Test',
                 lifecycle: {

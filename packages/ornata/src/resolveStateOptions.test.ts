@@ -2,7 +2,6 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import resolveStateOptions from './resolveStateOptions.js';
-import reporter from './reporter.js';
 
 describe('resolveStateOptions', () => {
     it('should resolve state options when property is in state options', () => {
@@ -19,7 +18,7 @@ describe('resolveStateOptions', () => {
         expect(resolvedState).toStrictEqual({ name: 'test' });
     });
 
-    it('should log error when a dataset property is not in state options', () => {
+    it('should ignore dataset properties that are not in state options', () => {
         const consoleError = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
@@ -27,14 +26,11 @@ describe('resolveStateOptions', () => {
         const root = document.createElement('div');
         root.dataset.name = 'test';
 
-        resolveStateOptions('Test', root, {}, stateOptions);
+        const resolvedState = resolveStateOptions('Test', root, {}, stateOptions);
 
-        expect(consoleError).toHaveBeenCalledWith(
-            reporter.message('ERR07', {
-                componentName: 'Test',
-                property: 'name',
-            })
-        );
+        expect(resolvedState).toStrictEqual({});
+        expect(consoleError).not.toHaveBeenCalled();
+        expect(root.dataset.name).toBe('test');
 
         consoleError.mockRestore();
     });

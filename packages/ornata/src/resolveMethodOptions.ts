@@ -1,4 +1,4 @@
-import type Ornata from './index.js';
+import type { InternalInstance, MethodOptions, Methods } from './runtime.js';
 
 /**
  * Resolves the methods options for a component.
@@ -6,14 +6,15 @@ import type Ornata from './index.js';
  * @param methodOptions The method options.
  * @returns The methods object to be assigned to the component instance.
  */
-export default function resolveMethodOptions<
-    T extends Ornata.ComponentInternalInstance,
->(this: T, methodsOptions: Ornata.ComponentOption<T, 'methods'>): T['methods'] {
-    const methods = {} as T['methods'];
+export default function resolveMethodOptions(
+    this: InternalInstance,
+    methodsOptions: MethodOptions
+): Methods {
+    const methods = {} as Methods;
 
     Object.entries(methodsOptions).forEach((entry) => {
-        const property = entry[0] as keyof T['methods'];
-        const method = entry[1] as Ornata.ComponentMethod;
+        const property = entry[0];
+        const method = entry[1];
 
         methods[property] = method.bind(this);
     });

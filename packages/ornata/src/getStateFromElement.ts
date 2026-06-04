@@ -1,14 +1,13 @@
 import type Ornata from './index';
 import reporter from './reporter';
+import type { StateOptions, StatePropertyOptions } from './runtime.js';
 
 /**
  * Infers the expected type from a state value.
  * @param value The value to infer the expected type from.
  * @returns The expected type from the value.
  */
-function inferExpectedType<T extends Ornata.ComponentInternalInstance>(
-    value: unknown
-): Ornata.ComponentStateOptions<T, keyof T['state']>['type'] {
+function inferExpectedType(value: unknown): StatePropertyOptions['type'] {
     if (typeof value === 'string') return String;
     if (typeof value === 'number') return Number;
     if (typeof value === 'boolean') return Boolean;
@@ -26,16 +25,16 @@ function inferExpectedType<T extends Ornata.ComponentInternalInstance>(
  * @param option The configuration options for the state property.
  * @returns The parsed value.
  */
-function parseDatasetValue<T extends Ornata.ComponentInternalInstance>(
+function parseDatasetValue(
     componentName: string,
     property: string,
     value: string,
-    option: Ornata.ComponentStateOptions<T, keyof T['state']>
+    option: StatePropertyOptions
 ): unknown {
     const { default: defaultValue, type, parse } = option;
     const expectedTypes = [
         type,
-        defaultValue !== undefined ? inferExpectedType<T>(defaultValue) : undefined,
+        defaultValue !== undefined ? inferExpectedType(defaultValue) : undefined,
     ];
 
     if (parse) {
@@ -103,25 +102,18 @@ function parseDatasetValue<T extends Ornata.ComponentInternalInstance>(
  * @returns The state object.
  * @private
  */
-export default function getStateFromElement<
-    T extends Ornata.ComponentInternalInstance,
->(
-    stateOptions: Ornata.ComponentOption<T, 'state'>,
+export default function getStateFromElement(
+    stateOptions: StateOptions,
     componentName: string,
     element: HTMLElement
-): Partial<T['state']> {
-    const state = {} as T['state'];
+): Partial<Ornata.ComponentState> {
+    const state = {} as Partial<Ornata.ComponentState>;
 
     Object.entries(element.dataset).forEach(([property, value]) => {
-        const option = stateOptions[property as keyof T['state']];
+        const option = stateOptions[property];
         let parsedValue: unknown;
 
         if (!option) {
-            reporter.error('ERR07', {
-                componentName,
-                property,
-            });
-
             return;
         }
 
@@ -138,8 +130,7 @@ export default function getStateFromElement<
 
         parsedValue = parseDatasetValue(componentName, property, value, option);
 
-        state[property as keyof T['state']] =
-            parsedValue as T['state'][keyof T['state']];
+        state[property] = parsedValue;
 
         delete element.dataset[property];
     });

@@ -1,6 +1,7 @@
 import type Ornata from './index.js';
 import reporter from './reporter.js';
 import describeElement from './describeElement.js';
+import type { ElementOptions } from './runtime.js';
 
 /**
  * Validates that the minimum number of elements is met.
@@ -72,9 +73,9 @@ function validateMaxElements(
  * @param elements The resolved elements.
  * @private
  */
-function validateDuplicateElements<T extends Ornata.ComponentInternalInstance>(
+function validateDuplicateElements(
     componentName: string,
-    elements: T['elements']
+    elements: Ornata.ComponentElements
 ): void {
     const references = new WeakMap<Element, string>();
 
@@ -113,18 +114,15 @@ function validateDuplicateElements<T extends Ornata.ComponentInternalInstance>(
     });
 }
 
-export default function resolveElementsOptions<
-    T extends Ornata.ComponentInternalInstance,
->(
+export default function resolveElementsOptions(
     componentName: string,
-    root: T['root'],
-    elementsOptions: Ornata.ComponentOption<T, 'elements'>
-): T['elements'] {
-    const elements = {} as T['elements'];
+    root: Element,
+    elementsOptions: ElementOptions
+): Ornata.ComponentElements {
+    const elements = {} as Ornata.ComponentElements;
 
     Object.entries(elementsOptions).forEach(([property, option]) => {
-        const { queryAll, query, create, resolve, min, max } =
-            option as Ornata.ComponentElementOptions<T, keyof T['elements']>;
+        const { queryAll, query, create, resolve, min, max } = option;
         const provided = [
             queryAll ? 'queryAll' : null,
             query ? 'query' : null,
@@ -195,8 +193,7 @@ export default function resolveElementsOptions<
         }
 
         if (minValid && maxValid) {
-            elements[property as keyof T['elements']] =
-                resolved as T['elements'][keyof T['elements']];
+            elements[property] = resolved as Ornata.ComponentElement;
         }
     });
 

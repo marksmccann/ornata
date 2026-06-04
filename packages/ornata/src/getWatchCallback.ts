@@ -1,4 +1,4 @@
-import type Ornata from './index.js';
+import type { InternalInstance, WatchCallback, WatchOptions } from './runtime.js';
 
 /**
  * Gets the watch callback for a given property.
@@ -8,18 +8,18 @@ import type Ornata from './index.js';
  * @returns The watch callback for the property.
  * @private
  */
-export default function getWatchCallback<
-    T extends Ornata.ComponentInternalInstance,
->(
-    this: T,
-    property: keyof T['state'],
-    watchOptions: Ornata.ComponentOption<T, 'watch'>
-): Ornata.ComponentWatchCallback<T, keyof T['state']> {
-    const watchCallback: Ornata.ComponentWatchCallback<T, keyof T['state']> =
-        function watchCallback(payload) {
-            const callback = watchOptions[property];
-            if (callback) callback.call(this, payload);
-        };
+export default function getWatchCallback(
+    this: InternalInstance,
+    property: string,
+    watchOptions: WatchOptions
+): WatchCallback {
+    const watchCallback: WatchCallback = function watchCallback(
+        newValue,
+        oldValue
+    ) {
+        const callback = watchOptions[property];
+        if (callback) callback.call(this, newValue, oldValue);
+    };
 
     return watchCallback;
 }

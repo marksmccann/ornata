@@ -1,5 +1,5 @@
-import type Ornata from './index.js';
 import reporter from './reporter.js';
+import type { RootOptions } from './runtime.js';
 
 /**
  * Resolves the root options for a component.
@@ -8,12 +8,10 @@ import reporter from './reporter.js';
  * @param rootOptions The root options.
  * @private
  */
-export default function resolveRootOptions<
-    T extends Ornata.ComponentInternalInstance,
->(
+export default function resolveRootOptions(
     componentName: string,
-    root: T['root'],
-    rootOptions: Ornata.ComponentRootOptions<T>
+    root: Element,
+    rootOptions: RootOptions
 ): void {
     const { matches } = rootOptions;
 

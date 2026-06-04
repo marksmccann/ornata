@@ -2,6 +2,11 @@ import type Ornata from './index';
 import renderElement from './renderElement';
 import type { RenderElementData } from './renderElement';
 import reporter from './reporter.js';
+import type {
+    InternalInstance,
+    RenderCallback,
+    RenderOptions,
+} from './runtime.js';
 
 /**
  * Renders the component by rendering its elements.
@@ -13,22 +18,17 @@ import reporter from './reporter.js';
  * @returns A function to clean up the element cleanup.
  * @private
  */
-export default function renderComponent<
-    T extends Ornata.ComponentInternalInstance,
->(
-    this: T,
+export default function renderComponent(
+    this: InternalInstance,
     componentName: string,
-    elements: T['elements'],
-    renderOptions: Ornata.ComponentOption<T, 'render'>
+    elements: Ornata.ComponentElements,
+    renderOptions: RenderOptions
 ): () => void {
     let elementCleanup: Array<ReturnType<typeof renderElement>> = [];
 
     Object.entries(renderOptions).forEach((entry) => {
-        const elementName = entry[0] as keyof T['elements'];
-        const renderCallback = entry[1] as Ornata.ComponentRenderCallback<
-            T,
-            keyof T['elements']
-        >;
+        const elementName = entry[0];
+        const renderCallback = entry[1] as RenderCallback;
         const elementsDataToRender: Array<RenderElementData> = [];
         const elementToRender = elements[elementName];
 

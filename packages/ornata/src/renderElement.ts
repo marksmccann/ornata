@@ -5,6 +5,7 @@ import renderStyle from './renderStyle';
 import renderClasses from './renderClasses';
 import renderDataset from './renderDataset';
 import attachEvents from './attachEvents';
+import type { InternalInstance } from './runtime.js';
 
 /**
  * The data required to render an element.
@@ -14,7 +15,7 @@ export type RenderElementData = {
     componentName: string;
     element: Element;
     elementName: string;
-    options: Ornata.ComponentRenderOptions;
+    options: Ornata.RenderOptions;
 };
 
 /**
@@ -24,39 +25,40 @@ export type RenderElementData = {
  * @returns A function to perform any cleanup tasks associated with the element.
  * @private
  */
-export default function renderElement<
-    T extends Ornata.ComponentInternalInstance,
->(this: T, data: RenderElementData): () => void {
+export default function renderElement(
+    this: InternalInstance,
+    data: RenderElementData
+): () => void {
     const { componentName, element, elementName, options } = data;
     let eventsCleanup: ReturnType<typeof attachEvents> | undefined;
 
     Object.entries(options).forEach((entry) => {
-        const option = entry[0] as keyof Ornata.ComponentRenderOptions;
+        const option = entry[0] as keyof Ornata.RenderOptions;
 
         if (option === 'attributes') {
             renderAttributes(
-                entry[1] as Ornata.ComponentRenderOptions['attributes'],
+                entry[1] as Ornata.RenderOptions['attributes'],
                 data
             );
         } else if (option === 'style') {
             renderStyle(
-                entry[1] as Ornata.ComponentRenderOptions['style'],
+                entry[1] as Ornata.RenderOptions['style'],
                 data
             );
         } else if (option === 'classes') {
             renderClasses(
-                entry[1] as Ornata.ComponentRenderOptions['classes'],
+                entry[1] as Ornata.RenderOptions['classes'],
                 data
             );
         } else if (option === 'dataset') {
             renderDataset(
-                entry[1] as Ornata.ComponentRenderOptions['dataset'],
+                entry[1] as Ornata.RenderOptions['dataset'],
                 data
             );
         } else if (option === 'events') {
             eventsCleanup = attachEvents.call(
                 this,
-                entry[1] as Ornata.ComponentRenderOptions['events'],
+                entry[1] as Ornata.RenderOptions['events'],
                 data
             );
         } else if (option === 'html') {
