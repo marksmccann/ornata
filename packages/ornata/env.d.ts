@@ -1,7 +1,9 @@
-declare const process:
-    | {
-          env?: {
-              NODE_ENV?: string;
-          };
-      }
-    | undefined;
+declare global {
+    namespace NodeJS {
+        interface ProcessEnv {
+            NODE_ENV?: string;
+        }
+    }
+}
+
+export {};
