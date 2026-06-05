@@ -13,7 +13,6 @@ import type {
  * @param this The component instance.
  * @param componentName The display name of the component.
  * @param elements The elements to render.
- * @param componentMetadata The metadata for the component.
  * @param renderOptions The render options for the elements.
  * @returns A function to clean up the element cleanup.
  * @private
@@ -44,7 +43,10 @@ export default function renderComponent(
 
         if (Array.isArray(elementToRender)) {
             elementToRender.forEach((element, index) => {
-                const result = renderCallback.call(this, index);
+                const result = renderCallback.call(this, {
+                    type: 'render',
+                    index,
+                });
 
                 elementsDataToRender.push({
                     componentName,
@@ -54,7 +56,10 @@ export default function renderComponent(
                 });
             });
         } else if (elementToRender instanceof Element) {
-            const result = renderCallback.call(this);
+            const result = renderCallback.call(this, {
+                type: 'render',
+                index: undefined,
+            });
 
             elementsDataToRender.push({
                 componentName,

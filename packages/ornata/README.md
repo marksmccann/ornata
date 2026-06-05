@@ -21,6 +21,9 @@ type Counter = Ornata.ComponentShape<{
         count: number;
         label: string;
     };
+    computed: {
+        total: number;
+    };
     methods: {
         increment(): void;
     };
@@ -35,6 +38,19 @@ const CounterComponent = defineComponent<Counter>({
     methods: {
         increment() {
             this.state.count += 1;
+        },
+    },
+    watch: {
+        count({ newValue, oldValue, isInitial }) {
+            if (isInitial) return;
+
+            console.log(`Count changed from ${oldValue} to ${newValue}`);
+        },
+    },
+    computed: {
+        total({ currentValue, changedProperty }) {
+            console.log("Recomputing because:", changedProperty, currentValue);
+            return this.state.count;
         },
     },
 });

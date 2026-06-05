@@ -19,8 +19,7 @@ export type InternalInstance = Ornata.InternalInstance;
  */
 export type ComputedCallback = (
     this: InternalInstance,
-    currentValue: unknown,
-    changedState: string
+    context: ComputedContext
 ) => unknown;
 
 /**
@@ -30,14 +29,23 @@ export type ComputedCallback = (
 export type ComputedOptions = Record<string, ComputedCallback>;
 
 /**
+ * Context passed to runtime computed callbacks.
+ * @private
+ */
+export interface ComputedContext {
+    type: 'computed';
+    currentValue: unknown;
+    changedProperty: string;
+}
+
+/**
  * A broad watch callback shape used by runtime helpers after generic component
  * definitions have been erased at the runtime boundary.
  * @private
  */
 export type WatchCallback = (
     this: InternalInstance,
-    newValue: unknown,
-    oldValue: unknown
+    context: WatchContext
 ) => void;
 
 /**
@@ -47,13 +55,24 @@ export type WatchCallback = (
 export type WatchOptions = Record<string, WatchCallback>;
 
 /**
+ * Context passed to runtime watch callbacks.
+ * @private
+ */
+export interface WatchContext {
+    type: 'watch';
+    newValue: unknown;
+    oldValue: unknown;
+    isInitial: boolean;
+}
+
+/**
  * A broad render callback shape used by runtime helpers after generic
  * component definitions have been erased at the runtime boundary.
  * @private
  */
 export type RenderCallback = (
     this: InternalInstance,
-    index?: number
+    context: RenderContext
 ) => Ornata.RenderOptions;
 
 /**
@@ -61,6 +80,15 @@ export type RenderCallback = (
  * @private
  */
 export type RenderOptions = Record<string, RenderCallback>;
+
+/**
+ * Context passed to runtime render callbacks.
+ * @private
+ */
+export interface RenderContext {
+    type: 'render';
+    index: number | undefined;
+}
 
 /**
  * A string-keyed record of runtime data values.

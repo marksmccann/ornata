@@ -27,11 +27,11 @@ export default function resolveComputedOptions(
             return;
         }
 
-        const value = computedCallback.call(
-            this,
-            this.computed[property],
-            changedState
-        );
+        const value = computedCallback.call(this, {
+            type: 'computed',
+            currentValue: this.computed[property],
+            changedProperty: changedState,
+        });
 
         this.computed[property] = value;
     });

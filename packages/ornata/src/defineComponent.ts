@@ -120,13 +120,15 @@ function defineComponent<T extends Ornata.InternalInstance>(
      * @param property The property that was updated.
      * @param oldValue The previous value of the property.
      * @param newValue The new value of the property.
+     * @param isInitial Whether the update is part of the initialization pass.
      * @private
      */
     function updateComponent(
         this: InternalInstance,
         property: string,
         oldValue: unknown,
-        newValue: unknown
+        newValue: unknown,
+        isInitial: boolean
     ) {
         const cleanupUpdate = updateCleanup.get(this);
         const externalInstance = externalInstances.get(this.root);
@@ -159,7 +161,12 @@ function defineComponent<T extends Ornata.InternalInstance>(
             watchOptions
         );
 
-        watchCallback.call(this, newValue, oldValue);
+        watchCallback.call(this, {
+            type: 'watch',
+            newValue,
+            oldValue,
+            isInitial,
+        });
 
         if (externalInstance && handlers) {
             const event = {
@@ -272,7 +279,8 @@ function defineComponent<T extends Ornata.InternalInstance>(
                         internalInstance,
                         property,
                         oldValue,
-                        newValue
+                        newValue,
+                        false
                     );
 
                     return true;
@@ -344,7 +352,14 @@ function defineComponent<T extends Ornata.InternalInstance>(
             Object.keys(stateOptions).forEach((key) => {
                 const property = key;
                 const value = internalInstance.state[property];
-                updateComponent.call(internalInstance, property, value, value);
+
+                updateComponent.call(
+                    internalInstance,
+                    property,
+                    value,
+                    value,
+                    true
+                );
             });
 
             // Set the initializing flag

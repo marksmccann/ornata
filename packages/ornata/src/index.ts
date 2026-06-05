@@ -178,15 +178,72 @@ namespace Ornata {
     }
 
     /**
-     * The metadata for a component related to its state and lifecycle; used internally by the component.
-     * @since v0.1.0
+     * Context passed to watch callbacks.
+     * @since v0.2.0
      */
-    export interface ComponentMetadata {
+    export interface WatchContext<
+        TState extends ComponentState,
+        K extends keyof TState,
+    > {
         /**
-         * Whether the component has been fully initialized.
-         * @since v0.1.0
+         * Identifies the framework callback context.
          */
-        initialized: boolean;
+        type: 'watch';
+
+        /**
+         * The latest value for the watched state property.
+         */
+        newValue: TState[K];
+
+        /**
+         * The previous value for the watched state property.
+         */
+        oldValue: TState[K];
+
+        /**
+         * Whether this is the initialization-time watch invocation.
+         */
+        isInitial: boolean;
+    }
+
+    /**
+     * Context passed to computed callbacks.
+     * @since v0.2.0
+     */
+    export interface ComputedContext<
+        TState extends ComponentState,
+        TValue,
+    > {
+        /**
+         * Identifies the framework callback context.
+         */
+        type: 'computed';
+
+        /**
+         * The current computed value before recomputation.
+         */
+        currentValue: TValue;
+
+        /**
+         * The state property that triggered this recomputation.
+         */
+        changedProperty: keyof TState;
+    }
+
+    /**
+     * Context passed to render callbacks.
+     * @since v0.2.0
+     */
+    export interface RenderContext<TElement extends ComponentElement> {
+        /**
+         * Identifies the framework callback context.
+         */
+        type: 'render';
+
+        /**
+         * The index of the current element when rendering an element array.
+         */
+        index: TElement extends Element[] ? number : void;
     }
 
     /**
@@ -196,7 +253,7 @@ namespace Ornata {
     export type WatchCallback<
         T extends InternalInstance,
         K extends keyof T['state'],
-    > = (this: T, newValue: T['state'][K], oldValue: T['state'][K]) => void;
+    > = (this: T, context: WatchContext<T['state'], K>) => void;
 
     /**
      * The callback function for the computed property for the `defineComponent` function.
@@ -207,8 +264,7 @@ namespace Ornata {
         K extends keyof T['computed'],
     > = (
         this: T,
-        currentValue: T['computed'][K],
-        changedState: keyof T['state']
+        context: ComputedContext<T['state'], T['computed'][K]>
     ) => T['computed'][K];
 
     /**
@@ -283,7 +339,7 @@ namespace Ornata {
         K extends keyof T['elements'],
     > = (
         this: T,
-        index: T['elements'][K] extends Element[] ? number : never
+        context: RenderContext<T['elements'][K]>
     ) => RenderOptions;
 
     /**
@@ -338,9 +394,7 @@ namespace Ornata {
         };
 
         /**
-         * Respond to value changes in the state properties. Each callback function is called with the
-         * new value, the previous value, and a convenient flag indicating whether the callback is being
-         * called for the first time (during initialization).
+         * Respond to value changes in the state properties with framework-provided watch context.
          * @since v0.1.0
          */
         watch?: {

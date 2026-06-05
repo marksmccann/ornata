@@ -15,4 +15,20 @@ npm install ornata
 
 ## Basic Usage
 
-Details coming soon as the framework develops.
+```ts
+import { defineComponent } from "ornata";
+
+const Counter = defineComponent({
+    name: "Counter",
+    state: {
+        count: { default: 0 },
+    },
+    watch: {
+        count({ newValue, oldValue, isInitial }) {
+            if (isInitial) return;
+
+            console.log(`Count changed from ${oldValue} to ${newValue}`);
+        },
+    },
+});
+```

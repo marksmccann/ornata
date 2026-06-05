@@ -13,12 +13,9 @@ export default function getWatchCallback(
     property: string,
     watchOptions: WatchOptions
 ): WatchCallback {
-    const watchCallback: WatchCallback = function watchCallback(
-        newValue,
-        oldValue
-    ) {
+    const watchCallback: WatchCallback = function watchCallback(context) {
         const callback = watchOptions[property];
-        if (callback) callback.call(this, newValue, oldValue);
+        if (callback) callback.call(this, context);
     };
 
     return watchCallback;

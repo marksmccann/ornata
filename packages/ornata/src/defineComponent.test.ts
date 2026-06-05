@@ -281,6 +281,251 @@ describe('defineComponent', () => {
         });
     });
 
+    describe('watch option', () => {
+        it('should call watch with context object and track initial invocation', () => {
+            const watch = vi.fn();
+            const Test = defineComponent({
+                name: 'Test',
+                state: {
+                    count: {
+                        default: 0,
+                    },
+                },
+                watch: {
+                    count(context) {
+                        watch(context);
+                    },
+                },
+            });
+            const instance = Test.createInstance(document.createElement('div'));
+
+            instance.state.count = 1;
+
+            expect(watch).toHaveBeenNthCalledWith(1, {
+                type: 'watch',
+                newValue: 0,
+                oldValue: 0,
+                isInitial: true,
+            });
+            expect(watch).toHaveBeenNthCalledWith(2, {
+                type: 'watch',
+                newValue: 1,
+                oldValue: 0,
+                isInitial: false,
+            });
+
+            instance.dispose();
+        });
+
+        it('should infer typed watch context', () => {
+            defineComponent({
+                name: 'Test',
+                state: {
+                    count: {
+                        default: 0,
+                    },
+                },
+                watch: {
+                    count(context) {
+                        expectTypeOf(context.type).toEqualTypeOf<'watch'>();
+                        expectTypeOf(context.newValue).toEqualTypeOf<number>();
+                        expectTypeOf(context.oldValue).toEqualTypeOf<number>();
+                        expectTypeOf(
+                            context.isInitial
+                        ).toEqualTypeOf<boolean>();
+                    },
+                },
+            });
+        });
+    });
+
+    describe('computed option', () => {
+        it('should call computed with context object', () => {
+            const computed = vi.fn(({ changedProperty }) => {
+                return changedProperty === 'count' ? 1 : 0;
+            });
+            const Test = defineComponent({
+                name: 'Test',
+                state: {
+                    count: {
+                        default: 0,
+                    },
+                },
+                computed: {
+                    total(context) {
+                        return computed(context);
+                    },
+                },
+            });
+            const instance = Test.createInstance(document.createElement('div'));
+
+            instance.state.count = 1;
+
+            expect(computed).toHaveBeenNthCalledWith(1, {
+                type: 'computed',
+                currentValue: undefined,
+                changedProperty: 'count',
+            });
+            expect(computed).toHaveBeenNthCalledWith(2, {
+                type: 'computed',
+                currentValue: 1,
+                changedProperty: 'count',
+            });
+
+            instance.dispose();
+        });
+
+        it('should infer typed computed context', () => {
+            type TestInstance = Ornata.ComponentShape<{
+                state: { count: number };
+                computed: { total: number };
+            }>;
+
+            const Test: Ornata.ComponentConstructor<TestInstance> =
+                defineComponent({
+                    name: 'Test',
+                    state: {
+                        count: {
+                            default: 0,
+                        },
+                    },
+                    computed: {
+                        total(context) {
+                            expectTypeOf(
+                                context.type
+                            ).toEqualTypeOf<'computed'>();
+                            expectTypeOf(
+                                context.currentValue
+                            ).toEqualTypeOf<number>();
+                            expectTypeOf(
+                                context.changedProperty
+                            ).toEqualTypeOf<'count'>();
+
+                            return 0;
+                        },
+                    },
+                });
+
+            expectTypeOf(Test).toEqualTypeOf<
+                Ornata.ComponentConstructor<TestInstance>
+            >();
+        });
+    });
+
+    describe('render option', () => {
+        it('should call render with undefined index for single elements', () => {
+            const render = vi.fn(
+                (_context: Ornata.RenderContext<Element | null>) => ({
+                    text: 'ready',
+                })
+            );
+            const root = document.createElement('div');
+            root.innerHTML = '<button></button>';
+            const Test = defineComponent({
+                name: 'Test',
+                state: {
+                    ready: {
+                        default: true,
+                    },
+                },
+                elements: {
+                    button: {
+                        query: 'button',
+                    },
+                },
+                render: {
+                    button(context) {
+                        return render(context);
+                    },
+                },
+            });
+
+            const instance = Test.createInstance(root);
+
+            expect(render).toHaveBeenCalledWith({
+                type: 'render',
+                index: undefined,
+            });
+
+            instance.dispose();
+        });
+
+        it('should call render with numeric index for element arrays', () => {
+            const render = vi.fn(({ index }) => ({ text: String(index) }));
+            const root = document.createElement('div');
+            root.innerHTML = '<li></li><li></li>';
+            const Test = defineComponent({
+                name: 'Test',
+                state: {
+                    ready: {
+                        default: true,
+                    },
+                },
+                elements: {
+                    items: {
+                        queryAll: 'li',
+                    },
+                },
+                render: {
+                    items(context) {
+                        return render(context);
+                    },
+                },
+            });
+
+            const instance = Test.createInstance(root);
+
+            expect(render).toHaveBeenNthCalledWith(1, {
+                type: 'render',
+                index: 0,
+            });
+            expect(render).toHaveBeenNthCalledWith(2, {
+                type: 'render',
+                index: 1,
+            });
+
+            instance.dispose();
+        });
+
+        it('should infer typed render context for single elements and arrays', () => {
+            defineComponent<
+                {},
+                {
+                    button: Element | null;
+                    items: Element[];
+                }
+            >({
+                    name: 'Test',
+                    elements: {
+                        button: {
+                            query: 'button',
+                        },
+                        items: {
+                            queryAll: 'li',
+                        },
+                    },
+                    render: {
+                        button(context) {
+                            expectTypeOf(
+                                context.type
+                            ).toEqualTypeOf<'render'>();
+                            expectTypeOf(context.index).toEqualTypeOf<void>();
+
+                            return {};
+                        },
+                        items(context) {
+                            expectTypeOf(
+                                context.type
+                            ).toEqualTypeOf<'render'>();
+                            expectTypeOf(context.index).toEqualTypeOf<number>();
+
+                        return {};
+                    },
+                },
+            });
+        });
+    });
+
     describe('state option: private', () => {
         it('should log error when reading a private state property externally', () => {
             const consoleError = vi
