@@ -206,43 +206,43 @@ describe('defineComponent', () => {
     });
 
     describe('lifecycle option', () => {
-        it('should call setup when instance is created', () => {
-            const setup = vi.fn();
+        it('should call mount when instance is created', () => {
+            const mount = vi.fn();
             const Test = defineComponent({
                 name: 'Test',
-                lifecycle: { setup },
+                lifecycle: { mount },
             });
             const root = document.createElement('div');
 
             Test.createInstance(root);
 
-            expect(setup).toHaveBeenCalledOnce();
+            expect(mount).toHaveBeenCalledOnce();
 
             Test.deleteInstance(root);
         });
 
-        it('should call teardown when instance is disposed', () => {
-            const teardown = vi.fn();
+        it('should call unmount when instance is disposed', () => {
+            const unmount = vi.fn();
             const Test = defineComponent({
                 name: 'Test',
-                lifecycle: { teardown },
+                lifecycle: { unmount },
             });
             const root = document.createElement('div');
             const instance = Test.createInstance(root);
 
-            expect(teardown).not.toHaveBeenCalled();
+            expect(unmount).not.toHaveBeenCalled();
 
             instance.dispose();
 
-            expect(teardown).toHaveBeenCalledOnce();
+            expect(unmount).toHaveBeenCalledOnce();
         });
 
-        it('should call setup with the internal component instance as this', () => {
+        it('should call mount with the internal component instance as this', () => {
             let capturedThis = {} as Ornata.InternalInstance;
             const Test = defineComponent({
                 name: 'Test',
                 lifecycle: {
-                    setup() {
+                    mount() {
                         capturedThis = this;
                     },
                 },
@@ -259,12 +259,12 @@ describe('defineComponent', () => {
             instance.dispose();
         });
 
-        it('should call teardown with the internal component instance as this', () => {
+        it('should call unmount with the internal component instance as this', () => {
             let capturedThis = {} as Ornata.InternalInstance;
             const Test = defineComponent({
                 name: 'Test',
                 lifecycle: {
-                    teardown() {
+                    unmount() {
                         capturedThis = this;
                     },
                 },
@@ -281,13 +281,13 @@ describe('defineComponent', () => {
             expect(capturedThis.data).toStrictEqual({});
         });
 
-        it('should give setup access to instance properties via this', () => {
+        it('should give mount access to instance properties via this', () => {
             let capturedRoot: unknown;
             const root = document.createElement('div');
             const Test = defineComponent({
                 name: 'Test',
                 lifecycle: {
-                    setup() {
+                    mount() {
                         capturedRoot = this.root;
                     },
                 },
@@ -300,7 +300,7 @@ describe('defineComponent', () => {
             Test.deleteInstance(root);
         });
 
-        it('should not throw when setup is not provided', () => {
+        it('should not throw when mount is not provided', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
 
@@ -309,7 +309,7 @@ describe('defineComponent', () => {
             Test.deleteInstance(root);
         });
 
-        it('should not throw when teardown is not provided', () => {
+        it('should not throw when unmount is not provided', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
             const instance = Test.createInstance(root);

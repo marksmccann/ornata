@@ -386,16 +386,16 @@ namespace Ornata {
          */
         lifecycle?: {
             /**
-             * A function that is called once when the component is created; useful for performing setup logic.
+             * A function that is called once when the component is mounted; useful for performing activation logic.
              * @since v0.1.0
              */
-            setup?: (this: T) => void;
+            mount?: (this: T) => void;
 
             /**
-             * A function that is called once when the component is disposed; useful for performing teardown logic.
+             * A function that is called once when the component is unmounted; useful for performing cleanup logic.
              * @since v0.1.0
              */
-            teardown?: (this: T) => void;
+            unmount?: (this: T) => void;
         };
 
         /**

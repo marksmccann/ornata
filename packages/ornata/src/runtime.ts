@@ -133,8 +133,8 @@ export type Methods = Record<string, (...args: unknown[]) => unknown>;
  * @private
  */
 export interface LifecycleOptions {
-    setup?: (this: InternalInstance) => void;
-    teardown?: (this: InternalInstance) => void;
+    mount?: (this: InternalInstance) => void;
+    unmount?: (this: InternalInstance) => void;
 }
 
 /**

@@ -199,8 +199,8 @@ export type InferredComponentOptions<TOptions extends LooseComponentOptions> = {
           }
         : never;
     lifecycle?: {
-        setup?: (this: InferComponentInstance<TOptions>) => void;
-        teardown?: (this: InferComponentInstance<TOptions>) => void;
+        mount?: (this: InferComponentInstance<TOptions>) => void;
+        unmount?: (this: InferComponentInstance<TOptions>) => void;
     };
     watch?: TOptions['watch'] extends object
         ? {

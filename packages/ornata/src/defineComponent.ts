@@ -333,8 +333,8 @@ function defineComponent<T extends Ornata.InternalInstance>(
             this.root = root;
             this.state = externalState;
 
-            // Run the setup lifecycle method
-            lifecycleOptions.setup?.call(internalInstance as InternalInstance);
+            // Run the mount lifecycle method
+            lifecycleOptions.mount?.call(internalInstance as InternalInstance);
 
             // Manually perform the initial update for every state property
             Object.keys(stateOptions).forEach((key) => {
@@ -376,7 +376,7 @@ function defineComponent<T extends Ornata.InternalInstance>(
             if (cleanupUpdate) cleanupUpdate();
             stateListeners.delete(internalInstance);
             updateCleanup.delete(internalInstance);
-            lifecycleOptions.teardown?.call(
+            lifecycleOptions.unmount?.call(
                 internalInstance as InternalInstance
             );
             externalInstances.delete(this.root);
