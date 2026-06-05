@@ -13,7 +13,7 @@ describe('isComponent', () => {
 
     it('should return false if the value is not a component constructor', () => {
         const Test = defineComponent({ name: 'Test' });
-        const instance = Test.createInstance(document.createElement('div'));
+        const instance = Test.mount(document.createElement('div'));
 
         expect(isComponent(instance)).toBe(false);
 

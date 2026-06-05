@@ -40,6 +40,10 @@ const CounterComponent = defineComponent({
         },
     },
 });
+
+const instance = CounterComponent.mount(
+    document.querySelector('[data-counter]')
+);
 ```
 
 ## Typed Usage
@@ -76,9 +80,22 @@ const CounterComponent = defineComponent<{
         },
     },
 });
+
+const instance = CounterComponent.mount(
+    document.querySelector('[data-counter]')
+);
 ```
 
 You can use the same named-type pattern for `elements`, `data`, and `computed` when you want stronger contracts or clearer documentation for maintainers.
+
+When you need to work with mounted instances imperatively, use the component constructor methods:
+
+```ts
+const instance = CounterComponent.mount(root);
+const sameInstance = CounterComponent.getInstance(root);
+const maybeInstance = CounterComponent.findInstance(root);
+CounterComponent.unmount(root);
+```
 
 ## License
 

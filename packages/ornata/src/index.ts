@@ -181,7 +181,10 @@ namespace Ornata {
      * Context passed to watch callbacks.
      * @since v0.2.0
      */
-    export interface WatchContext<TState extends object, K extends keyof TState> {
+    export interface WatchContext<
+        TState extends object,
+        K extends keyof TState,
+    > {
         /**
          * Identifies the framework callback context.
          */
@@ -331,10 +334,7 @@ namespace Ornata {
     export type RenderCallback<
         T extends InternalInstance,
         K extends keyof T['elements'],
-    > = (
-        this: T,
-        context: RenderContext<T['elements'][K]>
-    ) => RenderOptions;
+    > = (this: T, context: RenderContext<T['elements'][K]>) => RenderOptions;
 
     /**
      * The callback function for a method defined on the component.
@@ -538,7 +538,7 @@ namespace Ornata {
 
         /**
          * Create a new instance of the component.
-         * _Note: Use the `createInstance` method instead of the constructor directly to create an instance of the component._
+         * _Note: Use the `mount` method instead of the constructor directly to create an instance of the component._
          * @parameter root The root element of the instance to create. Can be a CSS selector or the element itself.
          * @parameter initialState The initial state of the component.
          * @returns The instance of the component.
@@ -556,29 +556,22 @@ namespace Ornata {
         readonly displayName: string;
 
         /**
-         * Create a new instance of the component.
-         * @parameter elementOrQuery The element or query to create the instance from.
+         * Mount a new instance of the component.
+         * @parameter elementOrQuery The element or query to mount the instance on.
          * @parameter initialState The initial state of the component.
          * @returns The instance of the component.
-         * @since v0.1.0
+         * @since v0.3.0
          */
-        createInstance(
+        mount(
             elementOrQuery: string | Element | null | undefined,
             initialState?: Partial<T['state']>
         ): ComponentInstance<T>;
 
         /**
-         * Delete an instance of the component; calls instance.dispose().
-         * @parameter instanceRoot A reference to the root element of the instance to delete. Can be a CSS selector or the element itself.
-         * @since v0.1.0
-         */
-        deleteInstance(instanceRoot: string | Element | null | undefined): void;
-
-        /**
          * Retrieves an instance of the component. Will throw an error if the instance does not exist.
          * @param instanceRoot A reference to the root element of the instance to get. Can be a CSS selector or the element itself.
          * @returns The instance of the component.
-         * @since v0.1.0
+         * @since v0.3.0
          */
         getInstance(
             instanceRoot: string | Element | null | undefined
@@ -588,22 +581,18 @@ namespace Ornata {
          * Retrieves an instance of the component. Will return `null` if the instance does not exist.
          * @param instanceRoot A reference to the root element of the instance to get. Can be a CSS selector or the element itself.
          * @returns The instance of the component or `null` if the instance does not exist.
-         * @since v0.1.0
+         * @since v0.3.0
          */
-        queryInstance(
+        findInstance(
             instanceRoot: string | Element | null | undefined
         ): ComponentInstance<T> | null;
 
         /**
-         * Imperatively updates the state of an instance of the component. Will throw an error if the instance does not exist.
-         * @param instanceRoot A reference to the root element of the instance to update. Can be a CSS selector or the element itself.
-         * @param stateChanges The state changes to apply to the instance.
-         * @since v0.1.0
+         * Unmount an instance of the component; calls instance.dispose().
+         * @parameter instanceRoot A reference to the root element of the instance to unmount. Can be a CSS selector or the element itself.
+         * @since v0.3.0
          */
-        updateInstance(
-            instanceRoot: string | Element | null | undefined,
-            stateChanges: Partial<T['state']>
-        ): void;
+        unmount(instanceRoot: string | Element | null | undefined): void;
     }
 
     /**
@@ -637,9 +626,7 @@ namespace Ornata {
         elements: 'elements' extends keyof T ? NonNullable<T['elements']> : {};
         methods: 'methods' extends keyof T ? NonNullable<T['methods']> : {};
         data: 'data' extends keyof T ? NonNullable<T['data']> : {};
-        computed: 'computed' extends keyof T
-            ? NonNullable<T['computed']>
-            : {};
+        computed: 'computed' extends keyof T ? NonNullable<T['computed']> : {};
     };
 }
 

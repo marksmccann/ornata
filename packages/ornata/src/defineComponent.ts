@@ -460,27 +460,29 @@ function defineComponent<T extends Ornata.InternalInstance>(
             return cleanup;
         };
 
-        static createInstance: Ornata.ComponentConstructor<T>['createInstance'] =
-            (instanceRoot, initialState) => {
-                const root = getRootElement<T['root']>(
-                    displayName,
-                    instanceRoot,
-                    'create'
-                );
+        static mount: Ornata.ComponentConstructor<T>['mount'] = (
+            instanceRoot,
+            initialState
+        ) => {
+            const root = getRootElement<T['root']>(
+                displayName,
+                instanceRoot,
+                'mount'
+            );
 
-                if (externalInstances.has(root)) {
-                    throw reporter.fail('ERR03', {
-                        componentName: displayName,
-                        action: 'create',
-                        root: describeElement(root),
-                    });
-                }
+            if (externalInstances.has(root)) {
+                throw reporter.fail('ERR03', {
+                    componentName: displayName,
+                    action: 'mount',
+                    root: describeElement(root),
+                });
+            }
 
-                return new Component(root, initialState);
-            };
+            return new Component(root, initialState);
+        };
 
         static getInstance: Ornata.ComponentConstructor<T>['getInstance'] = (
-            instanceRoot
+            instanceRoot: string | Element | null | undefined
         ) => {
             const root = getRootElement<T['root']>(
                 displayName,
@@ -501,8 +503,8 @@ function defineComponent<T extends Ornata.InternalInstance>(
             return instance;
         };
 
-        static queryInstance: Ornata.ComponentConstructor<T>['queryInstance'] =
-            (instanceRoot) => {
+        static findInstance: Ornata.ComponentConstructor<T>['findInstance'] =
+            (instanceRoot: string | Element | null | undefined) => {
                 try {
                     return this.getInstance(instanceRoot);
                 } catch (error) {
@@ -510,12 +512,12 @@ function defineComponent<T extends Ornata.InternalInstance>(
                 }
             };
 
-        static deleteInstance: Ornata.ComponentConstructor<T>['deleteInstance'] =
-            (instanceRoot) => {
+        static unmount: Ornata.ComponentConstructor<T>['unmount'] =
+            (instanceRoot: string | Element | null | undefined) => {
                 const root = getRootElement<T['root']>(
                     displayName,
                     instanceRoot,
-                    'delete'
+                    'unmount'
                 );
 
                 const instance = externalInstances.get(root);
@@ -523,36 +525,12 @@ function defineComponent<T extends Ornata.InternalInstance>(
                 if (!instance) {
                     throw reporter.fail('ERR04', {
                         componentName: displayName,
-                        action: 'delete',
+                        action: 'unmount',
                         root: describeElement(root),
                     });
                 }
 
                 instance.dispose();
-            };
-
-        static updateInstance: Ornata.ComponentConstructor<T>['updateInstance'] =
-            (instanceRoot, stateChanges) => {
-                const root = getRootElement<T['root']>(
-                    displayName,
-                    instanceRoot,
-                    'update'
-                );
-
-                const instance = externalInstances.get(root);
-
-                if (!instance) {
-                    throw reporter.fail('ERR04', {
-                        componentName: displayName,
-                        action: 'update',
-                        root: describeElement(root),
-                    });
-                }
-
-                Object.entries(stateChanges).forEach(([property, value]) => {
-                    (instance.state as Record<string, unknown>)[property] =
-                        value;
-                });
             };
     };
 }

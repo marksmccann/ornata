@@ -49,9 +49,7 @@ export default function createInitializer<
                 return;
             }
 
-            const instance = component.createInstance(
-                rootElement
-            ) as InitializedComponent;
+            const instance = component.mount(rootElement) as InitializedComponent;
 
             delete rootElement.dataset.ornata;
 

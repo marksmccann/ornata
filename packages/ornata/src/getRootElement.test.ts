@@ -7,7 +7,7 @@ import reporter from './reporter.js';
 describe('getRootElement', () => {
     it('should get root element by element', () => {
         const element = document.createElement('div');
-        const root = getRootElement('Test', element, 'create');
+        const root = getRootElement('Test', element, 'mount');
 
         expect(root).toStrictEqual(element);
     });
@@ -15,27 +15,27 @@ describe('getRootElement', () => {
     it('should get root element by selector', () => {
         const element = document.createElement('div');
         document.body.appendChild(element);
-        const root = getRootElement('Test', 'div', 'create');
+        const root = getRootElement('Test', 'div', 'mount');
         document.body.removeChild(element);
 
         expect(root).toStrictEqual(element);
     });
 
     it('should fail to get root element if element is not found', () => {
-        expect(() => getRootElement('Test', 'div', 'create')).toThrow(
+        expect(() => getRootElement('Test', 'div', 'mount')).toThrow(
             reporter.message('ERR01', {
                 componentName: 'Test',
-                action: 'create',
+                action: 'mount',
                 selector: 'div',
             })
         );
     });
 
     it('should fail to get root element if element is not valid', () => {
-        expect(() => getRootElement('Test', null, 'create')).toThrow(
+        expect(() => getRootElement('Test', null, 'mount')).toThrow(
             reporter.message('ERR02', {
                 componentName: 'Test',
-                action: 'create',
+                action: 'mount',
                 element: null,
             })
         );

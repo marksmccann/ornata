@@ -31,6 +31,8 @@ const Counter = defineComponent({
         },
     },
 });
+
+const instance = Counter.mount(document.querySelector("[data-counter]"));
 ```
 
 When you want stable named types and JSDoc on state properties, provide a single typed parts object:
@@ -49,4 +51,13 @@ const Counter = defineComponent<{
         count: { default: 0 },
     },
 });
+```
+
+For imperative instance management, use the component constructor methods:
+
+```ts
+const instance = Counter.mount(root);
+const sameInstance = Counter.getInstance(root);
+const maybeInstance = Counter.findInstance(root);
+Counter.unmount(root);
 ```

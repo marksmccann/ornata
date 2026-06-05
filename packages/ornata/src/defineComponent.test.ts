@@ -13,15 +13,12 @@ describe('defineComponent', () => {
 
         expect(Test.displayName).toStrictEqual('Test');
         expect(Test.$$typeof).toStrictEqual(ORNATA_COMPONENT_CONSTRUCTOR);
-        expect(Test.createInstance).toBeInstanceOf(Function);
-        expect(Test.getInstance).toBeInstanceOf(Function);
-        expect(Test.queryInstance).toBeInstanceOf(Function);
     });
 
     it('should create component instance', () => {
         const Test = defineComponent({ name: 'Test' });
         const root = document.createElement('div');
-        const instance = Test.createInstance(root);
+        const instance = Test.mount(root);
 
         expect(instance).toBeInstanceOf(Test);
         expect(instance.root).toStrictEqual(root);
@@ -31,7 +28,7 @@ describe('defineComponent', () => {
         instance.dispose();
     });
 
-    it('should infer typed state for createInstance and instance.state', () => {
+    it('should infer typed state for mount and instance.state', () => {
         const Test = defineComponent({
             name: 'Test',
             state: {
@@ -44,23 +41,23 @@ describe('defineComponent', () => {
             },
         });
 
-        const instance = Test.createInstance(document.createElement('div'), {
+        const instance = Test.mount(document.createElement('div'), {
             count: 1,
             label: 'ready',
         });
         const elementOrQuery: string | Element | null | undefined =
             document.createElement('div');
 
-        Test.createInstance(elementOrQuery, {
+        Test.mount(elementOrQuery, {
             count: 2,
         });
 
-        Test.createInstance(document.createElement('div'), {
+        Test.mount(document.createElement('div'), {
             // @ts-expect-error - count must be a number
             count: 'wrong',
         });
 
-        Test.createInstance(document.createElement('div'), {
+        Test.mount(document.createElement('div'), {
             // @ts-expect-error - label must be a string
             label: 123,
         });
@@ -95,7 +92,7 @@ describe('defineComponent', () => {
                 },
             },
         });
-        const instance = Test.createInstance(document.createElement('div'), {
+        const instance = Test.mount(document.createElement('div'), {
             count: 1,
         });
 
@@ -145,11 +142,11 @@ describe('defineComponent', () => {
         it('should dispose instance', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             instance.dispose();
 
-            expect(Test.queryInstance(root)).toBeNull();
+            expect(Test.findInstance(root)).toBeNull();
         });
 
         it('should return cleanup function from addStateListener', () => {
@@ -162,7 +159,7 @@ describe('defineComponent', () => {
                     },
                 },
             });
-            const instance = Test.createInstance(document.createElement('div'));
+            const instance = Test.mount(document.createElement('div'));
 
             const cleanup = instance.addStateListener('count', listener);
 
@@ -191,7 +188,7 @@ describe('defineComponent', () => {
                     },
                 },
             });
-            const instance = Test.createInstance(document.createElement('div'));
+            const instance = Test.mount(document.createElement('div'));
 
             const cleanup = instance.addStateListener('count', listener);
 
@@ -207,34 +204,34 @@ describe('defineComponent', () => {
 
     describe('lifecycle option', () => {
         it('should call mount when instance is created', () => {
-            const mount = vi.fn();
+            const onMount = vi.fn();
             const Test = defineComponent({
                 name: 'Test',
-                lifecycle: { mount },
+                lifecycle: { mount: onMount },
             });
             const root = document.createElement('div');
 
-            Test.createInstance(root);
+            Test.mount(root);
 
-            expect(mount).toHaveBeenCalledOnce();
+            expect(onMount).toHaveBeenCalledOnce();
 
-            Test.deleteInstance(root);
+            Test.unmount(root);
         });
 
         it('should call unmount when instance is disposed', () => {
-            const unmount = vi.fn();
+            const onUnmount = vi.fn();
             const Test = defineComponent({
                 name: 'Test',
-                lifecycle: { unmount },
+                lifecycle: { unmount: onUnmount },
             });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
-            expect(unmount).not.toHaveBeenCalled();
+            expect(onUnmount).not.toHaveBeenCalled();
 
             instance.dispose();
 
-            expect(unmount).toHaveBeenCalledOnce();
+            expect(onUnmount).toHaveBeenCalledOnce();
         });
 
         it('should call mount with the internal component instance as this', () => {
@@ -248,7 +245,7 @@ describe('defineComponent', () => {
                 },
             });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             expect(capturedThis.root).toBe(root);
             expect(capturedThis.state).toEqual({});
@@ -270,7 +267,7 @@ describe('defineComponent', () => {
                 },
             });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             instance.dispose();
 
@@ -293,26 +290,26 @@ describe('defineComponent', () => {
                 },
             });
 
-            Test.createInstance(root);
+            Test.mount(root);
 
             expect(capturedRoot).toBe(root);
 
-            Test.deleteInstance(root);
+            Test.unmount(root);
         });
 
         it('should not throw when mount is not provided', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
 
-            expect(() => Test.createInstance(root)).not.toThrow();
+            expect(() => Test.mount(root)).not.toThrow();
 
-            Test.deleteInstance(root);
+            Test.unmount(root);
         });
 
         it('should not throw when unmount is not provided', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             expect(() => instance.dispose()).not.toThrow();
         });
@@ -334,7 +331,7 @@ describe('defineComponent', () => {
                     },
                 },
             });
-            const instance = Test.createInstance(document.createElement('div'));
+            const instance = Test.mount(document.createElement('div'));
 
             instance.state.count = 1;
 
@@ -411,7 +408,7 @@ describe('defineComponent', () => {
                     },
                 },
             });
-            const instance = Test.createInstance(document.createElement('div'));
+            const instance = Test.mount(document.createElement('div'));
 
             instance.state.count = 1;
 
@@ -502,7 +499,7 @@ describe('defineComponent', () => {
                 },
             });
 
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             expect(render).toHaveBeenCalledWith({
                 type: 'render',
@@ -535,7 +532,7 @@ describe('defineComponent', () => {
                 },
             });
 
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             expect(render).toHaveBeenNthCalledWith(1, {
                 type: 'render',
@@ -640,7 +637,7 @@ describe('defineComponent', () => {
                 state: { secret: { private: true } },
             });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             void instance.state.secret;
 
@@ -662,7 +659,7 @@ describe('defineComponent', () => {
                 state: { secret: { private: true } },
             });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             expect(instance.state.secret).toBeUndefined();
 
@@ -679,7 +676,7 @@ describe('defineComponent', () => {
                 state: { secret: { private: true } },
             });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             try {
                 instance.state.secret = 'exposed';
@@ -706,7 +703,7 @@ describe('defineComponent', () => {
                 state: { secret: { private: true } },
             });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             try {
                 instance.state.secret = 'exposed';
@@ -731,7 +728,7 @@ describe('defineComponent', () => {
                 state: { count: { readonly: true } },
             });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root, { count: 0 });
+            const instance = Test.mount(root, { count: 0 });
 
             try {
                 instance.state.count = 99;
@@ -758,7 +755,7 @@ describe('defineComponent', () => {
                 state: { count: { readonly: true } },
             });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root, { count: 0 });
+            const instance = Test.mount(root, { count: 0 });
 
             try {
                 instance.state.count = 99;
@@ -778,7 +775,7 @@ describe('defineComponent', () => {
                 state: { count: { type: Number, readonly: true } },
             });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root, { count: 42 });
+            const instance = Test.mount(root, { count: 42 });
 
             expect(instance.state.count).toBe(42);
 
@@ -801,22 +798,22 @@ describe('defineComponent', () => {
             });
             const root = document.createElement('div');
 
-            expect(() => Test.createInstance(root)).not.toThrow();
+            expect(() => Test.mount(root)).not.toThrow();
 
-            Test.deleteInstance(root);
+            Test.unmount(root);
         });
     });
 
-    describe('static methods', () => {
+    describe('instance helpers', () => {
         it('should fail to create instance if root element already has an instance', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
-            expect(() => Test.createInstance(root)).toThrow(
+            expect(() => Test.mount(root)).toThrow(
                 reporter.message('ERR03', {
                     componentName: 'Test',
-                    action: 'create',
+                    action: 'mount',
                     root: describeElement(root),
                 })
             );
@@ -827,7 +824,7 @@ describe('defineComponent', () => {
         it('should get instance by root element', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             expect(Test.getInstance(root)).toStrictEqual(instance);
 
@@ -837,7 +834,7 @@ describe('defineComponent', () => {
         it('should get instance by selector', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             document.body.appendChild(root);
 
@@ -861,24 +858,24 @@ describe('defineComponent', () => {
             );
         });
 
-        it('should query instance by root element', () => {
+        it('should find instance by root element', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
-            expect(Test.queryInstance(root)).toStrictEqual(instance);
+            expect(Test.findInstance(root)).toStrictEqual(instance);
 
             instance.dispose();
         });
 
-        it('should query instance by selector', () => {
+        it('should find instance by selector', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
-            const instance = Test.createInstance(root);
+            const instance = Test.mount(root);
 
             document.body.appendChild(root);
 
-            expect(Test.queryInstance('div')).toStrictEqual(instance);
+            expect(Test.findInstance('div')).toStrictEqual(instance);
 
             document.body.removeChild(root);
             instance.dispose();
@@ -887,39 +884,39 @@ describe('defineComponent', () => {
         it('should return null if instance does not exist', () => {
             const Test = defineComponent({ name: 'Test' });
 
-            expect(Test.queryInstance('div')).toBeNull();
+            expect(Test.findInstance('div')).toBeNull();
         });
 
-        it('should delete instance by root element', () => {
+        it('should unmount instance by root element', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
 
-            Test.createInstance(root);
-            Test.deleteInstance(root);
+            Test.mount(root);
+            Test.unmount(root);
 
-            expect(Test.queryInstance(root)).toBeNull();
+            expect(Test.findInstance(root)).toBeNull();
         });
 
-        it('should delete instance by selector', () => {
+        it('should unmount instance by selector', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
 
-            Test.createInstance(root);
+            Test.mount(root);
             document.body.appendChild(root);
 
-            Test.deleteInstance('div');
+            Test.unmount('div');
 
             document.body.removeChild(root);
         });
 
-        it('should fail to delete instance if instance does not exist for root element', () => {
+        it('should fail to unmount instance if instance does not exist for root element', () => {
             const Test = defineComponent({ name: 'Test' });
             const root = document.createElement('div');
 
-            expect(() => Test.deleteInstance(root)).toThrow(
+            expect(() => Test.unmount(root)).toThrow(
                 reporter.message('ERR04', {
                     componentName: 'Test',
-                    action: 'delete',
+                    action: 'unmount',
                     root: describeElement(root),
                 })
             );
