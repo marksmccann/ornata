@@ -536,7 +536,7 @@ namespace Ornata {
         ): ComponentInstance<T> | null;
 
         /**
-         * Updates an instance of the component.
+         * Imperatively updates the state of an instance of the component. Will throw an error if the instance does not exist.
          * @param instanceRoot A reference to the root element of the instance to update. Can be a CSS selector or the element itself.
          * @param stateChanges The state changes to apply to the instance.
          * @since v0.1.0
