@@ -32,3 +32,21 @@ const Counter = defineComponent({
     },
 });
 ```
+
+When you want stable named types and JSDoc on state properties, provide a single typed parts object:
+
+```ts
+interface CounterState {
+    /** The current visible count. */
+    count: number;
+}
+
+const Counter = defineComponent<{
+    state: CounterState;
+}>({
+    name: "Counter",
+    state: {
+        count: { default: 0 },
+    },
+});
+```

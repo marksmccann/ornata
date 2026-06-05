@@ -2,6 +2,11 @@ import type Ornata from './index';
 import reporter from './reporter';
 import describeElement from './describeElement';
 import getRootElement from './getRootElement';
+import type {
+    InferComponentInstance,
+    InferredComponentOptions,
+    LooseComponentOptions,
+} from './defineComponent.types.js';
 import resolveRootOptions from './resolveRootOptions';
 import resolveStateOptions from './resolveStateOptions';
 import validateState from './validateState';
@@ -44,49 +49,32 @@ import { ORNATA_COMPONENT_CONSTRUCTOR } from './symbols';
  *
  * @example
  * ```ts
- * type CounterInstance = Ornata.ComponentShape<{
- *     state: {
- *         count: number;
- *     };
- * }>;
+ * interface CounterState {
+ *     // The current visible count.
+ *     count: number;
+ * }
  *
- * const Counter: Ornata.ComponentConstructor<CounterInstance> =
- *     defineComponent({
- *         name: "Counter",
- *         state: {
- *             count: {
- *                 default: 0,
- *             },
+ * const Counter = defineComponent<{
+ *     state: CounterState;
+ * }>({
+ *     name: "Counter",
+ *     state: {
+ *         count: {
+ *             default: 0,
  *         },
- *     });
+ *     },
+ * });
  * ```
  * @since v0.1.0
  */
-function defineComponent<
-    TState extends Ornata.ComponentState,
-    TElements extends Ornata.ComponentElements = {},
-    TMethods extends Ornata.ComponentMethods = {},
-    TData extends Ornata.ComponentData = {},
-    TComputed extends Ornata.ComponentComputed = {},
->(
+function defineComponent<TOptions extends LooseComponentOptions>(
+    options: TOptions & InferredComponentOptions<TOptions>
+): Ornata.ComponentConstructor<InferComponentInstance<TOptions>>;
+function defineComponent<TParts extends Ornata.ComponentParts>(
     options: Ornata.ComponentOptions<
-        Ornata.ComponentShape<{
-            state: TState;
-            elements: TElements;
-            methods: TMethods;
-            data: TData;
-            computed: TComputed;
-        }>
+        Ornata.NormalizeComponentParts<NoInfer<TParts>>
     >
-): Ornata.ComponentConstructor<
-    Ornata.ComponentShape<{
-        state: TState;
-        elements: TElements;
-        methods: TMethods;
-        data: TData;
-        computed: TComputed;
-    }>
->;
+): Ornata.ComponentConstructor<Ornata.NormalizeComponentParts<TParts>>;
 function defineComponent<T extends Ornata.InternalInstance>(
     options: Ornata.ComponentOptions<T>
 ): Ornata.ComponentConstructor<T> {
@@ -218,7 +206,7 @@ function defineComponent<T extends Ornata.InternalInstance>(
             ) as T['elements'];
 
             const methods = resolveMethodOptions.call(
-                internalInstance,
+                internalInstance as InternalInstance,
                 methodOptions
             ) as T['methods'];
 
@@ -276,7 +264,7 @@ function defineComponent<T extends Ornata.InternalInstance>(
                     }
 
                     updateComponent.call(
-                        internalInstance,
+                        internalInstance as InternalInstance,
                         property,
                         oldValue,
                         newValue,
@@ -306,7 +294,7 @@ function defineComponent<T extends Ornata.InternalInstance>(
                         return undefined;
                     }
 
-                    return internalState[property];
+                    return (internalState as Record<string, unknown>)[property];
                 },
                 set(target, key, value) {
                     if (typeof key === 'symbol') {
@@ -346,15 +334,17 @@ function defineComponent<T extends Ornata.InternalInstance>(
             this.state = externalState;
 
             // Run the setup lifecycle method
-            lifecycleOptions.setup?.call(internalInstance);
+            lifecycleOptions.setup?.call(internalInstance as InternalInstance);
 
             // Manually perform the initial update for every state property
             Object.keys(stateOptions).forEach((key) => {
                 const property = key;
-                const value = internalInstance.state[property];
+                const value = (
+                    internalInstance.state as Record<string, unknown>
+                )[property];
 
                 updateComponent.call(
-                    internalInstance,
+                    internalInstance as InternalInstance,
                     property,
                     value,
                     value,
@@ -386,7 +376,9 @@ function defineComponent<T extends Ornata.InternalInstance>(
             if (cleanupUpdate) cleanupUpdate();
             stateListeners.delete(internalInstance);
             updateCleanup.delete(internalInstance);
-            lifecycleOptions.teardown?.call(internalInstance);
+            lifecycleOptions.teardown?.call(
+                internalInstance as InternalInstance
+            );
             externalInstances.delete(this.root);
             internalInstances.delete(this);
         };
@@ -558,7 +550,8 @@ function defineComponent<T extends Ornata.InternalInstance>(
                 }
 
                 Object.entries(stateChanges).forEach(([property, value]) => {
-                    instance.state[property as keyof T['state']] = value;
+                    (instance.state as Record<string, unknown>)[property] =
+                        value;
                 });
             };
     };

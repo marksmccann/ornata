@@ -80,28 +80,65 @@ describe('defineComponent', () => {
         instance.dispose();
     });
 
-    it('should preserve explicit component shape typing on the returned constructor', () => {
-        type TestInstance = Ornata.ComponentShape<{
-            state: { count: number };
-        }>;
+    it('should preserve explicit component parts typing on the returned constructor', () => {
+        interface TestState {
+            count: number;
+        }
 
-        const Test: Ornata.ComponentConstructor<TestInstance> = defineComponent(
-            {
-                name: 'Test',
-                state: {
-                    count: {
-                        default: 0,
-                    },
+        const Test = defineComponent<{
+            state: TestState;
+        }>({
+            name: 'Test',
+            state: {
+                count: {
+                    default: 0,
                 },
-            }
-        );
+            },
+        });
         const instance = Test.createInstance(document.createElement('div'), {
             count: 1,
         });
 
+        expectTypeOf(Test).toEqualTypeOf<
+            Ornata.ComponentConstructor<
+                Ornata.NormalizeComponentParts<{
+                    state: TestState;
+                }>
+            >
+        >();
         expectTypeOf(instance.state.count).toEqualTypeOf<number>();
 
         instance.dispose();
+    });
+
+    it('should support sparse explicit component parts typing', () => {
+        interface TestState {
+            count: number;
+        }
+
+        interface TestMethods {
+            increment(): void;
+        }
+
+        defineComponent<{
+            state: TestState;
+            methods: TestMethods;
+        }>({
+            name: 'Test',
+            state: {
+                count: {
+                    default: 0,
+                },
+            },
+            methods: {
+                increment() {
+                    expectTypeOf(this.state.count).toEqualTypeOf<number>();
+                    expectTypeOf(this.methods.increment).toEqualTypeOf<
+                        () => void
+                    >();
+                },
+            },
+        });
     });
 
     describe('instance methods', () => {
@@ -317,8 +354,14 @@ describe('defineComponent', () => {
             instance.dispose();
         });
 
-        it('should infer typed watch context', () => {
-            defineComponent({
+        it('should infer typed watch context from explicit component parts', () => {
+            interface TestState {
+                count: number;
+            }
+
+            defineComponent<{
+                state: TestState;
+            }>({
                 name: 'Test',
                 state: {
                     count: {
@@ -341,10 +384,21 @@ describe('defineComponent', () => {
 
     describe('computed option', () => {
         it('should call computed with context object', () => {
+            interface TestState {
+                count: number;
+            }
+
+            interface TestComputed {
+                total: number;
+            }
+
             const computed = vi.fn(({ changedProperty }) => {
                 return changedProperty === 'count' ? 1 : 0;
             });
-            const Test = defineComponent({
+            const Test = defineComponent<{
+                state: TestState;
+                computed: TestComputed;
+            }>({
                 name: 'Test',
                 state: {
                     count: {
@@ -375,39 +429,47 @@ describe('defineComponent', () => {
             instance.dispose();
         });
 
-        it('should infer typed computed context', () => {
-            type TestInstance = Ornata.ComponentShape<{
-                state: { count: number };
-                computed: { total: number };
-            }>;
+        it('should infer typed computed context from explicit component parts', () => {
+            interface TestState {
+                count: number;
+            }
 
-            const Test: Ornata.ComponentConstructor<TestInstance> =
-                defineComponent({
-                    name: 'Test',
-                    state: {
-                        count: {
-                            default: 0,
-                        },
-                    },
-                    computed: {
-                        total(context) {
-                            expectTypeOf(
-                                context.type
-                            ).toEqualTypeOf<'computed'>();
-                            expectTypeOf(
-                                context.currentValue
-                            ).toEqualTypeOf<number>();
-                            expectTypeOf(
-                                context.changedProperty
-                            ).toEqualTypeOf<'count'>();
+            interface TestComputed {
+                total: number;
+            }
 
-                            return 0;
-                        },
+            const Test = defineComponent<{
+                state: TestState;
+                computed: TestComputed;
+            }>({
+                name: 'Test',
+                state: {
+                    count: {
+                        default: 0,
                     },
-                });
+                },
+                computed: {
+                    total(context) {
+                        expectTypeOf(context.type).toEqualTypeOf<'computed'>();
+                        expectTypeOf(
+                            context.currentValue
+                        ).toEqualTypeOf<number>();
+                        expectTypeOf(
+                            context.changedProperty
+                        ).toEqualTypeOf<'count'>();
+
+                        return 0;
+                    },
+                },
+            });
 
             expectTypeOf(Test).toEqualTypeOf<
-                Ornata.ComponentConstructor<TestInstance>
+                Ornata.ComponentConstructor<
+                    Ornata.NormalizeComponentParts<{
+                        state: TestState;
+                        computed: TestComputed;
+                    }>
+                >
             >();
         });
     });
@@ -487,39 +549,81 @@ describe('defineComponent', () => {
             instance.dispose();
         });
 
-        it('should infer typed render context for single elements and arrays', () => {
-            defineComponent<
-                {},
-                {
-                    button: Element | null;
-                    items: Element[];
-                }
-            >({
-                    name: 'Test',
-                    elements: {
-                        button: {
-                            query: 'button',
-                        },
-                        items: {
-                            queryAll: 'li',
-                        },
-                    },
-                    render: {
-                        button(context) {
-                            expectTypeOf(
-                                context.type
-                            ).toEqualTypeOf<'render'>();
-                            expectTypeOf(context.index).toEqualTypeOf<void>();
+        it('should infer typed render context from explicit component parts', () => {
+            interface TestElements {
+                button: Element | null;
+                items: Element[];
+            }
 
-                            return {};
-                        },
-                        items(context) {
-                            expectTypeOf(
-                                context.type
-                            ).toEqualTypeOf<'render'>();
-                            expectTypeOf(context.index).toEqualTypeOf<number>();
+            defineComponent<{
+                elements: TestElements;
+            }>({
+                name: 'Test',
+                elements: {
+                    button: {
+                        query: 'button',
+                    },
+                    items: {
+                        queryAll: 'li',
+                    },
+                },
+                render: {
+                    button(context) {
+                        expectTypeOf(context.type).toEqualTypeOf<'render'>();
+                        expectTypeOf(context.index).toEqualTypeOf<
+                            number | undefined
+                        >();
 
                         return {};
+                    },
+                    items(context) {
+                        expectTypeOf(context.type).toEqualTypeOf<'render'>();
+                        expectTypeOf(context.index).toEqualTypeOf<
+                            number | undefined
+                        >();
+
+                        return {};
+                    },
+                },
+            });
+        });
+
+        it('should infer typed this context from explicit component parts', () => {
+            interface TestState {
+                count: number;
+            }
+
+            interface TestData {
+                step: number;
+            }
+
+            interface TestMethods {
+                increment(): void;
+            }
+
+            defineComponent<{
+                state: TestState;
+                data: TestData;
+                methods: TestMethods;
+            }>({
+                name: 'Test',
+                state: {
+                    count: {
+                        default: 0,
+                    },
+                },
+                data: {
+                    step: 1,
+                },
+                methods: {
+                    increment() {
+                        expectTypeOf(this.state.count).toEqualTypeOf<number>();
+                        expectTypeOf(this.data.step).toEqualTypeOf<number>();
+                        expectTypeOf(this.methods.increment).toEqualTypeOf<
+                            () => void
+                        >();
+
+                        return undefined;
                     },
                 },
             });

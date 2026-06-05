@@ -2,13 +2,13 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import renderElement from './renderElement.js';
-import type Ornata from './index.js';
+import type { InternalInstance } from './runtime.js';
 
 describe('renderElement', () => {
     it('should render attributes', () => {
         const element = document.createElement('div');
         const attributes = { 'aria-hidden': true };
-        const instance: Ornata.InternalInstance = {
+        const instance: InternalInstance = {
             root: element,
             state: {},
             elements: {},

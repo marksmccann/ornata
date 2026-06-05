@@ -10,7 +10,14 @@ import type Ornata from './index.js';
  * A broad internal component instance shape used by runtime helpers.
  * @private
  */
-export type InternalInstance = Ornata.InternalInstance;
+export interface InternalInstance {
+    root: Element;
+    state: Record<string, unknown>;
+    elements: Record<string, Ornata.ComponentElement>;
+    methods: Record<string, (...args: unknown[]) => unknown>;
+    data: Record<string, unknown>;
+    computed: Record<string, unknown>;
+}
 
 /**
  * A broad computed callback shape used by runtime helpers after generic

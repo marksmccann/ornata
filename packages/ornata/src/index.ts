@@ -57,11 +57,11 @@ namespace Ornata {
      */
     export interface InternalInstance {
         root: Element;
-        state: ComponentState;
-        elements: ComponentElements;
-        methods: ComponentMethods;
-        data: ComponentData;
-        computed: ComponentComputed;
+        state: object;
+        elements: object;
+        methods: object;
+        data: object;
+        computed: object;
     }
 
     /**
@@ -181,10 +181,7 @@ namespace Ornata {
      * Context passed to watch callbacks.
      * @since v0.2.0
      */
-    export interface WatchContext<
-        TState extends ComponentState,
-        K extends keyof TState,
-    > {
+    export interface WatchContext<TState extends object, K extends keyof TState> {
         /**
          * Identifies the framework callback context.
          */
@@ -210,10 +207,7 @@ namespace Ornata {
      * Context passed to computed callbacks.
      * @since v0.2.0
      */
-    export interface ComputedContext<
-        TState extends ComponentState,
-        TValue,
-    > {
+    export interface ComputedContext<TState extends object, TValue> {
         /**
          * Identifies the framework callback context.
          */
@@ -234,7 +228,7 @@ namespace Ornata {
      * Context passed to render callbacks.
      * @since v0.2.0
      */
-    export interface RenderContext<TElement extends ComponentElement> {
+    export interface RenderContext<TElement = ComponentElement> {
         /**
          * Identifies the framework callback context.
          */
@@ -243,7 +237,7 @@ namespace Ornata {
         /**
          * The index of the current element when rendering an element array.
          */
-        index: TElement extends Element[] ? number : void;
+        index?: number;
     }
 
     /**
@@ -343,6 +337,17 @@ namespace Ornata {
     ) => RenderOptions;
 
     /**
+     * The callback function for a method defined on the component.
+     * @since v0.2.0
+     */
+    export type MethodDefinition<
+        T extends InternalInstance,
+        TMethod,
+    > = TMethod extends (...args: infer TArgs) => infer TReturn
+        ? (this: T, ...args: TArgs) => TReturn
+        : never;
+
+    /**
      * The configuration options for the component.
      * @since v0.1.0
      */
@@ -406,7 +411,7 @@ namespace Ornata {
          * @since v0.1.0
          */
         methods?: {
-            [K in keyof T['methods']]: T['methods'][K];
+            [K in keyof T['methods']]: MethodDefinition<T, T['methods'][K]>;
         };
 
         /**
@@ -610,68 +615,30 @@ namespace Ornata {
     > = T extends ComponentConstructor<infer U> ? ComponentInstance<U> : never;
 
     /**
-     * A partial set of internal instance overrides used to build a component-specific shape.
+     * The optional typed parts of a component definition.
      * @since v0.2.0
      */
-    interface ComponentShapeOverrides {
+    export interface ComponentParts {
         root?: Element;
-        state?: ComponentState;
-        elements?: ComponentElements;
-        methods?: ComponentMethods;
-        data?: ComponentData;
-        computed?: ComponentComputed;
+        state?: object;
+        elements?: object;
+        methods?: object;
+        data?: object;
+        computed?: object;
     }
 
     /**
-     * Builds a fully-typed internal instance shape from only the parts a component needs.
-     * @example
-     * ```ts
-     * type CounterInstance = Ornata.ComponentShape<{
-     *     state: {
-     *         count: number;
-     *     };
-     *     methods: {
-     *         increment(): void;
-     *     };
-     * }>;
-     *
-     * const Counter: Ornata.ComponentConstructor<CounterInstance> =
-     *     defineComponent({
-     *         name: "Counter",
-     *         state: {
-     *             count: {
-     *                 default: 0,
-     *             },
-     *         },
-     *         methods: {
-     *             increment() {
-     *                 this.state.count += 1;
-     *             },
-     *         },
-     *     });
-     * ```
+     * Builds a fully-typed internal instance shape from the typed parts of a component definition.
      * @since v0.2.0
      */
-    export type ComponentShape<T extends ComponentShapeOverrides = {}> = {
-        root: T extends { root: infer TRoot extends Element } ? TRoot : Element;
-        state: T extends { state: infer TState extends ComponentState }
-            ? TState
-            : {};
-        elements: T extends {
-            elements: infer TElements extends ComponentElements;
-        }
-            ? TElements
-            : {};
-        methods: T extends { methods: infer TMethods extends ComponentMethods }
-            ? TMethods
-            : {};
-        data: T extends { data: infer TData extends ComponentData }
-            ? TData
-            : {};
-        computed: T extends {
-            computed: infer TComputed extends ComponentComputed;
-        }
-            ? TComputed
+    export type NormalizeComponentParts<T extends ComponentParts> = {
+        root: 'root' extends keyof T ? NonNullable<T['root']> : Element;
+        state: 'state' extends keyof T ? NonNullable<T['state']> : {};
+        elements: 'elements' extends keyof T ? NonNullable<T['elements']> : {};
+        methods: 'methods' extends keyof T ? NonNullable<T['methods']> : {};
+        data: 'data' extends keyof T ? NonNullable<T['data']> : {};
+        computed: 'computed' extends keyof T
+            ? NonNullable<T['computed']>
             : {};
     };
 }

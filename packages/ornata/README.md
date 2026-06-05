@@ -13,27 +13,13 @@ npm install ornata
 ## Usage
 
 ```ts
-import { defineComponent } from "ornata";
-import type Ornata from "ornata";
+import { defineComponent } from 'ornata';
 
-type Counter = Ornata.ComponentShape<{
-    state: {
-        count: number;
-        label: string;
-    };
-    computed: {
-        total: number;
-    };
-    methods: {
-        increment(): void;
-    };
-}>;
-
-const CounterComponent = defineComponent<Counter>({
-    name: "Counter",
+const CounterComponent = defineComponent({
+    name: 'Counter',
     state: {
         count: { default: 0 },
-        label: { default: "Clicks" },
+        label: { default: 'Clicks' },
     },
     methods: {
         increment() {
@@ -49,12 +35,50 @@ const CounterComponent = defineComponent<Counter>({
     },
     computed: {
         total({ currentValue, changedProperty }) {
-            console.log("Recomputing because:", changedProperty, currentValue);
+            console.log('Recomputing because:', changedProperty, currentValue);
             return this.state.count;
         },
     },
 });
 ```
+
+## Typed Usage
+
+Use a named state interface when you want property descriptions to follow through to consumers.
+
+```ts
+import { defineComponent } from 'ornata';
+
+interface CounterState {
+    /** The current visible count. */
+    count: number;
+
+    /** The label shown next to the count. */
+    label: string;
+}
+
+interface CounterMethods {
+    increment(): void;
+}
+
+const CounterComponent = defineComponent<{
+    state: CounterState;
+    methods: CounterMethods;
+}>({
+    name: 'Counter',
+    state: {
+        count: { default: 0 },
+        label: { default: 'Clicks' },
+    },
+    methods: {
+        increment() {
+            this.state.count += 1;
+        },
+    },
+});
+```
+
+You can use the same named-type pattern for `elements`, `data`, and `computed` when you want stronger contracts or clearer documentation for maintainers.
 
 ## License
 
