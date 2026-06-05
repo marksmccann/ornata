@@ -53,7 +53,7 @@ namespace Ornata {
 
     /**
      * The internal instance of the component.
-     * @since v0.2.0
+     * @since v0.1.0
      */
     export interface InternalInstance {
         root: Element;
@@ -66,7 +66,7 @@ namespace Ornata {
 
     /**
      * The configuration options for the root element for the `defineComponent` function.
-     * @since v0.2.0
+     * @since v0.1.0
      */
     export interface RootOptions<T extends InternalInstance> {
         /**
@@ -79,7 +79,7 @@ namespace Ornata {
 
     /**
      * The configuration options for the state properties for the `defineComponent` function.
-     * @since v0.2.0
+     * @since v0.1.0
      */
     export interface StateOptions<
         T extends InternalInstance,
@@ -130,7 +130,7 @@ namespace Ornata {
 
     /**
      * The configuration options for the elements properties for the `defineComponent` function.
-     * @since v0.2.0
+     * @since v0.1.0
      */
     export interface ElementOptions<
         T extends InternalInstance,
@@ -191,7 +191,7 @@ namespace Ornata {
 
     /**
      * The callback function for the watch property for the `defineComponent` function.
-     * @since v0.2.0
+     * @since v0.1.0
      */
     export type WatchCallback<
         T extends InternalInstance,
@@ -200,7 +200,7 @@ namespace Ornata {
 
     /**
      * The callback function for the computed property for the `defineComponent` function.
-     * @since v0.2.0
+     * @since v0.1.0
      */
     export type ComputedCallback<
         T extends InternalInstance,
@@ -213,7 +213,7 @@ namespace Ornata {
 
     /**
      * The configuration options for the render method for the `defineComponent` function.
-     * @since v0.2.0
+     * @since v0.1.0
      */
     export interface RenderOptions {
         /**
@@ -276,7 +276,7 @@ namespace Ornata {
 
     /**
      * The callback function for the render method for the `defineComponent` function.
-     * @since v0.2.0
+     * @since v0.1.0
      */
     export type RenderCallback<
         T extends InternalInstance,
@@ -412,7 +412,7 @@ namespace Ornata {
 
     /**
      * The callback function for the state listener for the `defineComponent` function.
-     * @since v0.2.0
+     * @since v0.1.0
      */
     export type StateListener<
         TValue,
