@@ -27,7 +27,6 @@ describe('defineComponent', () => {
         expect(instance.root).toStrictEqual(root);
         expect(instance.state).toEqual({});
         expect(instance.addStateListener).toBeInstanceOf(Function);
-        expect(instance.removeStateListener).toBeInstanceOf(Function);
 
         instance.dispose();
     });
@@ -68,6 +67,15 @@ describe('defineComponent', () => {
 
         expectTypeOf(instance.state.count).toEqualTypeOf<number>();
         expectTypeOf(instance.state.label).toEqualTypeOf<string>();
+        expectTypeOf(
+            instance.addStateListener('count', () => undefined)
+        ).toEqualTypeOf<Ornata.StateListenerCleanup>();
+        instance.addStateListener('count', (event) => {
+            expectTypeOf(event.property).toEqualTypeOf<'count'>();
+            expectTypeOf(event.newValue).toEqualTypeOf<number>();
+            expectTypeOf(event.oldValue).toEqualTypeOf<number>();
+            expectTypeOf(event.target).toEqualTypeOf<typeof instance>();
+        });
 
         instance.dispose();
     });
@@ -105,6 +113,58 @@ describe('defineComponent', () => {
             instance.dispose();
 
             expect(Test.queryInstance(root)).toBeNull();
+        });
+
+        it('should return cleanup function from addStateListener', () => {
+            const listener = vi.fn();
+            const Test = defineComponent({
+                name: 'Test',
+                state: {
+                    count: {
+                        default: 0,
+                    },
+                },
+            });
+            const instance = Test.createInstance(document.createElement('div'));
+
+            const cleanup = instance.addStateListener('count', listener);
+
+            instance.state.count = 1;
+            cleanup();
+            instance.state.count = 2;
+
+            expect(listener).toHaveBeenCalledOnce();
+            expect(listener).toHaveBeenCalledWith({
+                property: 'count',
+                newValue: 1,
+                oldValue: 0,
+                target: instance,
+            });
+
+            instance.dispose();
+        });
+
+        it('should allow cleanup function to be called more than once', () => {
+            const listener = vi.fn();
+            const Test = defineComponent({
+                name: 'Test',
+                state: {
+                    count: {
+                        default: 0,
+                    },
+                },
+            });
+            const instance = Test.createInstance(document.createElement('div'));
+
+            const cleanup = instance.addStateListener('count', listener);
+
+            cleanup();
+            cleanup();
+            instance.state.count = 1;
+
+            expect(listener).not.toHaveBeenCalled();
+
+            instance.dispose();
         });
     });
 

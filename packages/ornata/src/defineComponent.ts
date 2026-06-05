@@ -30,6 +30,36 @@ import { ORNATA_COMPONENT_CONSTRUCTOR } from './symbols';
  * Defines an Ornata component constructor from a set of typed component options.
  * @param options The configuration used to define the component's state, elements, methods, lifecycle, and rendering behavior.
  * @returns A component constructor that can create and manage component instances.
+ * @example
+ * ```ts
+ * const Counter = defineComponent({
+ *     name: "Counter",
+ *     state: {
+ *         count: {
+ *             default: 0,
+ *         },
+ *     },
+ * });
+ * ```
+ *
+ * @example
+ * ```ts
+ * type CounterInstance = Ornata.ComponentShape<{
+ *     state: {
+ *         count: number;
+ *     };
+ * }>;
+ *
+ * const Counter: Ornata.ComponentConstructor<CounterInstance> =
+ *     defineComponent({
+ *         name: "Counter",
+ *         state: {
+ *             count: {
+ *                 default: 0,
+ *             },
+ *         },
+ *     });
+ * ```
  * @since v0.1.0
  */
 function defineComponent<
@@ -132,8 +162,15 @@ function defineComponent<T extends Ornata.InternalInstance>(
         watchCallback.call(this, newValue, oldValue);
 
         if (externalInstance && handlers) {
+            const event = {
+                property,
+                newValue,
+                oldValue,
+                target: externalInstance,
+            };
+
             handlers.forEach((handler) => {
-                handler.call(externalInstance, newValue, oldValue);
+                handler.call(externalInstance, event);
             });
         }
 
@@ -352,7 +389,7 @@ function defineComponent<T extends Ornata.InternalInstance>(
                     action: `add state listener for property "${property as string}"`,
                 });
 
-                return;
+                return () => {};
             }
 
             if (!Object.hasOwn(stateOptions, property)) {
@@ -362,7 +399,7 @@ function defineComponent<T extends Ornata.InternalInstance>(
                     property: property as string,
                 });
 
-                return;
+                return () => {};
             }
 
             let listeners = stateListeners.get(internalInstance);
@@ -379,6 +416,27 @@ function defineComponent<T extends Ornata.InternalInstance>(
                 listeners.set(property as string, handlers);
             }
 
+            const cleanup = () => {
+                const currentListeners = stateListeners.get(internalInstance);
+                const currentHandlers = currentListeners?.get(
+                    property as string
+                );
+
+                if (!currentListeners || !currentHandlers) {
+                    return;
+                }
+
+                currentHandlers.delete(handler);
+
+                if (currentHandlers.size === 0) {
+                    currentListeners.delete(property as string);
+                }
+
+                if (currentListeners.size === 0) {
+                    stateListeners.delete(internalInstance);
+                }
+            };
+
             if (handlers.has(handler)) {
                 reporter.warn('WRN01', {
                     componentName: displayName,
@@ -387,60 +445,13 @@ function defineComponent<T extends Ornata.InternalInstance>(
                     status: 'already exists',
                 });
 
-                return;
+                return cleanup;
             }
 
             handlers.add(handler);
+
+            return cleanup;
         };
-
-        removeStateListener: Ornata.ComponentInstance<T>['removeStateListener'] =
-            (property, listener) => {
-                const internalInstance = internalInstances.get(this);
-                const handler = listener as StateListener;
-
-                if (!internalInstance) {
-                    reporter.error('ERR21', {
-                        componentName: displayName,
-                        action: `remove state listener for property "${property as string}"`,
-                    });
-
-                    return;
-                }
-
-                if (!Object.hasOwn(stateOptions, property)) {
-                    reporter.error('ERR22', {
-                        componentName: displayName,
-                        action: 'remove state listener for',
-                        property: property as string,
-                    });
-
-                    return;
-                }
-
-                const listeners = stateListeners.get(internalInstance);
-                const handlers = listeners?.get(property as string);
-
-                if (!listeners || !handlers || !handlers.has(handler)) {
-                    reporter.warn('WRN01', {
-                        componentName: displayName,
-                        action: `remove`,
-                        property: property as string,
-                        status: 'does not exist',
-                    });
-
-                    return;
-                }
-
-                handlers.delete(handler);
-
-                if (handlers.size === 0) {
-                    listeners.delete(property as string);
-                }
-
-                if (listeners.size === 0) {
-                    stateListeners.delete(internalInstance);
-                }
-            };
 
         static createInstance: Ornata.ComponentConstructor<T>['createInstance'] =
             (instanceRoot, initialState) => {

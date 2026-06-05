@@ -162,7 +162,18 @@ export type StateOptions = Record<string, StatePropertyOptions>;
  * A broad state listener shape used by runtime helpers.
  * @private
  */
-export type StateListener = (newValue: unknown, oldValue: unknown) => void;
+export interface StateListenerEvent {
+    property: string;
+    newValue: unknown;
+    oldValue: unknown;
+    target: unknown;
+}
+
+/**
+ * A broad state listener shape used by runtime helpers.
+ * @private
+ */
+export type StateListener = (event: StateListenerEvent) => void;
 
 /**
  * A string-keyed map of runtime state listeners by state property.

@@ -287,15 +287,6 @@ namespace Ornata {
     ) => RenderOptions;
 
     /**
-     * A helper type to get the non-nullable options for the component.
-     * @since v0.1.0
-     */
-    export type ComponentOption<
-        T extends InternalInstance,
-        K extends keyof ComponentOptions<T>,
-    > = NonNullable<ComponentOptions<T>[K]>;
-
-    /**
      * The configuration options for the component.
      * @since v0.1.0
      */
@@ -390,10 +381,50 @@ namespace Ornata {
     }
 
     /**
+     * Event payload passed to state listeners.
+     * @since v0.2.0
+     */
+    export interface StateListenerEvent<
+        TValue,
+        TProperty extends PropertyKey = string,
+        TTarget = unknown,
+    > {
+        /**
+         * The state property that changed.
+         */
+        property: TProperty;
+
+        /**
+         * The new value of the state property.
+         */
+        newValue: TValue;
+
+        /**
+         * The previous value of the state property.
+         */
+        oldValue: TValue;
+
+        /**
+         * The component instance that emitted the change.
+         */
+        target: TTarget;
+    }
+
+    /**
      * The callback function for the state listener for the `defineComponent` function.
      * @since v0.2.0
      */
-    export type StateListener<T> = (newValue: T, oldValue: T) => void;
+    export type StateListener<
+        TValue,
+        TProperty extends PropertyKey = string,
+        TTarget = unknown,
+    > = (event: StateListenerEvent<TValue, TProperty, TTarget>) => void;
+
+    /**
+     * Cleanup function returned by `addStateListener`.
+     * @since v0.2.0
+     */
+    export type StateListenerCleanup = () => void;
 
     /**
      * The instance of the component. The primary interface for interacting with the component externally.
@@ -424,27 +455,15 @@ namespace Ornata {
          * Add a state listener to the component; a function that is called when the state property is updated.
          * @param this The component instance.
          * @param property The property to add the state listener to.
-         * @param listener The state listener to add.
+         * @param listener The callback function to call when the state property is updated.
+         * @returns A cleanup function that removes the state listener.
          * @since v0.1.0
          */
         addStateListener<U extends keyof T['state']>(
             this: ComponentInstance<T>,
             property: U,
-            listener: StateListener<T['state'][U]>
-        ): void;
-
-        /**
-         * Remove a state listener from the component; a function that is called when the state property is updated.
-         * @param this The component instance.
-         * @param property The property to remove the state listener from.
-         * @param listener The state listener to remove.
-         * @since v0.1.0
-         */
-        removeStateListener<U extends keyof T['state']>(
-            this: ComponentInstance<T>,
-            property: U,
-            listener: StateListener<T['state'][U]>
-        ): void;
+            listener: StateListener<T['state'][U], U, ComponentInstance<T>>
+        ): StateListenerCleanup;
     }
 
     /**
@@ -460,7 +479,7 @@ namespace Ornata {
 
         /**
          * Create a new instance of the component.
-         * _Note: This method is typically not called directly by users. Instead, it is called by the `createInstance` method._
+         * _Note: Use the `createInstance` method instead of the constructor directly to create an instance of the component._
          * @parameter root The root element of the instance to create. Can be a CSS selector or the element itself.
          * @parameter initialState The initial state of the component.
          * @returns The instance of the component.
@@ -540,7 +559,7 @@ namespace Ornata {
      * A partial set of internal instance overrides used to build a component-specific shape.
      * @since v0.2.0
      */
-    export interface ComponentShapeOverrides {
+    interface ComponentShapeOverrides {
         root?: Element;
         state?: ComponentState;
         elements?: ComponentElements;
@@ -551,6 +570,32 @@ namespace Ornata {
 
     /**
      * Builds a fully-typed internal instance shape from only the parts a component needs.
+     * @example
+     * ```ts
+     * type CounterInstance = Ornata.ComponentShape<{
+     *     state: {
+     *         count: number;
+     *     };
+     *     methods: {
+     *         increment(): void;
+     *     };
+     * }>;
+     *
+     * const Counter: Ornata.ComponentConstructor<CounterInstance> =
+     *     defineComponent({
+     *         name: "Counter",
+     *         state: {
+     *             count: {
+     *                 default: 0,
+     *             },
+     *         },
+     *         methods: {
+     *             increment() {
+     *                 this.state.count += 1;
+     *             },
+     *         },
+     *     });
+     * ```
      * @since v0.2.0
      */
     export type ComponentShape<T extends ComponentShapeOverrides = {}> = {
