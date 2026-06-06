@@ -10,6 +10,25 @@ Ornata helps you build HTML-first sites that work without JavaScript, then progr
 npm install ornata
 ```
 
+## Browser Build
+
+Ornata also ships a browser-ready global build that you can load directly into a server-rendered HTML page.
+
+Use a pinned version in production so your pages do not change unexpectedly when a new release is published.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/ornata@0.2.0/dist/index.global.js"></script>
+<script>
+    const { defineComponent, createInitializer, isComponent } = window.Ornata;
+</script>
+```
+
+If you prefer UNPKG, the same build is also available at:
+
+```html
+<script src="https://unpkg.com/ornata@0.2.0/dist/index.global.js"></script>
+```
+
 ## Usage
 
 ```ts

@@ -7,6 +7,17 @@ description: A filtering example that updates the DOM from existing list markup.
 
 This example filters an existing list as the user types.
 
+## Live Demo
+
+<iframe
+    src="../../demos/live-filter.html"
+    title="Live filter demo"
+    loading="lazy"
+    style="width: 100%; min-height: 360px; border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: white;"
+></iframe>
+
+[Open this demo in a new tab](../../demos/live-filter.html)
+
 ## HTML
 
 ```html
@@ -74,4 +85,10 @@ export const LiveFilter = defineComponent<{
         },
     },
 });
+```
+
+## Mount
+
+```ts
+LiveFilter.mount("[data-filter]");
 ```

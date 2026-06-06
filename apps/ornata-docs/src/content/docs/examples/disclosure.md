@@ -7,6 +7,17 @@ description: A disclosure pattern that keeps the content in the HTML and uses Or
 
 Disclosure is a good example of progressive enhancement because the content already exists in the markup.
 
+## Live Demo
+
+<iframe
+    src="../../demos/disclosure.html"
+    title="Disclosure demo"
+    loading="lazy"
+    style="width: 100%; min-height: 340px; border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: white;"
+></iframe>
+
+[Open this demo in a new tab](../../demos/disclosure.html)
+
 ## HTML
 
 ```html
@@ -64,4 +75,10 @@ export const Disclosure = defineComponent({
         },
     },
 });
+```
+
+## Mount
+
+```ts
+Disclosure.mount("[data-disclosure]");
 ```

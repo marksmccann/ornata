@@ -43,6 +43,8 @@ If you are new to Ornata, this is the recommended path:
 3. Build [Your First Component](/ornata/guides/your-first-component/)
 4. Learn [Initializing From HTML](/ornata/guides/initializing-from-html/)
 
+If you want to use Ornata directly in a plain HTML page, the [Getting Started](/ornata/guides/getting-started/) guide also includes a browser CDN setup using the global build.
+
 ## Progressive enhancement, intentionally
 
 Progressive enhancement starts with semantic HTML, adds CSS for presentation, and layers JavaScript only where it improves the experience.

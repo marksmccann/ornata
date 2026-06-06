@@ -13,6 +13,17 @@ This guide takes you from installation to a working progressively enhanced compo
 npm install ornata
 ```
 
+If you want to enhance a page without a bundler, load the browser build from a CDN instead:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/ornata@0.2.0/dist/index.global.js"></script>
+<script>
+    const { defineComponent } = window.Ornata;
+</script>
+```
+
+Pin a specific version in production so your deployed HTML always gets the same runtime.
+
 ## Start with HTML
 
 Write server-rendered markup that already makes sense on its own.

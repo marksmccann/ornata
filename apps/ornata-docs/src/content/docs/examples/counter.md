@@ -7,6 +7,17 @@ description: A compact example showing state, methods, element resolution, and r
 
 This example is a small but complete Ornata component.
 
+## Live Demo
+
+<iframe
+    src="../../demos/counter.html"
+    title="Counter demo"
+    loading="lazy"
+    style="width: 100%; min-height: 320px; border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: white;"
+></iframe>
+
+[Open this demo in a new tab](../../demos/counter.html)
+
 ## HTML
 
 ```html

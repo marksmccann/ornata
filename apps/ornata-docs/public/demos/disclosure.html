@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Ornata Disclosure Demo</title>
+        <style>
+            :root {
+                color-scheme: light;
+                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                background: #f4f6fb;
+                color: #192235;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: grid;
+                place-items: center;
+                padding: 24px;
+                background:
+                    radial-gradient(circle at top, #fdfdff 0, #eef2fb 46%, #dfe7f8 100%);
+            }
+
+            .demo-shell {
+                width: min(100%, 440px);
+                padding: 24px;
+                border: 1px solid #cfd8ee;
+                border-radius: 22px;
+                background: rgba(255, 255, 255, 0.96);
+                box-shadow: 0 18px 40px rgba(36, 56, 104, 0.12);
+            }
+
+            h1 {
+                margin: 0 0 8px;
+                font-size: 1.25rem;
+            }
+
+            p {
+                margin: 0 0 18px;
+                line-height: 1.5;
+            }
+
+            [data-disclosure] {
+                display: grid;
+                gap: 12px;
+            }
+
+            [data-disclosure-button] {
+                justify-self: start;
+                border: 0;
+                border-radius: 999px;
+                padding: 0.8rem 1rem;
+                font: inherit;
+                font-weight: 700;
+                color: #f8fbff;
+                background: linear-gradient(135deg, #2956b3, #173878);
+                cursor: pointer;
+            }
+
+            [data-disclosure-panel] {
+                padding: 16px;
+                border-radius: 16px;
+                background: #eef4ff;
+                border: 1px solid #cdd9f6;
+                line-height: 1.5;
+            }
+
+            [data-disclosure-panel][hidden] {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <main class="demo-shell">
+            <h1>Disclosure Demo</h1>
+            <p>The content stays in the document and Ornata manages the open state.</p>
+
+            <section data-disclosure>
+                <button type="button" aria-expanded="false" data-disclosure-button>
+                    More details
+                </button>
+
+                <div hidden data-disclosure-panel>
+                    Progressive enhancement keeps this content in the document.
+                </div>
+            </section>
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/ornata@0.2.0/dist/index.global.js"></script>
+        <script>
+            const { defineComponent } = window.Ornata;
+
+            const Disclosure = defineComponent({
+                name: "Disclosure",
+                state: {
+                    open: { default: false, type: Boolean },
+                },
+                elements: {
+                    button: { query: "[data-disclosure-button]" },
+                    panel: { query: "[data-disclosure-panel]" },
+                },
+                methods: {
+                    toggle() {
+                        this.state.open = !this.state.open;
+                    },
+                },
+                render: {
+                    button() {
+                        return {
+                            attributes: {
+                                "aria-expanded": String(this.state.open),
+                            },
+                            events: {
+                                click: () => this.methods.toggle(),
+                            },
+                        };
+                    },
+                    panel() {
+                        return {
+                            attributes: {
+                                hidden: !this.state.open,
+                            },
+                        };
+                    },
+                },
+            });
+
+            Disclosure.mount("[data-disclosure]");
+        </script>
+    </body>
+</html>
