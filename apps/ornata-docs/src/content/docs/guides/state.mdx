@@ -1,0 +1,274 @@
+---
+title: State
+description: Initialize state from JavaScript or HTML, react to updates, and use Ornata's built-in safety controls for public state access.
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+# State
+
+State is one of the core building blocks in Ornata.
+
+It is designed to work well with server-rendered HTML, progressive enhancement, and direct component updates.
+
+## State can start in more than one place
+
+Ornata can build a component’s initial state from:
+
+- `default` values in the component definition
+- `data-*` values on the root HTML element
+- `initialState` passed to `mount()`
+
+That makes state flexible in a server-rendered environment because the server can provide initial values in markup, while JavaScript can still refine or override them when mounting.
+
+## Initial state precedence
+
+When Ornata resolves initial state, later sources win.
+
+The current order is:
+
+1. component `default` values
+2. parsed values from the root element dataset
+3. `initialState` passed to `mount()`
+
+That means mount-time JavaScript wins over HTML, and HTML wins over definition defaults.
+
+## Example: start from HTML
+
+```html
+<section
+    data-counter
+    data-count="5"
+    data-label="Server count"
+></section>
+```
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const Counter = defineComponent({
+    state: {
+        count: { default: 0, type: Number },
+        label: { default: "Clicks", type: String },
+    },
+});
+
+Counter.mount("[data-counter]");
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { defineComponent } from "ornata";
+
+interface CounterState {
+    count: number;
+    label: string;
+}
+
+const Counter = defineComponent<{
+    state: CounterState;
+}>({
+    state: {
+        count: { default: 0, type: Number },
+        label: { default: "Clicks", type: String },
+    },
+});
+
+Counter.mount("[data-counter]");
+```
+
+  </TabItem>
+</Tabs>
+
+The mounted instance starts with:
+
+- `count = 5`
+- `label = "Server count"`
+
+## Example: override HTML with JavaScript
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+Counter.mount("[data-counter]", {
+    count: 10,
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+Counter.mount("[data-counter]", {
+    count: 10,
+});
+```
+
+  </TabItem>
+</Tabs>
+
+Now `count` starts at `10`, even if the HTML contained `data-count="5"`.
+
+## State is reactive
+
+When state changes after mount, Ornata runs its update flow automatically.
+
+That includes:
+
+- validating the new value
+- recomputing computed values
+- re-running render callbacks
+- calling matching watch callbacks
+- notifying external state listeners
+
+This means state updates drive the component directly.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+methods: {
+    increment() {
+        this.state.count += 1;
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterMethods {
+    increment(): void;
+}
+
+methods: {
+    increment() {
+        this.state.count += 1;
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+You do not need a separate setter API to trigger updates. Updating the state property is the update.
+
+## Reacting to state changes
+
+Ornata gives you two different ways to react to state changes:
+
+- `watch` for internal component-side reactions
+- `addStateListener()` for external subscriptions on a mounted instance
+
+Use `watch` when the component itself needs to respond to its own updates.
+
+Use `addStateListener()` when code outside the component needs to observe public state changes.
+
+Read [Watchers](/ornata/guides/watchers/) and [State Listeners](/ornata/guides/state-listeners/) for the deeper guidance.
+
+## Public state safeguards
+
+Ornata also protects state access at the component boundary.
+
+Each state property can define:
+
+- `type`
+- `parse`
+- `private`
+- `readonly`
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+state: {
+    count: { default: 0, type: Number },
+    token: { private: true },
+    label: { default: "Clicks", readonly: true },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+state: {
+    count: { default: 0, type: Number },
+    token: { private: true },
+    label: { default: "Clicks", readonly: true },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+These options support a few useful guarantees:
+
+- invalid values can be reported
+- HTML dataset values can be parsed into the expected type
+- private state cannot be read or written externally
+- readonly state cannot be written externally
+
+## HTML parsing behavior
+
+When state is read from HTML, Ornata uses the state property options to decide how to parse the value.
+
+Depending on the configuration, it can parse:
+
+- strings
+- numbers
+- booleans
+- arrays
+- objects
+
+You can also supply `parse()` when you want custom parsing logic.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+state: {
+    filters: {
+        parse(value) {
+            return value.split(",");
+        },
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+state: {
+    filters: {
+        parse(value: string) {
+            return value.split(",");
+        },
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## A good mental model
+
+Ornata state is:
+
+- flexible at initialization time
+- direct to update
+- reactive once mounted
+- guarded at the public boundary
+
+That makes it a strong fit for server-rendered pages that need interactive behavior without giving up control over where the initial data comes from.
+
+## State is not the only place to keep values
+
+If a value should persist for the life of the component instance but should not be reactive, use `data` instead.
+
+Read [Data](/ornata/guides/data/) for that pattern.

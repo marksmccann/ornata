@@ -2,6 +2,7 @@
 title: Initializing From HTML
 description: Use createInitializer to mount components declaratively from data-ornata attributes.
 ---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 # Initializing From HTML
 
@@ -25,6 +26,23 @@ Add a `data-ornata` attribute whose value matches the component name you want to
 
 ## Create the initializer
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+import { createInitializer } from "ornata";
+import { Counter } from "./counter";
+import { Disclosure } from "./disclosure";
+
+const initialize = createInitializer({
+    Counter,
+    Disclosure,
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 import { createInitializer } from "ornata";
 import { Counter } from "./counter";
@@ -36,11 +54,27 @@ const initialize = createInitializer({
 });
 ```
 
+  </TabItem>
+</Tabs>
+
 ## Run it
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+initialize();
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 initialize();
 ```
+
+  </TabItem>
+</Tabs>
 
 The initializer will:
 
@@ -54,6 +88,19 @@ The initializer will:
 
 This pattern works well when your server already knows which component belongs to each root. It keeps the browser bootstrap code very small:
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+import { createInitializer } from "ornata";
+import { components } from "./components";
+
+createInitializer(components)();
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 import { createInitializer } from "ornata";
 import { components } from "./components";
@@ -61,6 +108,11 @@ import { components } from "./components";
 createInitializer(components)();
 ```
 
+  </TabItem>
+</Tabs>
+
 ## Important detail
 
 The `data-ornata` value must match a real Ornata component constructor in the initializer map. If it does not, Ornata will report an error and skip that root.
+
+For a fuller page-level pattern, read [Page Bootstrap](/ornata/guides/page-bootstrap/).

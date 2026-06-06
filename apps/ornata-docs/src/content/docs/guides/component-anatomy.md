@@ -59,9 +59,23 @@ state: {
 }
 ```
 
+### Why `state` is a bigger feature than it looks
+
+State in Ornata is designed for server-rendered apps:
+
+- defaults can be declared in the component
+- initial values can come from root HTML `data-*` attributes
+- mount-time `initialState` can override both
+- writes trigger the component update flow automatically
+- public access can be restricted with `private` and `readonly`
+
+For a focused walkthrough, see [State](/ornata/guides/state/).
+
 ## `elements`
 
 `elements` resolves important DOM references within the root element.
+
+This is one of Ornata’s most valuable features because it turns DOM lookups into a defined part of the component contract instead of leaving them scattered across the implementation.
 
 Each property can use:
 
@@ -79,6 +93,32 @@ elements: {
 }
 ```
 
+### Why `elements` is more than a convenience
+
+Element resolution in Ornata comes with a few built-in safeguards:
+
+- lookups are scoped to the component root
+- `min` and `max` can validate expected element counts
+- duplicate element references are detected
+- `resolve()` gives you an explicit escape hatch for custom logic
+
+That makes `elements` a strong fit for component APIs that depend on stable DOM structure.
+
+```ts
+elements: {
+    tabs: {
+        queryAll: "[data-tab]",
+        min: 2,
+    },
+    panels: {
+        queryAll: "[data-panel]",
+        min: 2,
+    },
+}
+```
+
+For a dedicated walkthrough, see [Safe DOM References](/ornata/guides/safe-dom-references/).
+
 ## `methods`
 
 `methods` defines internal reusable actions.
@@ -92,6 +132,14 @@ methods: {
     },
 }
 ```
+
+### Why `methods` deserves its own place
+
+Methods are where your component’s named actions live.
+
+They are especially useful for keeping render callbacks small and for centralizing event-driven logic that would otherwise be duplicated inline.
+
+For a focused walkthrough, see [Methods](/ornata/guides/methods/).
 
 ## `computed`
 
@@ -144,6 +192,14 @@ data: {
 }
 ```
 
+### Why `data` matters
+
+`data` is the right place for persistent internal values that should survive for the life of the component instance without triggering updates.
+
+Common examples include timer IDs, observer instances, caches, and third-party integration objects.
+
+For a focused walkthrough, see [Data](/ornata/guides/data/).
+
 ## `render`
 
 `render` maps resolved elements to DOM updates.
@@ -184,3 +240,7 @@ lifecycle: {
     },
 }
 ```
+
+Lifecycle hooks are best for setup and cleanup work rather than DOM output.
+
+For a deeper walkthrough, see [Lifecycle](/ornata/guides/lifecycle/).

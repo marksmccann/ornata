@@ -1,0 +1,92 @@
+---
+title: Lifecycle
+description: Use mount and unmount hooks for setup and cleanup in progressively enhanced Ornata components.
+---
+
+# Lifecycle
+
+Ornata supports two lifecycle hooks:
+
+- `mount`
+- `unmount`
+
+These hooks are useful when a component needs setup or cleanup behavior outside the normal render flow.
+
+## `mount`
+
+`lifecycle.mount` runs once when the component is mounted.
+
+```ts
+lifecycle: {
+    mount() {
+        console.log("Mounted");
+    },
+}
+```
+
+This is a good place for:
+
+- starting timers
+- registering observers
+- connecting third-party integrations
+- performing one-time activation logic
+
+## `unmount`
+
+`lifecycle.unmount` runs once when the component is disposed or unmounted.
+
+```ts
+lifecycle: {
+    unmount() {
+        console.log("Cleaned up");
+    },
+}
+```
+
+This is a good place for:
+
+- stopping timers
+- disconnecting observers
+- removing integration state
+- general teardown logic
+
+## A practical example
+
+```ts
+const Clock = defineComponent({
+    name: "Clock",
+    data: {
+        intervalId: null as number | null,
+    },
+    lifecycle: {
+        mount() {
+            this.data.intervalId = window.setInterval(() => {
+                console.log("tick");
+            }, 1000);
+        },
+        unmount() {
+            if (this.data.intervalId !== null) {
+                window.clearInterval(this.data.intervalId);
+            }
+        },
+    },
+});
+```
+
+This is also a good example of why `data` exists: some values need to persist across lifecycle hooks without becoming reactive state.
+
+See [Data](/ornata/guides/data/) for that concept directly.
+
+## Lifecycle versus render
+
+Use `render` when the goal is to update DOM output.
+
+Use lifecycle hooks when the goal is setup or cleanup around the component’s existence.
+
+That distinction keeps the component easier to reason about.
+
+## Lifecycle versus watch
+
+Use `watch` when behavior should happen because a specific state property changed.
+
+Use `mount` and `unmount` when behavior should happen because the component started or stopped existing.

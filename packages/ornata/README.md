@@ -4,6 +4,22 @@ A progressive enhancement framework for server-rendered websites.
 
 Ornata helps you build HTML-first sites that work without JavaScript, then progressively enhance them with interactivity where needed.
 
+It is also TypeScript-friendly by default, with strong inference for component options and a clear path to explicit typed component contracts when you want them.
+
+## Documentation
+
+The full documentation site lives at:
+
+- [https://marksmccann.github.io/ornata/](https://marksmccann.github.io/ornata/)
+
+Use the docs site for:
+
+- getting started guides
+- API reference
+- examples
+- tutorials
+- TypeScript usage patterns
+
 ## Installation
 
 ```bash
@@ -29,92 +45,22 @@ If you prefer UNPKG, the same build is also available at:
 <script src="https://unpkg.com/ornata@0.2.0/dist/index.global.js"></script>
 ```
 
-## Usage
+## Quick Start
 
 ```ts
 import { defineComponent } from 'ornata';
 
-const CounterComponent = defineComponent({
+const Counter = defineComponent({
     name: 'Counter',
     state: {
         count: { default: 0 },
-        label: { default: 'Clicks' },
-    },
-    methods: {
-        increment() {
-            this.state.count += 1;
-        },
-    },
-    watch: {
-        count({ newValue, oldValue, isInitial }) {
-            if (isInitial) return;
-
-            console.log(`Count changed from ${oldValue} to ${newValue}`);
-        },
-    },
-    computed: {
-        total({ currentValue, changedProperty }) {
-            console.log('Recomputing because:', changedProperty, currentValue);
-            return this.state.count;
-        },
     },
 });
 
-const instance = CounterComponent.mount(
-    document.querySelector('[data-counter]')
-);
+Counter.mount('[data-counter]');
 ```
 
-## Typed Usage
-
-Use a named state interface when you want property descriptions to follow through to consumers.
-
-```ts
-import { defineComponent } from 'ornata';
-
-interface CounterState {
-    /** The current visible count. */
-    count: number;
-
-    /** The label shown next to the count. */
-    label: string;
-}
-
-interface CounterMethods {
-    increment(): void;
-}
-
-const CounterComponent = defineComponent<{
-    state: CounterState;
-    methods: CounterMethods;
-}>({
-    name: 'Counter',
-    state: {
-        count: { default: 0 },
-        label: { default: 'Clicks' },
-    },
-    methods: {
-        increment() {
-            this.state.count += 1;
-        },
-    },
-});
-
-const instance = CounterComponent.mount(
-    document.querySelector('[data-counter]')
-);
-```
-
-You can use the same named-type pattern for `elements`, `data`, and `computed` when you want stronger contracts or clearer documentation for maintainers.
-
-When you need to work with mounted instances imperatively, use the component constructor methods:
-
-```ts
-const instance = CounterComponent.mount(root);
-const sameInstance = CounterComponent.getInstance(root);
-const maybeInstance = CounterComponent.findInstance(root);
-CounterComponent.unmount(root);
-```
+For the full component authoring model, typed usage, `createInitializer()`, DOM element safeguards, and richer examples, see the documentation site.
 
 ## License
 

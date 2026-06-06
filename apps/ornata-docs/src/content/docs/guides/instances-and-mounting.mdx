@@ -1,0 +1,136 @@
+---
+title: Instances and Mounting
+description: Mount components, retrieve existing instances, and clean them up with the Ornata constructor and instance APIs.
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+# Instances and Mounting
+
+Ornata components are both declarative and imperative.
+
+The declarative story is great for page bootstrap, but there is also an important constructor and instance API for direct control.
+
+## Mounting a component
+
+You can mount a component with either an element or a selector.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const instanceA = Counter.mount(document.querySelector("[data-counter]"));
+const instanceB = Counter.mount("[data-counter]");
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+const instanceA = Counter.mount(document.querySelector("[data-counter]"));
+const instanceB = Counter.mount("[data-counter]");
+```
+
+  </TabItem>
+</Tabs>
+
+You can also pass `initialState` at mount time.
+
+## Getting an existing instance
+
+Use `getInstance()` when you expect the instance to exist and want absence to throw.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const instance = Counter.getInstance("[data-counter]");
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+const instance = Counter.getInstance("[data-counter]");
+```
+
+  </TabItem>
+</Tabs>
+
+Use `findInstance()` when absence is a normal branch.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const maybeInstance = Counter.findInstance("[data-counter]");
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+const maybeInstance = Counter.findInstance("[data-counter]");
+```
+
+  </TabItem>
+</Tabs>
+
+## Unmounting and disposal
+
+You can unmount from the constructor:
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+Counter.unmount("[data-counter]");
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+Counter.unmount("[data-counter]");
+```
+
+  </TabItem>
+</Tabs>
+
+Or dispose from the instance:
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const instance = Counter.mount("[data-counter]");
+instance.dispose();
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+const instance = Counter.mount("[data-counter]");
+instance.dispose();
+```
+
+  </TabItem>
+</Tabs>
+
+## Root lookup safeguards
+
+When you pass a selector, Ornata resolves the root for you.
+
+If the selector does not match an element, Ornata throws.
+
+If the input is not a valid element or selector, Ornata also throws.
+
+That makes the mounting API stricter and easier to trust.
+
+## A good mental model
+
+- `mount()` creates an instance
+- `getInstance()` retrieves an existing one and throws if missing
+- `findInstance()` retrieves an existing one or returns `null`
+- `unmount()` removes an instance by root
+- `dispose()` removes the current instance directly

@@ -2,6 +2,7 @@
 title: Getting Started
 description: Install Ornata, define a component, and mount it onto existing HTML.
 ---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 # Getting Started
 
@@ -16,7 +17,7 @@ npm install ornata
 If you want to enhance a page without a bundler, load the browser build from a CDN instead:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/ornata@0.2.0/dist/index.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ornata@latest/dist/index.global.js"></script>
 <script>
     const { defineComponent } = window.Ornata;
 </script>
@@ -41,7 +42,10 @@ Write server-rendered markup that already makes sense on its own.
 
 ## Define a component
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 import { defineComponent } from "ornata";
 
 const Counter = defineComponent({
@@ -75,7 +79,78 @@ const Counter = defineComponent({
 });
 ```
 
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { defineComponent } from "ornata";
+
+interface CounterState {
+    count: number;
+}
+
+interface CounterElements {
+    value: Element | null;
+    button: Element | null;
+}
+
+interface CounterMethods {
+    increment(): void;
+}
+
+const Counter = defineComponent<{
+    state: CounterState;
+    elements: CounterElements;
+    methods: CounterMethods;
+}>({
+    name: "Counter",
+    state: {
+        count: { default: 0 },
+    },
+    elements: {
+        value: { query: "[data-count-value]" },
+        button: { query: "[data-count-button]" },
+    },
+    methods: {
+        increment() {
+            this.state.count += 1;
+        },
+    },
+    render: {
+        value() {
+            return {
+                text: String(this.state.count),
+            };
+        },
+        button() {
+            return {
+                events: {
+                    click: () => this.methods.increment(),
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+</Tabs>
+
 ## Mount it
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const root = document.querySelector("[data-counter]");
+
+if (root) {
+    Counter.mount(root);
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 const root = document.querySelector("[data-counter]");
@@ -84,6 +159,9 @@ if (root) {
     Counter.mount(root);
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 ## What happens when it mounts
 
@@ -96,8 +174,12 @@ When `mount()` runs, Ornata:
 - runs the mount lifecycle hook if present
 - performs an initial render pass for each state property
 
+That state can come from component defaults, HTML `data-*` attributes on the root element, or an `initialState` object passed to `mount()`.
+
 ## Where to go next
 
 - Read [Your First Component](/ornata/guides/your-first-component/) for a deeper walkthrough
+- Read [State](/ornata/guides/state/) to understand initialization, reactivity, and safety controls
 - Read [Initializing From HTML](/ornata/guides/initializing-from-html/) to mount components declaratively with `data-ornata`
+- Read [Page Bootstrap](/ornata/guides/page-bootstrap/) for whole-page initialization patterns
 - Read [Component Anatomy](/ornata/guides/component-anatomy/) for the full shape of `defineComponent()`

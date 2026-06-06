@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Ornata Component Methods Demo</title>
+        <style>
+            :root {
+                color-scheme: light;
+                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                background: #f5f7fc;
+                color: #1b2231;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: grid;
+                place-items: center;
+                padding: 24px;
+                background:
+                    radial-gradient(circle at top, #ffffff 0, #eff3fb 48%, #dfe7f8 100%);
+            }
+
+            .demo-shell {
+                width: min(100%, 480px);
+                padding: 24px;
+                border: 1px solid #ced8ef;
+                border-radius: 22px;
+                background: rgba(255, 255, 255, 0.96);
+                box-shadow: 0 18px 40px rgba(37, 55, 96, 0.12);
+            }
+
+            h1 {
+                margin: 0 0 8px;
+                font-size: 1.25rem;
+            }
+
+            p {
+                margin: 0 0 18px;
+                line-height: 1.5;
+            }
+
+            [data-disclosure] {
+                display: grid;
+                gap: 14px;
+            }
+
+            .button-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            button {
+                border: 0;
+                border-radius: 999px;
+                padding: 0.8rem 1rem;
+                font: inherit;
+                font-weight: 700;
+                color: #fff;
+                background: linear-gradient(135deg, #3b66c5, #24417c);
+                cursor: pointer;
+            }
+
+            [data-disclosure-panel] {
+                padding: 16px;
+                border-radius: 16px;
+                border: 1px solid #d7e1f6;
+                background: #f8faff;
+            }
+        </style>
+    </head>
+    <body>
+        <main class="demo-shell">
+            <h1>Component Methods Demo</h1>
+            <p>The render layer stays small because the named actions live in methods.</p>
+
+            <section data-disclosure>
+                <div class="button-row">
+                    <button type="button" data-open-button>Open</button>
+                    <button type="button" data-close-button>Close</button>
+                    <button type="button" data-toggle-button>Toggle</button>
+                </div>
+
+                <div hidden data-disclosure-panel>
+                    These buttons all call named methods instead of duplicating inline state mutation.
+                </div>
+            </section>
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/ornata/dist/index.global.js"></script>
+        <script>
+            const { defineComponent } = window.Ornata;
+
+            const Disclosure = defineComponent({
+                name: "Disclosure",
+                state: {
+                    open: { default: false, type: Boolean },
+                },
+                elements: {
+                    openButton: { query: "[data-open-button]" },
+                    closeButton: { query: "[data-close-button]" },
+                    toggleButton: { query: "[data-toggle-button]" },
+                    panel: { query: "[data-disclosure-panel]" },
+                },
+                methods: {
+                    open() {
+                        this.state.open = true;
+                    },
+                    close() {
+                        this.state.open = false;
+                    },
+                    toggle() {
+                        this.state.open = !this.state.open;
+                    },
+                },
+                render: {
+                    openButton() {
+                        return {
+                            events: {
+                                click: () => this.methods.open(),
+                            },
+                        };
+                    },
+                    closeButton() {
+                        return {
+                            events: {
+                                click: () => this.methods.close(),
+                            },
+                        };
+                    },
+                    toggleButton() {
+                        return {
+                            events: {
+                                click: () => this.methods.toggle(),
+                            },
+                        };
+                    },
+                    panel() {
+                        return {
+                            attributes: {
+                                hidden: !this.state.open,
+                            },
+                        };
+                    },
+                },
+            });
+
+            Disclosure.mount("[data-disclosure]");
+        </script>
+    </body>
+</html>

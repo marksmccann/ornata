@@ -9,11 +9,14 @@ Ornata is a progressive enhancement framework for server-rendered websites.
 
 It helps you keep HTML as the foundation of the experience, then layer on interactivity where it adds value.
 
+It is also TypeScript-friendly by default, so component definitions can stay lightweight while still giving you strong editor help and clearer contracts as your codebase grows.
+
 ## Why teams reach for it
 
 - HTML-first pages still work before JavaScript runs
 - interactivity can stay close to the DOM it enhances
 - component logic can be introduced without adopting a full SPA architecture
+- TypeScript inference and typed component parts fit naturally into the authoring model
 - the public runtime stays small and focused
 
 ## What you can do today

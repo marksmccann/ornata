@@ -1,0 +1,211 @@
+---
+title: HTML State
+description: Initialize component state from server-rendered HTML data attributes, then override or react to it in JavaScript.
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+# HTML State
+
+This example shows one of Ornata’s most useful server-rendered patterns: letting HTML provide the initial state.
+
+## Live Demo
+
+<iframe
+    src="../../demos/html-state.html"
+    title="HTML state demo"
+    loading="lazy"
+    style="width: 100%; min-height: 360px; border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: white;"
+></iframe>
+
+[Open this demo in a new tab](../../demos/html-state.html)
+
+## HTML
+
+```html
+<section
+    data-counter
+    data-count="3"
+    data-label="Server count"
+>
+    <p>
+        <span data-count-label></span>:
+        <strong data-count-value></strong>
+    </p>
+    <button type="button" data-count-button>Increment</button>
+</section>
+```
+
+## Component
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+import { defineComponent } from "ornata";
+
+export const Counter = defineComponent({
+    name: "Counter",
+    state: {
+        count: { default: 0, type: Number },
+        label: { default: "Clicks", type: String },
+    },
+    elements: {
+        label: { query: "[data-count-label]" },
+        value: { query: "[data-count-value]" },
+        button: { query: "[data-count-button]" },
+    },
+    methods: {
+        increment() {
+            this.state.count += 1;
+        },
+    },
+    render: {
+        label() {
+            return {
+                text: this.state.label,
+            };
+        },
+        value() {
+            return {
+                text: String(this.state.count),
+            };
+        },
+        button() {
+            return {
+                events: {
+                    click: () => this.methods.increment(),
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { defineComponent } from "ornata";
+
+interface CounterState {
+    count: number;
+    label: string;
+}
+
+interface CounterElements {
+    label: Element | null;
+    value: Element | null;
+    button: Element | null;
+}
+
+interface CounterMethods {
+    increment(): void;
+}
+
+export const Counter = defineComponent<{
+    state: CounterState;
+    elements: CounterElements;
+    methods: CounterMethods;
+}>({
+    name: "Counter",
+    state: {
+        count: { default: 0, type: Number },
+        label: { default: "Clicks", type: String },
+    },
+    elements: {
+        label: { query: "[data-count-label]" },
+        value: { query: "[data-count-value]" },
+        button: { query: "[data-count-button]" },
+    },
+    methods: {
+        increment() {
+            this.state.count += 1;
+        },
+    },
+    render: {
+        label() {
+            return {
+                text: this.state.label,
+            };
+        },
+        value() {
+            return {
+                text: String(this.state.count),
+            };
+        },
+        button() {
+            return {
+                events: {
+                    click: () => this.methods.increment(),
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+</Tabs>
+
+## Mount
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+Counter.mount("[data-counter]");
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+Counter.mount("[data-counter]");
+```
+
+  </TabItem>
+</Tabs>
+
+## What happens
+
+The component definition provides defaults:
+
+- `count: 0`
+- `label: "Clicks"`
+
+But the HTML root provides:
+
+- `data-count="3"`
+- `data-label="Server count"`
+
+So the mounted instance starts with:
+
+- `count = 3`
+- `label = "Server count"`
+
+## Override from JavaScript
+
+If you mount with `initialState`, that wins over the HTML values:
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+Counter.mount("[data-counter]", {
+    count: 10,
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+Counter.mount("[data-counter]", {
+    count: 10,
+});
+```
+
+  </TabItem>
+</Tabs>
+
+Now the starting `count` is `10`.

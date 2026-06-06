@@ -1,0 +1,84 @@
+---
+title: Data
+description: Use data for persistent internal component values that should survive for the life of the instance without becoming reactive state.
+---
+
+# Data
+
+`data` gives an Ornata component a place to store persistent internal values.
+
+These values live on the internal component instance and remain available across methods, watchers, lifecycle hooks, computed callbacks, and render callbacks.
+
+## What `data` is for
+
+Use `data` for values that should:
+
+- persist for the life of the component instance
+- be available across multiple parts of the component
+- not trigger reactive updates on their own
+
+Common examples include:
+
+- timer IDs
+- observer instances
+- third-party integration objects
+- internal caches
+- non-reactive bookkeeping flags
+
+## `data` versus `state`
+
+This is the most important distinction:
+
+- `state` is reactive
+- `data` is persistent but non-reactive
+
+If changing a value should trigger Ornata’s update flow, it belongs in `state`.
+
+If a value just needs to be stored and reused internally, it likely belongs in `data`.
+
+## `data` versus `computed`
+
+Use `computed` for derived values based on state.
+
+Use `data` for stored values that you want to keep around directly.
+
+## A simple example
+
+```ts
+const Clock = defineComponent({
+    name: "Clock",
+    data: {
+        intervalId: null as number | null,
+    },
+    lifecycle: {
+        mount() {
+            this.data.intervalId = window.setInterval(() => {
+                console.log("tick");
+            }, 1000);
+        },
+        unmount() {
+            if (this.data.intervalId !== null) {
+                window.clearInterval(this.data.intervalId);
+            }
+        },
+    },
+});
+```
+
+Here, `intervalId` needs to persist for the life of the component, but it does not belong in reactive state.
+
+## Why this matters
+
+Without `data`, component authors often end up:
+
+- putting non-reactive values into state
+- scattering local variables around closures
+- making lifecycle setup and cleanup harder to follow
+
+`data` gives those values a clear home.
+
+## A good mental model
+
+Think of `data` as the component’s internal storage shelf.
+
+It is there when the component needs to remember something, but not everything the component remembers needs to be reactive state.

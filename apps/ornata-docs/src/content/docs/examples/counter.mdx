@@ -2,6 +2,7 @@
 title: Counter
 description: A compact example showing state, methods, element resolution, and rendering together.
 ---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 # Counter
 
@@ -29,7 +30,10 @@ This example is a small but complete Ornata component.
 
 ## Component
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 import { defineComponent } from "ornata";
 
 export const Counter = defineComponent({
@@ -63,8 +67,78 @@ export const Counter = defineComponent({
 });
 ```
 
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { defineComponent } from "ornata";
+
+interface CounterState {
+    count: number;
+}
+
+interface CounterElements {
+    value: Element | null;
+    button: Element | null;
+}
+
+interface CounterMethods {
+    increment(): void;
+}
+
+export const Counter = defineComponent<{
+    state: CounterState;
+    elements: CounterElements;
+    methods: CounterMethods;
+}>({
+    name: "Counter",
+    state: {
+        count: { default: 0 },
+    },
+    elements: {
+        value: { query: "[data-count-value]" },
+        button: { query: "[data-count-button]" },
+    },
+    methods: {
+        increment() {
+            this.state.count += 1;
+        },
+    },
+    render: {
+        value() {
+            return {
+                text: String(this.state.count),
+            };
+        },
+        button() {
+            return {
+                events: {
+                    click: () => this.methods.increment(),
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+</Tabs>
+
 ## Mount
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+Counter.mount("[data-counter]");
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 Counter.mount("[data-counter]");
 ```
+
+  </TabItem>
+</Tabs>

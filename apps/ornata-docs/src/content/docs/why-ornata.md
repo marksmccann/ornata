@@ -13,6 +13,7 @@ That makes it a good fit when you want to:
 - ship pages that work before JavaScript runs
 - add focused interactivity to specific parts of a page
 - avoid rebuilding your site architecture around a full client-side framework
+- keep a strong TypeScript experience without requiring heavy component abstractions
 
 ## The core idea
 
@@ -24,6 +25,8 @@ Then use Ornata to attach behavior to that markup:
 - elements are resolved from the existing DOM
 - render functions update attributes, classes, styles, text, HTML, dataset values, and event listeners
 - watch and computed callbacks react to state changes
+
+The same authoring model also works well with TypeScript, whether you prefer inferred types from the options object or explicit named interfaces for longer-lived component contracts.
 
 This lets you progressively enhance the page instead of replacing it.
 

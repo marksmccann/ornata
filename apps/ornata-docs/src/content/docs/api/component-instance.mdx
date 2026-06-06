@@ -2,14 +2,28 @@
 title: Component Instance
 description: Work with mounted component instances and constructor-level instance helpers.
 ---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 # Component Instance
 
 When you mount a component, Ornata returns a component instance.
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const instance = Counter.mount(root);
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 const instance = Counter.mount(root);
 ```
+
+  </TabItem>
+</Tabs>
 
 ## Instance shape
 
@@ -32,6 +46,8 @@ Updating writable public properties triggers the component update flow.
 
 Properties marked `private` or `readonly` in state options are protected from external writes.
 
+When a public state write succeeds, Ornata validates the new value, updates computed values, re-runs render callbacks, calls matching watch callbacks, and notifies state listeners.
+
 ## `dispose()`
 
 `dispose()` unmounts the instance and runs cleanup behavior, including:
@@ -44,13 +60,43 @@ Properties marked `private` or `readonly` in state options are protected from ex
 
 Use `addStateListener()` to subscribe to a specific state property.
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const cleanup = instance.addStateListener("count", (event) => {
+    console.log(event.newValue);
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 const cleanup = instance.addStateListener("count", (event) => {
     console.log(event.newValue);
 });
 ```
 
+  </TabItem>
+</Tabs>
+
 The listener receives:
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+{
+    property,
+    newValue,
+    oldValue,
+    target,
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 {
@@ -61,7 +107,14 @@ The listener receives:
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 The method returns a cleanup function that removes the listener.
+
+Use this when code outside the component needs to observe public state changes.
+
+For the conceptual difference between this and `watch`, see [State Listeners](/ornata/guides/state-listeners/) and [Watchers](/ornata/guides/watchers/).
 
 ## Constructor helpers
 
@@ -73,3 +126,5 @@ The component constructor also provides instance-management helpers:
 - `unmount(root)`
 
 Use `getInstance()` when absence should throw, and `findInstance()` when absence is an expected branch.
+
+For a fuller walkthrough, read [Instances and Mounting](/ornata/guides/instances-and-mounting/).

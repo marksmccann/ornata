@@ -1,0 +1,177 @@
+---
+title: List Rendering
+description: Use render callbacks with index-aware list rendering for repeated DOM collections.
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+# List Rendering
+
+This example shows how `index` helps when rendering repeated elements from a single piece of component state.
+
+## Live Demo
+
+<iframe
+    src="../../demos/list-rendering.html"
+    title="List rendering demo"
+    loading="lazy"
+    style="width: 100%; min-height: 380px; border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: white;"
+></iframe>
+
+[Open this demo in a new tab](../../demos/list-rendering.html)
+
+## HTML
+
+```html
+<section data-tabs>
+    <div role="tablist">
+        <button type="button" data-tab>Overview</button>
+        <button type="button" data-tab>Usage</button>
+        <button type="button" data-tab>API</button>
+    </div>
+
+    <section data-panel>Overview content</section>
+    <section data-panel hidden>Usage content</section>
+    <section data-panel hidden>API content</section>
+</section>
+```
+
+## Component
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+import { defineComponent } from "ornata";
+
+export const Tabs = defineComponent({
+    name: "Tabs",
+    state: {
+        activeIndex: { default: 0, type: Number },
+    },
+    elements: {
+        tabs: {
+            resolve(root) {
+                return Array.from(
+                    root.querySelectorAll("[data-tab]")
+                ) as HTMLButtonElement[];
+            },
+            min: 2,
+        },
+        panels: {
+            resolve(root) {
+                return Array.from(
+                    root.querySelectorAll("[data-panel]")
+                ) as HTMLElement[];
+            },
+            min: 2,
+        },
+    },
+    render: {
+        tabs({ index }) {
+            const currentIndex = index ?? 0;
+            const isActive = currentIndex === this.state.activeIndex;
+
+            return {
+                attributes: {
+                    "aria-selected": String(isActive),
+                },
+                classes: {
+                    "is-active": isActive,
+                },
+                events: {
+                    click: () => {
+                        this.state.activeIndex = currentIndex;
+                    },
+                },
+            };
+        },
+        panels({ index }) {
+            const currentIndex = index ?? 0;
+
+            return {
+                attributes: {
+                    hidden: currentIndex !== this.state.activeIndex,
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { defineComponent } from "ornata";
+
+export const Tabs = defineComponent<{
+    state: {
+        activeIndex: number;
+    };
+    elements: {
+        tabs: HTMLButtonElement[];
+        panels: HTMLElement[];
+    };
+}>({
+    name: "Tabs",
+    state: {
+        activeIndex: { default: 0, type: Number },
+    },
+    elements: {
+        tabs: {
+            resolve(root) {
+                return Array.from(
+                    root.querySelectorAll("[data-tab]")
+                ) as HTMLButtonElement[];
+            },
+            min: 2,
+        },
+        panels: {
+            resolve(root) {
+                return Array.from(
+                    root.querySelectorAll("[data-panel]")
+                ) as HTMLElement[];
+            },
+            min: 2,
+        },
+    },
+    render: {
+        tabs({ index }) {
+            const currentIndex = index ?? 0;
+            const isActive = currentIndex === this.state.activeIndex;
+
+            return {
+                attributes: {
+                    "aria-selected": String(isActive),
+                },
+                classes: {
+                    "is-active": isActive,
+                },
+                events: {
+                    click: () => {
+                        this.state.activeIndex = currentIndex;
+                    },
+                },
+            };
+        },
+        panels({ index }) {
+            const currentIndex = index ?? 0;
+
+            return {
+                attributes: {
+                    hidden: currentIndex !== this.state.activeIndex,
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+</Tabs>
+
+## Why `index` matters
+
+Without `index`, each repeated element would need more custom plumbing.
+
+With it, each tab and panel can respond to shared component state while still rendering individually.

@@ -1,0 +1,129 @@
+---
+title: Page Bootstrap
+description: Bootstrap a whole server-rendered page with createInitializer and a small component registry.
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+# Page Bootstrap
+
+Once a page has more than one component, the next question is usually how to bootstrap everything without writing a pile of manual `mount()` calls.
+
+That is what `createInitializer()` is for.
+
+## Mark up roots in HTML
+
+```html
+<section data-ornata="Counter" data-counter>
+    <span data-count-value>0</span>
+    <button type="button" data-count-button>Increment</button>
+</section>
+
+<section data-ornata="Disclosure" data-disclosure>
+    <button type="button" data-disclosure-button>Toggle</button>
+    <div data-disclosure-panel hidden>Panel content</div>
+</section>
+```
+
+## Build a component registry
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+import { Counter } from "./counter";
+import { Disclosure } from "./disclosure";
+
+export const components = {
+    Counter,
+    Disclosure,
+};
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { Counter } from "./counter";
+import { Disclosure } from "./disclosure";
+
+export const components = {
+    Counter,
+    Disclosure,
+};
+```
+
+  </TabItem>
+</Tabs>
+
+## Create the initializer
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+import { createInitializer } from "ornata";
+import { components } from "./components";
+
+const initialize = createInitializer(components);
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { createInitializer } from "ornata";
+import { components } from "./components";
+
+const initialize = createInitializer(components);
+```
+
+  </TabItem>
+</Tabs>
+
+## Run it once for the page
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const instances = initialize();
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+const instances = initialize();
+```
+
+  </TabItem>
+</Tabs>
+
+## What happens during bootstrap
+
+The initializer:
+
+- finds all `[data-ornata]` roots
+- reads the component name from `data-ornata`
+- validates that the name maps to a real Ornata component constructor
+- mounts each root
+- removes the `data-ornata` attribute afterward
+- returns the mounted instances
+
+## Why this pattern scales
+
+This keeps page bootstrap code small even as the page grows more interactive.
+
+Instead of hand-writing:
+
+- multiple `querySelector()` calls
+- multiple `mount()` calls
+- separate branching for each component
+
+you let the HTML and the registry describe the page.
+
+## A good mental model
+
+Use `mount()` for one-off component setup.
+
+Use `createInitializer()` when the page itself should declare what gets initialized.

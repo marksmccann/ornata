@@ -38,6 +38,8 @@ render: {
 }
 ```
 
+For a full walkthrough of `text`, `html`, `attributes`, `classes`, `style`, `dataset`, `events`, and list rendering with `index`, see [Render Options](/ornata/guides/render-options/).
+
 ## Use `watch` for side effects
 
 `watch` is best for logging, analytics, timers, imperative integrations, and other side effects.
@@ -51,6 +53,8 @@ watch: {
     },
 }
 ```
+
+For a deeper walkthrough of watcher behavior and `isInitial`, see [Watchers](/ornata/guides/watchers/).
 
 ## Use `computed` for derived values
 
@@ -67,3 +71,9 @@ computed: {
 ## Initial updates
 
 During mount, Ornata performs an initial update pass for each state property. That is why watch callbacks receive `isInitial`, and why render output is available immediately after mount.
+
+## External subscriptions
+
+When code outside the component needs to react to public state changes, use `addStateListener()` on the mounted instance instead of putting that logic in `watch`.
+
+See [State Listeners](/ornata/guides/state-listeners/) for that pattern.

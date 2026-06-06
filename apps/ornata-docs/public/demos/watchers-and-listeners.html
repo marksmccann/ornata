@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Ornata Watchers and Listeners Demo</title>
+        <style>
+            :root {
+                color-scheme: light;
+                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                background: #f6f4fb;
+                color: #201d33;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: grid;
+                place-items: center;
+                padding: 24px;
+                background:
+                    radial-gradient(circle at top, #fffeff 0, #f2effb 48%, #e3dcf5 100%);
+            }
+
+            .demo-shell {
+                width: min(100%, 520px);
+                padding: 24px;
+                border: 1px solid #d7cfef;
+                border-radius: 22px;
+                background: rgba(255, 255, 255, 0.96);
+                box-shadow: 0 18px 40px rgba(66, 48, 108, 0.12);
+            }
+
+            h1 {
+                margin: 0 0 8px;
+                font-size: 1.25rem;
+            }
+
+            p {
+                margin: 0 0 18px;
+                line-height: 1.5;
+            }
+
+            [data-counter] {
+                display: grid;
+                gap: 14px;
+            }
+
+            .row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                padding: 16px;
+                border-radius: 16px;
+                border: 1px solid #e6def8;
+                background: #fcfbff;
+            }
+
+            button {
+                border: 0;
+                border-radius: 999px;
+                padding: 0.8rem 1rem;
+                font: inherit;
+                font-weight: 700;
+                color: #fff;
+                background: linear-gradient(135deg, #7a56d3, #5a399e);
+                cursor: pointer;
+            }
+
+            [data-log] {
+                margin: 0;
+                padding-left: 1.25rem;
+                display: grid;
+                gap: 6px;
+                font-size: 0.95rem;
+            }
+        </style>
+    </head>
+    <body>
+        <main class="demo-shell">
+            <h1>Watchers and Listeners Demo</h1>
+            <p>Each click triggers both an internal watcher and an external state listener.</p>
+
+            <section data-counter>
+                <div class="row">
+                    <p>Total: <strong data-count-value>0</strong></p>
+                    <button type="button" data-count-button>Increment</button>
+                </div>
+
+                <ul data-log></ul>
+            </section>
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/ornata/dist/index.global.js"></script>
+        <script>
+            const { defineComponent } = window.Ornata;
+            const logRoot = document.querySelector("[data-log]");
+
+            const addLog = (message) => {
+                const entry = document.createElement("li");
+                entry.textContent = message;
+                logRoot.prepend(entry);
+            };
+
+            const Counter = defineComponent({
+                name: "Counter",
+                state: {
+                    count: { default: 0, type: Number },
+                },
+                elements: {
+                    value: { query: "[data-count-value]" },
+                    button: { query: "[data-count-button]" },
+                },
+                methods: {
+                    increment() {
+                        this.state.count += 1;
+                    },
+                },
+                watch: {
+                    count({ isInitial, newValue, oldValue }) {
+                        if (isInitial) return;
+
+                        addLog(`Internal watcher: ${oldValue} -> ${newValue}`);
+                    },
+                },
+                render: {
+                    value() {
+                        return {
+                            text: String(this.state.count),
+                        };
+                    },
+                    button() {
+                        return {
+                            events: {
+                                click: () => this.methods.increment(),
+                            },
+                        };
+                    },
+                },
+            });
+
+            const instance = Counter.mount("[data-counter]");
+
+            instance.addStateListener("count", ({ newValue, oldValue }) => {
+                addLog(`External listener: ${oldValue} -> ${newValue}`);
+            });
+        </script>
+    </body>
+</html>

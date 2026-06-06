@@ -1,0 +1,90 @@
+---
+title: Methods
+description: Use methods to name and centralize the actions your Ornata component performs.
+---
+
+# Methods
+
+`methods` gives an Ornata component a place to define reusable internal actions.
+
+These are the named behaviors your component performs when something happens, such as a click, a toggle, a reset, or a selection change.
+
+## Why methods matter
+
+Methods help keep a component readable.
+
+Instead of putting the same imperative logic inside multiple render callbacks or event handlers, you define the action once and call it where needed.
+
+## A simple example
+
+```ts
+methods: {
+    increment() {
+        this.state.count += 1;
+    },
+}
+```
+
+That method can then be called from render events or from other methods:
+
+```ts
+render: {
+    button() {
+        return {
+            events: {
+                click: () => this.methods.increment(),
+            },
+        };
+    },
+}
+```
+
+## What methods can access
+
+Methods are bound to the internal component instance.
+
+That means they can work with:
+
+- `this.state`
+- `this.elements`
+- `this.methods`
+- `this.data`
+- `this.computed`
+
+This makes them a natural place for action-oriented component logic.
+
+## Good uses for methods
+
+Methods are especially useful for:
+
+- event-driven actions
+- toggles and counters
+- focus management
+- selection logic
+- logic shared across multiple event handlers
+
+Examples:
+
+- `increment()`
+- `toggle()`
+- `setActiveIndex(index)`
+- `focusFirstItem()`
+- `reset()`
+
+## Methods versus render
+
+Use `render` to describe DOM output.
+
+Use `methods` to perform actions.
+
+That separation keeps render callbacks smaller and easier to scan.
+
+## Methods versus watch
+
+Use `watch` when behavior should happen because a state property changed.
+
+Use `methods` when you want to name an action and call it intentionally.
+
+## A good mental model
+
+If `state` is what the component knows, `methods` are what the component does.

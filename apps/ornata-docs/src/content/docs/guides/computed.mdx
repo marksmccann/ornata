@@ -1,0 +1,163 @@
+---
+title: Computed
+description: Use computed values for derived component data that updates automatically when state changes.
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+# Computed
+
+`computed` is where Ornata components define derived values.
+
+If `state` is the source of truth, `computed` is where you turn that state into values the rest of the component can read conveniently.
+
+## Why computed exists
+
+Computed values help when:
+
+- multiple render callbacks need the same derived value
+- a method needs a value derived from several state properties
+- you want derived logic in one named place instead of repeating it inline
+
+## A simple example
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+computed: {
+    countLabel() {
+        return this.state.count === 1 ? "item" : "items";
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterComputed {
+    countLabel: string;
+}
+
+computed: {
+    countLabel() {
+        return this.state.count === 1 ? "item" : "items";
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## Computed values update automatically
+
+When state changes, Ornata recomputes every computed property.
+
+Each computed callback receives a context object with:
+
+- `type`
+- `currentValue`
+- `changedProperty`
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+computed: {
+    summary({ currentValue, changedProperty }) {
+        console.log("Was:", currentValue);
+        console.log("Triggered by:", changedProperty);
+
+        return `${this.state.count} clicks`;
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+computed: {
+    summary({ currentValue, changedProperty }) {
+        console.log("Was:", currentValue);
+        console.log("Triggered by:", changedProperty);
+
+        return `${this.state.count} clicks`;
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## Use computed from render and methods
+
+Computed values are especially helpful when several parts of the component need the same derived data.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+computed: {
+    isOpen() {
+        return this.state.open && this.state.enabled;
+    },
+},
+render: {
+    panel() {
+        return {
+            attributes: {
+                hidden: !this.computed.isOpen,
+            },
+        };
+    },
+},
+methods: {
+    announce() {
+        console.log(this.computed.isOpen);
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface DisclosureComputed {
+    isOpen: boolean;
+}
+
+computed: {
+    isOpen() {
+        return this.state.open && this.state.enabled;
+    },
+},
+render: {
+    panel() {
+        return {
+            attributes: {
+                hidden: !this.computed.isOpen,
+            },
+        };
+    },
+},
+methods: {
+    announce() {
+        console.log(this.computed.isOpen);
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## Computed versus other options
+
+- use `computed` for derived values
+- use `watch` for side effects
+- use `data` for persistent non-reactive storage
+- use `render` for DOM output
+
+## A good mental model
+
+If `state` is what the component knows, `computed` is what the component can infer from what it knows.

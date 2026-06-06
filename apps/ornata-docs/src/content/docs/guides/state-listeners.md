@@ -1,0 +1,80 @@
+---
+title: State Listeners
+description: Use addStateListener to subscribe to public state changes from outside a mounted Ornata component.
+---
+
+# State Listeners
+
+`addStateListener()` is the public subscription API on a mounted Ornata component instance.
+
+It lets code outside the component observe changes to a specific public state property.
+
+```ts
+const instance = Counter.mount("[data-counter]");
+
+const cleanup = instance.addStateListener("count", (event) => {
+    console.log(event.newValue);
+});
+```
+
+## What the listener receives
+
+The listener receives an event object with:
+
+- `property`
+- `newValue`
+- `oldValue`
+- `target`
+
+```ts
+instance.addStateListener("count", ({ property, newValue, oldValue, target }) => {
+    console.log(property, newValue, oldValue, target);
+});
+```
+
+## Cleanup
+
+`addStateListener()` returns a cleanup function.
+
+```ts
+const cleanup = instance.addStateListener("count", (event) => {
+    console.log(event.newValue);
+});
+
+cleanup();
+```
+
+That makes it easy to use listeners in page-level orchestration code or temporary integrations.
+
+## When to use state listeners
+
+Use `addStateListener()` when:
+
+- external code needs to observe a component
+- another system needs to react to state changes
+- you are coordinating behavior between mounted instances
+- you want subscriptions without putting more logic inside the component itself
+
+## Watchers versus state listeners
+
+These APIs are related, but they are for different layers of your application:
+
+- `watch` is for internal component-side reactions
+- `addStateListener()` is for external instance-side subscriptions
+
+That distinction keeps component behavior and integration code from blurring together.
+
+## Public state rules still apply
+
+State listeners observe public state changes.
+
+That means the component’s state contract still matters:
+
+- listeners are attached to known state properties
+- private and readonly rules still shape how external code can interact with state
+
+## A good mental model
+
+State listeners are for external observers.
+
+They are a clean way to integrate a mounted Ornata component into wider page behavior without reaching into its internals.

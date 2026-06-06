@@ -1,0 +1,215 @@
+---
+title: Safe DOM References
+description: Use Ornata's elements option to resolve DOM references with clearer intent and built-in safeguards.
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+# Safe DOM References
+
+One of Ornata’s nicest features is that DOM references are part of the component contract.
+
+Instead of scattering `querySelector()` calls across event handlers and render code, you define the important elements once in `elements`, then let Ornata resolve and validate them during mount.
+
+## Why this matters
+
+This approach gives you a few benefits at once:
+
+- lookups are scoped to the component root
+- each element definition communicates intent
+- structural mistakes are caught earlier
+- render and method code can focus on behavior instead of DOM plumbing
+
+## Root-scoped queries
+
+Every `query` and `queryAll` lookup happens inside the component root.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+elements: {
+    button: { query: "[data-disclosure-button]" },
+    items: { queryAll: "[data-item]" },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface DisclosureElements {
+    button: Element | null;
+    items: Element[];
+}
+
+elements: {
+    button: { query: "[data-disclosure-button]" },
+    items: { queryAll: "[data-item]" },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+That keeps component lookups local and reduces the chance of accidentally grabbing matching elements from elsewhere on the page.
+
+## Express intent with the right resolver
+
+Ornata supports four ways to resolve an element property:
+
+- `query` for a single element
+- `queryAll` for a list of elements
+- `create` to create a new element
+- `resolve` for custom logic
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+elements: {
+    panel: { query: "[data-panel]" },
+    items: { queryAll: "[data-item]" },
+    status: { create: "output" },
+    input: {
+        resolve(root) {
+            return root.querySelector("[data-filter-input]");
+        },
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface ExampleElements {
+    panel: Element | null;
+    items: Element[];
+    status: HTMLOutputElement;
+    input: HTMLInputElement | null;
+}
+
+elements: {
+    panel: { query: "[data-panel]" },
+    items: { queryAll: "[data-item]" },
+    status: { create: "output" },
+    input: {
+        resolve(root) {
+            return root.querySelector(
+                "[data-filter-input]"
+            ) as HTMLInputElement | null;
+        },
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## Validate cardinality with `min` and `max`
+
+When your markup has structural expectations, make them explicit.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+elements: {
+    items: {
+        queryAll: "[data-tab]",
+        min: 2,
+    },
+    button: {
+        query: "[data-submit]",
+        max: 1,
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+elements: {
+    items: {
+        queryAll: "[data-tab]",
+        min: 2,
+    },
+    button: {
+        query: "[data-submit]",
+        max: 1,
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+This is especially useful for components like tabs, menus, accordions, and lists where the DOM shape matters.
+
+## Catch duplicate references
+
+Ornata also checks for duplicate element references across your `elements` map.
+
+That helps catch cases where two properties accidentally point to the same DOM node or the same node appears multiple times in resolved collections.
+
+## Use `resolve()` when you need stronger control
+
+`resolve()` is the escape hatch for cases where a plain selector is not enough.
+
+It is a good fit when you want:
+
+- a narrower DOM type like `HTMLInputElement | null`
+- custom filtering logic
+- fallback logic
+- to return a specific element array shape
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+elements: {
+    input: {
+        resolve(root) {
+            return root.querySelector(
+                "[data-search-input]"
+            ) as HTMLInputElement | null;
+        },
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface SearchElements {
+    input: HTMLInputElement | null;
+}
+
+elements: {
+    input: {
+        resolve(root) {
+            return root.querySelector(
+                "[data-search-input]"
+            ) as HTMLInputElement | null;
+        },
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## A good mental model
+
+Think of `elements` as a DOM schema for the component.
+
+It tells future readers:
+
+- what nodes the component cares about
+- how those nodes are found
+- how many are expected
+- whether any custom resolution rules exist
+
+That makes the component easier to trust and easier to change.

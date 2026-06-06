@@ -2,6 +2,7 @@
 title: Your First Component
 description: Build a small component and learn the core Ornata authoring pattern.
 ---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 # Your First Component
 
@@ -23,7 +24,10 @@ Even without JavaScript, this markup still renders understandable content.
 
 ## The component
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 import { defineComponent } from "ornata";
 
 const Counter = defineComponent({
@@ -76,7 +80,104 @@ const Counter = defineComponent({
 });
 ```
 
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { defineComponent } from "ornata";
+
+interface CounterState {
+    count: number;
+    label: string;
+}
+
+interface CounterElements {
+    label: Element | null;
+    value: Element | null;
+    button: Element | null;
+}
+
+interface CounterMethods {
+    increment(): void;
+}
+
+interface CounterComputed {
+    total: number;
+}
+
+const Counter = defineComponent<{
+    state: CounterState;
+    elements: CounterElements;
+    methods: CounterMethods;
+    computed: CounterComputed;
+}>({
+    name: "Counter",
+    state: {
+        count: { default: 0 },
+        label: { default: "Clicks" },
+    },
+    elements: {
+        label: { query: "[data-count-label]" },
+        value: { query: "[data-count-value]" },
+        button: { query: "[data-count-button]" },
+    },
+    methods: {
+        increment() {
+            this.state.count += 1;
+        },
+    },
+    watch: {
+        count({ newValue, oldValue, isInitial }) {
+            if (isInitial) return;
+
+            console.log(`Count changed from ${oldValue} to ${newValue}`);
+        },
+    },
+    computed: {
+        total() {
+            return this.state.count;
+        },
+    },
+    render: {
+        label() {
+            return {
+                text: this.state.label,
+            };
+        },
+        value() {
+            return {
+                text: String(this.computed.total),
+            };
+        },
+        button() {
+            return {
+                events: {
+                    click: () => this.methods.increment(),
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+</Tabs>
+
 ## The mounting code
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const root = document.querySelector("[data-counter]");
+
+if (root) {
+    Counter.mount(root);
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 const root = document.querySelector("[data-counter]");
@@ -85,6 +186,9 @@ if (root) {
     Counter.mount(root);
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 ## How to read this component
 
@@ -98,6 +202,8 @@ Each top-level option has a clear job:
 - `render` applies DOM updates to resolved elements
 
 That separation is one of Ornata’s main strengths. The component stays small, direct, and easy to scan.
+
+If you want a deeper look at action-oriented component logic, read [Methods](/ornata/guides/methods/).
 
 ## Add stronger typing
 
@@ -133,3 +239,5 @@ const Counter = defineComponent<{
 ## Next
 
 Continue to [Component Anatomy](/ornata/guides/component-anatomy/) for a deeper look at every option section.
+
+If you want a fuller walkthrough of inference and explicit typed parts, read [TypeScript](/ornata/guides/typescript/).

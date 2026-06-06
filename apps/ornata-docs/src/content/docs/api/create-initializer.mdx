@@ -2,16 +2,45 @@
 title: createInitializer
 description: Create a document-level initializer that mounts components from data-ornata attributes.
 ---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 # createInitializer
 
 `createInitializer()` creates a function that mounts Ornata components from HTML.
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+import { createInitializer } from "ornata";
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 import { createInitializer } from "ornata";
 ```
 
+  </TabItem>
+</Tabs>
+
 ## Basic usage
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const initialize = createInitializer({
+    Counter,
+    Disclosure,
+});
+
+initialize();
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 const initialize = createInitializer({
@@ -21,6 +50,9 @@ const initialize = createInitializer({
 
 initialize();
 ```
+
+  </TabItem>
+</Tabs>
 
 ## Expected HTML
 
@@ -37,9 +69,22 @@ The attribute value must match a key in the constructor map you pass to `createI
 
 Calling the returned initializer function returns an array of mounted instances.
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const instances = initialize();
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 const instances = initialize();
 ```
+
+  </TabItem>
+</Tabs>
 
 ## Behavior notes
 
@@ -49,3 +94,5 @@ const instances = initialize();
 - the `data-ornata` attribute is removed after mounting
 
 This makes it a good fit for page-level bootstrap code in server-rendered apps.
+
+See [Page Bootstrap](/ornata/guides/page-bootstrap/) for a fuller guide.
