@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import starlight from '@astrojs/starlight';
+import starlightThemeNord from 'starlight-theme-nord';
 
 export default defineConfig({
     site: "https://marksmccann.github.io",
@@ -10,6 +11,7 @@ export default defineConfig({
             title: "Ornata",
             description:
                 "A progressive enhancement framework for server-rendered websites",
+            plugins: [starlightThemeNord()],
             sidebar: [
                 {
                     label: "Introduction",
