@@ -1,6 +1,7 @@
 ---
-title: Introduction
+title: Home
 description: Welcome to Ornata, a progressive enhancement framework for server-rendered websites.
+slug: /
 ---
 
 # Introduction
