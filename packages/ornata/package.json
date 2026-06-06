@@ -1,6 +1,6 @@
 {
     "name": "ornata",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "type": "module",
     "description": "Ornata is a progressive enhancement framework for server-rendered websites",
     "main": "dist/index.cjs",

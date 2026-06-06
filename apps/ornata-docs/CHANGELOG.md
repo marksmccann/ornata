@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/marksmccann/ornata/compare/v0.2.0...v0.3.0) (2026-06-06)
+
+### Code Refactoring
+
+- **instance:** rename component instance management methods ([b31a10c](https://github.com/marksmccann/ornata/commit/b31a10c1bc144e78997f633c07ecbca4e60fe39b))
+
+### Features
+
+- **ornata:** add callback context objects for framework hooks ([a479b36](https://github.com/marksmccann/ornata/commit/a479b36a1bfe0fae3fd9b415583ed463c5d16bac))
+- **ornata:** improve defineComponent typing ergonomics ([700ae6c](https://github.com/marksmccann/ornata/commit/700ae6ca81e121f46f575842b6319384706e68b6))
+
+### BREAKING CHANGES
+
+- **instance:** Components must use Component.mount, Component.findInstance, and Component.unmount
+  instead of createInstance, queryInstance, and deleteInstance. Component.updateInstance has been
+  removed.
+- **ornata:** ComponentShape has been removed in favor of defineComponent<{ ... }> typing.
+- **ornata:** watch, computed, and render callbacks now receive context objects instead of
+  positional arguments.
+
 # 0.2.0 (2026-06-05)
 
 ### Features

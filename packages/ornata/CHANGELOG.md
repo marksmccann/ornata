@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/marksmccann/ornata/compare/v0.2.0...v0.3.0) (2026-06-06)
+
+### Bug Fixes
+
+- **ornata:** resolve env typing conflict ([42380c2](https://github.com/marksmccann/ornata/commit/42380c29c69b7c8294cf9b31aed56a3985847a62))
+
+### Code Refactoring
+
+- **instance:** rename component instance management methods ([b31a10c](https://github.com/marksmccann/ornata/commit/b31a10c1bc144e78997f633c07ecbca4e60fe39b))
+- **lifecycle:** rename setup and teardown hooks to mount and unmount ([d9c72ad](https://github.com/marksmccann/ornata/commit/d9c72ad5e5cbe652fddcba683c598f9c3669af0d))
+
+### Features
+
+- **definecomponent:** streamline state listener subscriptions ([f38ccb6](https://github.com/marksmccann/ornata/commit/f38ccb662874a28539698c710382b76b1de1cf95))
+- **ornata:** add callback context objects for framework hooks ([a479b36](https://github.com/marksmccann/ornata/commit/a479b36a1bfe0fae3fd9b415583ed463c5d16bac))
+- **ornata:** improve defineComponent typing ergonomics ([700ae6c](https://github.com/marksmccann/ornata/commit/700ae6ca81e121f46f575842b6319384706e68b6))
+
+### BREAKING CHANGES
+
+- **instance:** Components must use Component.mount, Component.findInstance, and Component.unmount
+  instead of createInstance, queryInstance, and deleteInstance. Component.updateInstance has been
+  removed.
+- **lifecycle:** Components must now define lifecycle.mount and lifecycle.unmount instead of
+  lifecycle.setup and lifecycle.teardown.
+- **ornata:** ComponentShape has been removed in favor of defineComponent<{ ... }> typing.
+- **ornata:** watch, computed, and render callbacks now receive context objects instead of
+  positional arguments.
+- **definecomponent:** removeStateListener was removed; use the cleanup function returned by
+  addStateListener, whose callback now receives an event object.
+
 # 0.2.0 (2026-06-05)
 
 ### Bug Fixes
