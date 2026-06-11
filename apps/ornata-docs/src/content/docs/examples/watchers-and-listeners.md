@@ -3,9 +3,8 @@ title: Watchers and Listeners
 description: Compare internal watch callbacks with external addStateListener subscriptions.
 ---
 
-# Watchers and Listeners
 
-This example shows the difference between `watch` and `addStateListener()`.
+This example shows the difference between `watch` and `addStateListener()` when a component needs both internal reactions and external integration hooks.
 
 ## Live Demo
 

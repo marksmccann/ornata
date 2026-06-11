@@ -2,12 +2,25 @@
 title: State Listeners
 description: Use addStateListener to subscribe to public state changes from outside a mounted Ornata component.
 ---
-
-# State Listeners
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 `addStateListener()` is the public subscription API on a mounted Ornata component instance.
 
 It lets code outside the component observe changes to a specific public state property.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const instance = Counter.mount("[data-counter]");
+
+const cleanup = instance.addStateListener("count", (event) => {
+    console.log(event.newValue);
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 const instance = Counter.mount("[data-counter]");
@@ -16,6 +29,9 @@ const cleanup = instance.addStateListener("count", (event) => {
     console.log(event.newValue);
 });
 ```
+
+  </TabItem>
+</Tabs>
 
 ## What the listener receives
 
@@ -26,15 +42,47 @@ The listener receives an event object with:
 - `oldValue`
 - `target`
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 instance.addStateListener("count", ({ property, newValue, oldValue, target }) => {
     console.log(property, newValue, oldValue, target);
 });
 ```
 
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+instance.addStateListener(
+    "count",
+    ({ property, newValue, oldValue, target }) => {
+        console.log(property, newValue, oldValue, target);
+    }
+);
+```
+
+  </TabItem>
+</Tabs>
+
 ## Cleanup
 
 `addStateListener()` returns a cleanup function.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const cleanup = instance.addStateListener("count", (event) => {
+    console.log(event.newValue);
+});
+
+cleanup();
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 const cleanup = instance.addStateListener("count", (event) => {
@@ -43,6 +91,9 @@ const cleanup = instance.addStateListener("count", (event) => {
 
 cleanup();
 ```
+
+  </TabItem>
+</Tabs>
 
 That makes it easy to use listeners in page-level orchestration code or temporary integrations.
 
@@ -68,7 +119,7 @@ That distinction keeps component behavior and integration code from blurring tog
 
 State listeners observe public state changes.
 
-That means the component’s state contract still matters:
+That means the component's state contract still matters:
 
 - listeners are attached to known state properties
 - private and readonly rules still shape how external code can interact with state

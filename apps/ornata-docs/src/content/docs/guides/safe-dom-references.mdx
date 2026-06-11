@@ -4,9 +4,7 @@ description: Use Ornata's elements option to resolve DOM references with clearer
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-# Safe DOM References
-
-One of Ornata’s nicest features is that DOM references are part of the component contract.
+One of Ornata's nicest features is that DOM references are part of the component contract.
 
 Instead of scattering `querySelector()` calls across event handlers and render code, you define the important elements once in `elements`, then let Ornata resolve and validate them during mount.
 
@@ -171,9 +169,7 @@ It is a good fit when you want:
 elements: {
     input: {
         resolve(root) {
-            return root.querySelector(
-                "[data-search-input]"
-            ) as HTMLInputElement | null;
+            return root.querySelector("[data-search-input]");
         },
     },
 }

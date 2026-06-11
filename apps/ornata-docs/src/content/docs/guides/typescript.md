@@ -3,11 +3,9 @@ title: TypeScript
 description: Use Ornata with strong type inference or explicit component contracts for state, elements, methods, data, and computed values.
 ---
 
-# TypeScript
-
 Ornata is designed to feel good in TypeScript-heavy codebases without forcing you to write a lot of type boilerplate up front.
 
-You can usually start with inference, then move to explicit types when the component becomes important enough to deserve a stronger contract.
+You can usually start with inference, then move to explicit types when a shared component becomes important enough to deserve a stronger contract.
 
 ## Start with inference
 

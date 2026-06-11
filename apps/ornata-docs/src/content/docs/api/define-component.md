@@ -1,11 +1,12 @@
 ---
 title: defineComponent
-description: Define a component constructor with state, elements, methods, computed values, watch callbacks, and render behavior.
+description: Define a reusable component contract with state, elements, methods, computed values, watch callbacks, and render behavior.
 ---
 
-# defineComponent
 
 `defineComponent()` is the primary Ornata authoring API.
+
+It is where you describe what HTML a component expects, how it stores and derives state, and how it enhances the DOM over time.
 
 ```ts
 import { defineComponent } from "ornata";

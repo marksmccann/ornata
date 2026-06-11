@@ -4,21 +4,19 @@ description: Initialize state from JavaScript or HTML, react to updates, and use
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-# State
-
 State is one of the core building blocks in Ornata.
 
-It is designed to work well with server-rendered HTML, progressive enhancement, and direct component updates.
+It is designed to work well with HTML-first markup, progressive enhancement, and direct component updates.
 
 ## State can start in more than one place
 
-Ornata can build a component’s initial state from:
+Ornata can build a component's initial state from:
 
 - `default` values in the component definition
 - `data-*` values on the root HTML element
 - `initialState` passed to `mount()`
 
-That makes state flexible in a server-rendered environment because the server can provide initial values in markup, while JavaScript can still refine or override them when mounting.
+That makes state flexible in an HTML-first environment because a server template, CMS, or other markup source can provide initial values while JavaScript still refines or overrides them at mount time.
 
 ## Initial state precedence
 
@@ -265,7 +263,7 @@ Ornata state is:
 - reactive once mounted
 - guarded at the public boundary
 
-That makes it a strong fit for server-rendered pages that need interactive behavior without giving up control over where the initial data comes from.
+That makes it a strong fit for HTML-first environments that need interactive behavior without giving up control over where the initial data comes from.
 
 ## State is not the only place to keep values
 

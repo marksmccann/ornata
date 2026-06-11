@@ -2,8 +2,7 @@
 title: Watchers
 description: Use watch callbacks for internal reactions to state changes inside an Ornata component.
 ---
-
-# Watchers
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 `watch` lets a component react to changes in its own state.
 
@@ -13,6 +12,20 @@ This is the internal reaction mechanism in Ornata. It lives inside `defineCompon
 
 Each watcher is keyed by a state property name and receives a context object:
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+watch: {
+    count({ newValue, oldValue, isInitial }) {
+        console.log(newValue, oldValue, isInitial);
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 watch: {
     count({ newValue, oldValue, isInitial }) {
@@ -20,6 +33,9 @@ watch: {
     },
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 The context includes:
 
@@ -34,6 +50,22 @@ Watchers also run during the initial mount update pass.
 
 That is why `isInitial` exists:
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+watch: {
+    count({ isInitial, newValue }) {
+        if (isInitial) return;
+
+        console.log("Count changed:", newValue);
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 watch: {
     count({ isInitial, newValue }) {
@@ -43,6 +75,9 @@ watch: {
     },
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 In practice, this usually means you should decide whether your watcher is meant to handle initialization, later updates, or both.
 
@@ -68,6 +103,24 @@ Use other parts of Ornata when they fit better:
 
 If the goal is to update DOM state, prefer `render`.
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    panel() {
+        return {
+            attributes: {
+                hidden: !this.state.open,
+            },
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 render: {
     panel() {
@@ -80,7 +133,26 @@ render: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 If the goal is to trigger a side effect because the state changed, use `watch`.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+watch: {
+    open({ isInitial, newValue }) {
+        if (!isInitial && newValue) {
+            console.log("Disclosure opened");
+        }
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 watch: {
@@ -91,6 +163,9 @@ watch: {
     },
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 ## Watchers versus computed
 

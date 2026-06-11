@@ -1,10 +1,8 @@
 # Ornata
 
-A progressive enhancement framework for server-rendered websites.
+Ornata is a type-safe framework for building distributable interactive UI components for HTML-first applications.
 
-Ornata helps you build HTML-first sites that work without JavaScript, then progressively enhance them with interactivity where needed.
-
-It is also TypeScript-friendly by default, with strong inference for component options and a clear path to explicit typed component contracts when you want them.
+Create encapsulated, protable components that enhance existing HTML instead of replacing it. Ornata combines state, behavior, rendering, lifecycle, and DOM contracts into reusable components that can be integrated into CMSs, server-rendered applications, design systems, and environments where rendering is not fully controlled by the component.
 
 ## Documentation
 

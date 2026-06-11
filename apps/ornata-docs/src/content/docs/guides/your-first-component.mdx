@@ -1,12 +1,10 @@
 ---
 title: Your First Component
-description: Build a small component and learn the core Ornata authoring pattern.
+description: Build a small progressively enhanced component and learn the core Ornata authoring pattern.
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-# Your First Component
-
-The easiest way to learn Ornata is to enhance a small piece of existing HTML.
+The easiest way to learn Ornata is to enhance a small piece of existing HTML with a clear component contract.
 
 ## The markup
 
@@ -201,7 +199,9 @@ Each top-level option has a clear job:
 - `computed` derives values from state
 - `render` applies DOM updates to resolved elements
 
-That separation is one of Ornata’s main strengths. The component stays small, direct, and easy to scan.
+That separation is one of Ornata's main strengths. It keeps the contract between markup, behavior, and state visible, which makes the component easier to reuse in larger HTML-first systems.
+
+This example intentionally shows several top-level sections together. Smaller components do not need every section, but the shape stays consistent across the library.
 
 If you want a deeper look at action-oriented component logic, read [Methods](/ornata/guides/methods/).
 

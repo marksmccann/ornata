@@ -1,12 +1,10 @@
 ---
 title: Getting Started
-description: Install Ornata, define a component, and mount it onto existing HTML.
+description: Install Ornata, define a small component contract, and mount it onto existing HTML.
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-# Getting Started
-
-This guide takes you from installation to a working progressively enhanced component.
+This guide takes you from installation to a working progressively enhanced component in an HTML-first environment.
 
 ## Install
 
@@ -28,6 +26,8 @@ Pin a specific version in production so your deployed HTML always gets the same 
 ## Start with HTML
 
 Write server-rendered markup that already makes sense on its own.
+
+Ornata treats that markup as the integration surface, then layers a reusable component on top.
 
 ```html
 <section data-counter>
@@ -176,10 +176,11 @@ When `mount()` runs, Ornata:
 
 That state can come from component defaults, HTML `data-*` attributes on the root element, or an `initialState` object passed to `mount()`.
 
+Together, those pieces form a small component contract: the HTML stays visible, the state has a clear home, and the enhancement logic remains reusable.
+
 ## Where to go next
 
 - Read [Your First Component](/ornata/guides/your-first-component/) for a deeper walkthrough
 - Read [State](/ornata/guides/state/) to understand initialization, reactivity, and safety controls
-- Read [Initializing From HTML](/ornata/guides/initializing-from-html/) to mount components declaratively with `data-ornata`
-- Read [Page Bootstrap](/ornata/guides/page-bootstrap/) for whole-page initialization patterns
+- Read [Page Bootstrap](/ornata/guides/page-bootstrap/) to mount components declaratively with `data-ornata`
 - Read [Component Anatomy](/ornata/guides/component-anatomy/) for the full shape of `defineComponent()`

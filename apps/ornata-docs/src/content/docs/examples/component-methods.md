@@ -1,11 +1,10 @@
 ---
 title: Component Methods
-description: Keep event handlers small by moving action logic into named component methods.
+description: Keep event handlers small by moving action logic into named component methods that belong to the component contract.
 ---
 
-# Component Methods
 
-This example shows how methods keep action logic out of inline event handlers.
+This example shows how methods keep action logic out of inline event handlers so behavior stays portable and easy to grow.
 
 ## Live Demo
 

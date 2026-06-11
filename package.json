@@ -2,8 +2,7 @@
     "name": "ornata",
     "private": true,
     "type": "module",
-    "version": "0.1.0",
-    "description": "Ornata is a progressive enhancement framework for server-rendered websites",
+    "description": "Ornata is a type-safe framework for building and distributing interactive UI components on HTML-first applications",
     "workspaces": [
         "packages/*",
         "apps/*"

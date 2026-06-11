@@ -1,11 +1,9 @@
 ---
 title: Browser Global
-description: Use Ornata directly in the browser without a bundler by loading its global build from a CDN.
+description: Use Ornata directly in the browser without a bundler by loading its global build into an HTML-first page.
 ---
 
-# Browser Global
-
-Ornata ships a browser-ready global build, which means you can use it directly in a server-rendered page without a bundler.
+Ornata ships a browser-ready global build, which means you can use it directly in server-rendered, CMS-driven, or otherwise HTML-first pages without a bundler.
 
 ## Load the global build
 
@@ -48,8 +46,8 @@ This is a strong fit for:
 - server-rendered sites
 - prototypes
 - CMS-driven pages
-- pages that want focused interactivity without a bundler step
+- pages that want focused interactivity without a separate app build step
 
 ## A good mental model
 
-If you already have HTML on the page and just want to enhance it, the browser global build keeps the setup extremely small.
+If you already have HTML on the page and want to layer interaction onto it, the browser global build keeps the setup extremely small.

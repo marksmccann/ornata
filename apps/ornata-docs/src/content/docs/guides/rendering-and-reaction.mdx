@@ -2,8 +2,7 @@
 title: Rendering and Reaction
 description: Understand how state updates trigger computed values, watch callbacks, and DOM rendering.
 ---
-
-# Rendering and Reaction
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 Ornata components react to state changes in a predictable sequence.
 
@@ -23,6 +22,27 @@ That means render and watch logic both respond to the same state transition, but
 
 `render` should be your primary way to reflect state into the DOM.
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    panel() {
+        return {
+            attributes: {
+                hidden: !this.state.open,
+            },
+            classes: {
+                "is-open": this.state.open,
+            },
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 render: {
     panel() {
@@ -38,11 +58,30 @@ render: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 For a full walkthrough of `text`, `html`, `attributes`, `classes`, `style`, `dataset`, `events`, and list rendering with `index`, see [Render Options](/ornata/guides/render-options/).
 
 ## Use `watch` for side effects
 
 `watch` is best for logging, analytics, timers, imperative integrations, and other side effects.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+watch: {
+    open({ isInitial, newValue }) {
+        if (!isInitial && newValue) {
+            console.log("Disclosure opened");
+        }
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 watch: {
@@ -54,11 +93,28 @@ watch: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 For a deeper walkthrough of watcher behavior and `isInitial`, see [Watchers](/ornata/guides/watchers/).
 
 ## Use `computed` for derived values
 
 Computed values help when multiple render callbacks or methods need the same derived data.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+computed: {
+    countLabel() {
+        return this.state.count === 1 ? "item" : "items";
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 computed: {
@@ -67,6 +123,9 @@ computed: {
     },
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 ## Initial updates
 

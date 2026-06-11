@@ -3,8 +3,6 @@ title: Safeguards
 description: Understand Ornata's runtime safeguards around roots, state, elements, and component contracts.
 ---
 
-# Safeguards
-
 One of Ornata’s quiet strengths is that it treats component structure as a contract.
 
 That means the framework does more than provide helpers. It also checks common failure cases and reports problems when a component does not match its declared expectations.
@@ -49,7 +47,7 @@ The component constructor helpers also lean toward explicit behavior:
 
 ## Why this matters
 
-These checks are especially helpful in server-rendered apps, where the DOM structure and the JavaScript enhancement layer need to stay aligned over time.
+These checks are especially helpful in HTML-first environments, where the DOM structure and the JavaScript enhancement layer need to stay aligned over time.
 
 ## A good mental model
 

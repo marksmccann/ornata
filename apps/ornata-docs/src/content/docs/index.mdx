@@ -1,0 +1,100 @@
+---
+title: Home
+description: Ornata is a type-safe framework for building distributable interactive UI components for HTML-first applications.
+template: splash
+hero:
+    title: <span class="ornata-hero-kicker"><svg class="ornata-hero-logo" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 107.1 24.4" fill="currentColor" aria-label="Ornata"><path fill="currentColor" d="M7.8 0A8 8 0 0 0 0 7.8v8.8c0 4.3 3.5 7.8 7.8 7.8H14c4.4 0 7.9-3.5 7.9-7.8V7.8C21.9 3.5 18.4 0 14 0zm0 2.3H14c3 0 5.6 2.5 5.6 5.6v8.7c0 3-2.5 5.6-5.6 5.6H7.9a5.7 5.7 0 0 1-5.7-5.6V7.9c0-3 2.6-5.6 5.7-5.6m1.7 1.9a5 5 0 0 0-5.2 5.1v5.9a5 5 0 0 0 5.2 5h3a5 5 0 0 0 5-5V9.3c0-2.8-2.3-5.1-5-5.1zm.2 2.1h2.5c1.7 0 3.2 1.5 3.2 3.2V15c0 1.7-1.5 3.1-3.2 3.1H9.7A3 3 0 0 1 6.6 15V9.5c0-1.7 1.4-3.2 3.1-3.2m90 1.4L95 17.2h2.5l3.6-7.6 2 4.2h-2.2l-.9 1.8h4l.7 1.6h2.5l-4.6-9.5zm-23.4 0-4.7 9.5H74l3.6-7.6 2 4.2h-2.3l-.8 1.8h3.9l.7 1.6h2.6L79 7.7Zm7.9 0v1.8h4v7.7h2.3V9.5h4.1V7.7Zm-26.8 0v9.5h2.2v-6.8l6.7 6.8h2.4V7.7h-2.2v6.6l-6.7-6.6Zm-14.2 0v9.5h2.3V14h3.1l2.6 3.3H54L51.4 14q2.1-.2 2.3-2.3V10c0-1.2-1-2.3-2.3-2.3h-6zm2.3 1.8h5.1q.6 0 .7.8v1q0 .7-.7.8h-5zM30.6 7.6q-2 .2-2.1 2.2V15c0 1.2 1 2.1 2.1 2.1h7c1.1 0 2-1 2-2.1V9.8c0-1.2-.9-2.2-2-2.2zm1 1.8h4.9q1 .1 1 1.1v3.7q0 1-1 1.1h-4.8a1 1 0 0 1-1.1-1v-3.8q.1-1 1-1"/></svg></span><span class="ornata-hero-title-line">Bring the component model to HTML-first applications</span>
+    tagline: "Build reusable UI libraries with encapsulated, portable components that work with the HTML you already have."
+    actions:
+        - text: Get Started
+          link: /ornata/guides/getting-started/
+          variant: primary
+        - text: Browse Examples
+          link: /ornata/examples/counter/
+          variant: secondary
+        - text: API Reference
+          link: /ornata/api/
+          variant: minimal
+---
+
+
+import { CardGrid, Card, LinkCard, Tabs, TabItem } from "@astrojs/starlight/components";
+
+## Why Ornata exists
+
+Component-driven development has made encapsulated, reusable UI the standard for modern front-end development.
+
+But many HTML-first environments &ndash; content management systems (CMSs), server-rendered applications, template-driven platforms, and multi-framework systems &ndash; do not always fit neatly into framework-owned component models.
+
+Ornata brings a familiar component model to those environments, helping teams build portable UI libraries that integrate with existing HTML, render their own structure where needed, and scale across applications.
+
+## Who is Ornata for?
+
+Ornata is designed for teams building reusable UI libraries in HTML-first environments.
+
+- **Design systems** that need portable, interactive components across applications
+- **CMS-driven sites** that need to integrate behavior into existing markup
+- **Server-rendered applications** that want reusable interaction patterns without moving to a client-rendered architecture
+- **Multi-framework platforms** that need components to work across different application stacks
+
+## See It In Practice
+
+<CardGrid>
+    <LinkCard
+        title="HTML State"
+        description="See how default state, dataset state, and mount-time state work together."
+        href="/ornata/examples/html-state/"
+    />
+    <LinkCard
+        title="Element Safeguards"
+        description="Explore scoped DOM references, element contracts, and resolution guardrails."
+        href="/ornata/examples/element-safeguards/"
+    />
+    <LinkCard
+        title="List Rendering"
+        description="Use render callbacks with index-aware updates for repeated DOM structures."
+        href="/ornata/examples/list-rendering/"
+    />
+    <LinkCard
+        title="Build a Disclosure"
+        description="Walk through a full progressively enhanced component from HTML to behavior."
+        href="/ornata/tutorials/build-a-disclosure/"
+    />
+</CardGrid>
+
+## How Ornata works
+
+Ornata organizes interactive UI into reusable components through a structured component API.
+
+State, behavior, rendering, lifecycle, DOM references, and events each have a clear place in the component definition. That consistency makes components easier to understand individually and easier to distribute as part of a reusable UI library.
+
+The result is a self-contained component model that can scale across HTML-first environments.
+
+## Learn more
+
+<CardGrid>
+    <LinkCard
+        title="Why Ornata"
+        description="Understand the core problems Ornata is trying to solve and where it fits in the frontend ecosystem."
+        href="/ornata/why-ornata/"
+    />
+    <LinkCard
+        title="Getting Started"
+        description="Install the package, mount a component, and get a working baseline quickly."
+        href="/ornata/guides/getting-started/"
+    />
+    <LinkCard
+        title="Mental Model"
+        description="Learn the core ideas and guiding principles that shaped Ornata's design and authoring model."
+        href="/ornata/mental-model/"
+    />
+    <LinkCard
+        title="Your First Component"
+        description="See the authoring model in its simplest form with state, elements, and targeted rendering."
+        href="/ornata/guides/your-first-component/"
+    />
+</CardGrid>
+
+## Why “Ornata”?
+
+Ornata derives its name from the Latin word meaning equipped, furnished, or enhanced. It reflects the idea that Ornata components build on existing HTML rather than replace it.

@@ -1,11 +1,11 @@
 ---
 title: Component Anatomy
-description: Learn how the defineComponent options map to state, DOM resolution, rendering, and lifecycle behavior.
+description: Learn how the defineComponent options form a component contract around state, DOM resolution, rendering, and lifecycle behavior.
 ---
 
-# Component Anatomy
-
 `defineComponent()` is the main authoring API in Ornata.
+
+It is where you describe how a reusable component fits into existing HTML, what it expects from the DOM, and how it reacts over time.
 
 ```ts
 const Component = defineComponent({
@@ -61,7 +61,7 @@ state: {
 
 ### Why `state` is a bigger feature than it looks
 
-State in Ornata is designed for server-rendered apps:
+State in Ornata is designed for HTML-first environments:
 
 - defaults can be declared in the component
 - initial values can come from root HTML `data-*` attributes

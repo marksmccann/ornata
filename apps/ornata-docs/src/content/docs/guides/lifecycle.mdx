@@ -2,8 +2,7 @@
 title: Lifecycle
 description: Use mount and unmount hooks for setup and cleanup in progressively enhanced Ornata components.
 ---
-
-# Lifecycle
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 Ornata supports two lifecycle hooks:
 
@@ -16,6 +15,20 @@ These hooks are useful when a component needs setup or cleanup behavior outside 
 
 `lifecycle.mount` runs once when the component is mounted.
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+lifecycle: {
+    mount() {
+        console.log("Mounted");
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 lifecycle: {
     mount() {
@@ -23,6 +36,9 @@ lifecycle: {
     },
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 This is a good place for:
 
@@ -35,6 +51,20 @@ This is a good place for:
 
 `lifecycle.unmount` runs once when the component is disposed or unmounted.
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+lifecycle: {
+    unmount() {
+        console.log("Cleaned up");
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 lifecycle: {
     unmount() {
@@ -42,6 +72,9 @@ lifecycle: {
     },
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 This is a good place for:
 
@@ -51,6 +84,33 @@ This is a good place for:
 - general teardown logic
 
 ## A practical example
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const Clock = defineComponent({
+    name: "Clock",
+    data: {
+        intervalId: null,
+    },
+    lifecycle: {
+        mount() {
+            this.data.intervalId = window.setInterval(() => {
+                console.log("tick");
+            }, 1000);
+        },
+        unmount() {
+            if (this.data.intervalId !== null) {
+                window.clearInterval(this.data.intervalId);
+            }
+        },
+    },
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 const Clock = defineComponent({
@@ -73,6 +133,9 @@ const Clock = defineComponent({
 });
 ```
 
+  </TabItem>
+</Tabs>
+
 This is also a good example of why `data` exists: some values need to persist across lifecycle hooks without becoming reactive state.
 
 See [Data](/ornata/guides/data/) for that concept directly.
@@ -81,7 +144,7 @@ See [Data](/ornata/guides/data/) for that concept directly.
 
 Use `render` when the goal is to update DOM output.
 
-Use lifecycle hooks when the goal is setup or cleanup around the component’s existence.
+Use lifecycle hooks when the goal is setup or cleanup around the component's existence.
 
 That distinction keeps the component easier to reason about.
 

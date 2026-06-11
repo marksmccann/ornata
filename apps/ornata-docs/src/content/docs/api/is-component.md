@@ -3,7 +3,6 @@ title: isComponent
 description: Check whether a value is an Ornata component constructor.
 ---
 
-# isComponent
 
 `isComponent()` is a runtime type guard for Ornata component constructors.
 

@@ -2,8 +2,7 @@
 title: Data
 description: Use data for persistent internal component values that should survive for the life of the instance without becoming reactive state.
 ---
-
-# Data
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 `data` gives an Ornata component a place to store persistent internal values.
 
@@ -32,7 +31,7 @@ This is the most important distinction:
 - `state` is reactive
 - `data` is persistent but non-reactive
 
-If changing a value should trigger Ornata’s update flow, it belongs in `state`.
+If changing a value should trigger Ornata's update flow, it belongs in `state`.
 
 If a value just needs to be stored and reused internally, it likely belongs in `data`.
 
@@ -43,6 +42,33 @@ Use `computed` for derived values based on state.
 Use `data` for stored values that you want to keep around directly.
 
 ## A simple example
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const Clock = defineComponent({
+    name: "Clock",
+    data: {
+        intervalId: null,
+    },
+    lifecycle: {
+        mount() {
+            this.data.intervalId = window.setInterval(() => {
+                console.log("tick");
+            }, 1000);
+        },
+        unmount() {
+            if (this.data.intervalId !== null) {
+                window.clearInterval(this.data.intervalId);
+            }
+        },
+    },
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 const Clock = defineComponent({
@@ -65,6 +91,9 @@ const Clock = defineComponent({
 });
 ```
 
+  </TabItem>
+</Tabs>
+
 Here, `intervalId` needs to persist for the life of the component, but it does not belong in reactive state.
 
 ## Why this matters
@@ -79,6 +108,6 @@ Without `data`, component authors often end up:
 
 ## A good mental model
 
-Think of `data` as the component’s internal storage shelf.
+Think of `data` as the component's internal storage shelf.
 
 It is there when the component needs to remember something, but not everything the component remembers needs to be reactive state.

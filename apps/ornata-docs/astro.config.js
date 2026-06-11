@@ -10,14 +10,19 @@ export default defineConfig({
         starlight({
             title: "Ornata",
             description:
-                "A progressive enhancement framework for server-rendered websites",
+                "A progressive enhancement framework for HTML-first applications",
             plugins: [starlightThemeNord()],
+            components: {
+                SiteTitle: "./src/components/SiteTitle.astro",
+            },
+            customCss: ["/src/styles/home.css"],
             sidebar: [
                 {
                     label: "Introduction",
                     items: [
                         { label: "Overview", slug: "" },
-                        { label: "Why Ornata", slug: "why-ornata" },
+                        { label: "Why Ornata?", slug: "why-ornata" },
+                        { label: "Mental Model", slug: "mental-model" },
                     ],
                 },
                 {
@@ -31,16 +36,8 @@ export default defineConfig({
                                     slug: "guides/getting-started",
                                 },
                                 {
-                                    label: "Mental Model",
-                                    slug: "guides/mental-model",
-                                },
-                                {
                                     label: "Your First Component",
                                     slug: "guides/your-first-component",
-                                },
-                                {
-                                    label: "Initializing From HTML",
-                                    slug: "guides/initializing-from-html",
                                 },
                                 {
                                     label: "Page Bootstrap",

@@ -1,12 +1,13 @@
 ---
 title: Component Instance
-description: Work with mounted component instances and constructor-level instance helpers.
+description: Work with mounted component instances and constructor-level helpers when integration code needs direct control.
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-# Component Instance
 
 When you mount a component, Ornata returns a component instance.
+
+That instance becomes the integration point between the component and surrounding page code.
 
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">

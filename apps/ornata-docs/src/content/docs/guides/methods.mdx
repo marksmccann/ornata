@@ -2,8 +2,7 @@
 title: Methods
 description: Use methods to name and centralize the actions your Ornata component performs.
 ---
-
-# Methods
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 `methods` gives an Ornata component a place to define reusable internal actions.
 
@@ -17,6 +16,20 @@ Instead of putting the same imperative logic inside multiple render callbacks or
 
 ## A simple example
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+methods: {
+    increment() {
+        this.state.count += 1;
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 methods: {
     increment() {
@@ -25,7 +38,28 @@ methods: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 That method can then be called from render events or from other methods:
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    button() {
+        return {
+            events: {
+                click: () => this.methods.increment(),
+            },
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 render: {
@@ -38,6 +72,9 @@ render: {
     },
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 ## What methods can access
 

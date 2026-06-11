@@ -4,8 +4,6 @@ description: Use computed values for derived component data that updates automat
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-# Computed
-
 `computed` is where Ornata components define derived values.
 
 If `state` is the source of truth, `computed` is where you turn that state into values the rest of the component can read conveniently.
@@ -59,6 +57,12 @@ Each computed callback receives a context object with:
 - `currentValue`
 - `changedProperty`
 
+`currentValue` is the previously computed value for that property.
+
+`changedProperty` is the state key that triggered the recomputation.
+
+That context is especially useful when a computed value is expensive to derive. You can check whether the changed state is actually relevant before redoing heavier work.
+
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">
 
@@ -89,6 +93,57 @@ computed: {
 
   </TabItem>
 </Tabs>
+
+## Use the context to avoid unnecessary work
+
+For simple computed values, you can usually ignore the context object.
+
+For more expensive computed values, `currentValue` and `changedProperty` let you skip work when the updated state does not affect the result.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+computed: {
+    filteredItems({ currentValue, changedProperty }) {
+        if (
+            changedProperty !== "query" &&
+            changedProperty !== "items"
+        ) {
+            return currentValue ?? [];
+        }
+
+        return this.state.items.filter((item) =>
+            item.label.includes(this.state.query)
+        );
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+computed: {
+    filteredItems({ currentValue, changedProperty }) {
+        if (
+            changedProperty !== "query" &&
+            changedProperty !== "items"
+        ) {
+            return currentValue ?? [];
+        }
+
+        return this.state.items.filter((item) =>
+            item.label.includes(this.state.query)
+        );
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+This gives the component a chance to reuse the current computed value when unrelated state changes trigger the broader update flow.
 
 ## Use computed from render and methods
 

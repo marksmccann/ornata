@@ -1,16 +1,18 @@
 ---
 title: Page Bootstrap
-description: Bootstrap a whole server-rendered page with createInitializer and a small component registry.
+description: Mount components declaratively from HTML with createInitializer and a small page-level registry.
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-# Page Bootstrap
-
-Once a page has more than one component, the next question is usually how to bootstrap everything without writing a pile of manual `mount()` calls.
+Once a page has more than one component, the next question is usually how to bootstrap everything without scattering manual `mount()` calls across page code.
 
 That is what `createInitializer()` is for.
 
+It lets the page's HTML declare which components should enhance which roots, while JavaScript provides the small registry that connects those names to real component constructors.
+
 ## Mark up roots in HTML
+
+Add a `data-ornata` attribute whose value matches the component name you want to initialize.
 
 ```html
 <section data-ornata="Counter" data-counter>
@@ -99,6 +101,31 @@ const instances = initialize();
   </TabItem>
 </Tabs>
 
+You can also inline the pattern when the registry already exists:
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+import { createInitializer } from "ornata";
+import { components } from "./components";
+
+createInitializer(components)();
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { createInitializer } from "ornata";
+import { components } from "./components";
+
+createInitializer(components)();
+```
+
+  </TabItem>
+</Tabs>
+
 ## What happens during bootstrap
 
 The initializer:
@@ -110,6 +137,10 @@ The initializer:
 - removes the `data-ornata` attribute afterward
 - returns the mounted instances
 
+## Important detail
+
+The `data-ornata` value must match a real Ornata component constructor in the initializer map. If it does not, Ornata will report an error and skip that root.
+
 ## Why this pattern scales
 
 This keeps page bootstrap code small even as the page grows more interactive.
@@ -120,10 +151,10 @@ Instead of hand-writing:
 - multiple `mount()` calls
 - separate branching for each component
 
-you let the HTML and the registry describe the page.
+you let the HTML and the registry describe how the page gets enhanced.
 
 ## A good mental model
 
-Use `mount()` for one-off component setup.
+Use `mount()` for direct single-root setup.
 
-Use `createInitializer()` when the page itself should declare what gets initialized.
+Use `createInitializer()` when the page's HTML should declare which components get enhanced.

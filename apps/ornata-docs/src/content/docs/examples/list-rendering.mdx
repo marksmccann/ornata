@@ -1,12 +1,11 @@
 ---
 title: List Rendering
-description: Use render callbacks with index-aware list rendering for repeated DOM collections.
+description: Use render callbacks with index-aware list rendering for repeated DOM collections inside an existing HTML structure.
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-# List Rendering
 
-This example shows how `index` helps when rendering repeated elements from a single piece of component state.
+This example shows how `index` helps when repeated HTML elements share state but still need individual DOM updates.
 
 ## Live Demo
 
@@ -49,22 +48,8 @@ export const Tabs = defineComponent({
         activeIndex: { default: 0, type: Number },
     },
     elements: {
-        tabs: {
-            resolve(root) {
-                return Array.from(
-                    root.querySelectorAll("[data-tab]")
-                ) as HTMLButtonElement[];
-            },
-            min: 2,
-        },
-        panels: {
-            resolve(root) {
-                return Array.from(
-                    root.querySelectorAll("[data-panel]")
-                ) as HTMLElement[];
-            },
-            min: 2,
-        },
+        tabs: { queryAll: "[data-tab]", min: 2 },
+        panels: { queryAll: "[data-panel]", min: 2 },
     },
     render: {
         tabs({ index }) {

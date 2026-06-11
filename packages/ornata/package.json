@@ -2,7 +2,7 @@
     "name": "ornata",
     "version": "0.3.1",
     "type": "module",
-    "description": "Ornata is a progressive enhancement framework for server-rendered websites",
+    "description": "Ornata is a type-safe framework for building and distributing interactive UI components on HTML-first applications",
     "main": "dist/index.cjs",
     "module": "dist/index.js",
     "types": "dist/index.d.ts",

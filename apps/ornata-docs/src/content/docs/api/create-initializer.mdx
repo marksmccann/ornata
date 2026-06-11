@@ -1,12 +1,13 @@
 ---
 title: createInitializer
-description: Create a document-level initializer that mounts components from data-ornata attributes.
+description: Create a document-level initializer that mounts components from data-ornata attributes in HTML.
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-# createInitializer
 
 `createInitializer()` creates a function that mounts Ornata components from HTML.
+
+It is the API that lets the markup declare which components should enhance the page.
 
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">
@@ -93,6 +94,6 @@ const instances = initialize();
 - each matching root is mounted with `component.mount(rootElement)`
 - the `data-ornata` attribute is removed after mounting
 
-This makes it a good fit for page-level bootstrap code in server-rendered apps.
+This makes it a good fit for page-level bootstrap code in HTML-first environments.
 
 See [Page Bootstrap](/ornata/guides/page-bootstrap/) for a fuller guide.

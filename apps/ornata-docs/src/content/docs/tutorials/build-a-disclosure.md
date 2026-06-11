@@ -1,11 +1,10 @@
 ---
 title: Build a Disclosure
-description: Build a progressively enhanced disclosure component step by step.
+description: Build a progressively enhanced disclosure component contract step by step.
 ---
 
-# Build a Disclosure
 
-This tutorial walks through a small disclosure component from plain HTML to interactive behavior.
+This tutorial walks through a small disclosure component from plain HTML to reusable interactive behavior.
 
 ## Step 1: Write the baseline HTML
 

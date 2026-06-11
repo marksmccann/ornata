@@ -1,11 +1,10 @@
 ---
 title: Element Safeguards
-description: See how Ornata's elements option can encode DOM expectations directly into a component definition.
+description: See how Ornata's elements option can encode DOM expectations directly into a reusable component contract.
 ---
 
-# Element Safeguards
 
-This example focuses on a small pattern with stronger DOM expectations than a simple one-off selector.
+This example focuses on a small pattern with stronger DOM expectations than a simple selector helper.
 
 ## Live Demo
 

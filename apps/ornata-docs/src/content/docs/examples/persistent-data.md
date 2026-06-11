@@ -3,9 +3,8 @@ title: Persistent Data
 description: Use data to keep internal values alive across lifecycle hooks and component behavior without making them reactive state.
 ---
 
-# Persistent Data
 
-This example shows why `data` is useful for values that need to persist but should not participate in rendering.
+This example shows why `data` is useful for values that need to persist inside a reusable component without participating in rendering.
 
 ## Live Demo
 

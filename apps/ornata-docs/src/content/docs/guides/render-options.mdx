@@ -1,15 +1,30 @@
 ---
 title: Render Options
-description: Use render callbacks to map component state into direct DOM updates, including lists with index-aware rendering.
+description: Use render callbacks to map component state back into existing or generated DOM, including lists with index-aware rendering.
 ---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-# Render Options
-
-`render` is how Ornata turns component state into DOM output.
+`render` is how Ornata turns component state back into DOM output inside the component's HTML contract.
 
 Each render callback returns a `RenderOptions` object for one resolved element or one item in a resolved element list.
 
 ## Basic shape
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    value() {
+        return {
+            text: String(this.state.count),
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 render: {
@@ -20,6 +35,9 @@ render: {
     },
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 ## Available render outputs
 
@@ -39,6 +57,22 @@ These options can be combined in a single render result.
 
 Set `text` when you want to update `textContent`.
 
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    label() {
+        return {
+            text: this.state.label,
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
 ```ts
 render: {
     label() {
@@ -49,9 +83,28 @@ render: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 ## `html`
 
 Set `html` when you want to update `innerHTML`.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    output() {
+        return {
+            html: `<strong>${this.state.message}</strong>`,
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 render: {
@@ -63,9 +116,31 @@ render: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 ## `attributes`
 
 Use `attributes` for standard and boolean attributes.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    panel() {
+        return {
+            attributes: {
+                hidden: !this.state.open,
+                "aria-expanded": String(this.state.open),
+            },
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 render: {
@@ -80,6 +155,9 @@ render: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 Behavior summary:
 
 - string values set the attribute
@@ -91,6 +169,24 @@ Behavior summary:
 ## `classes`
 
 Use `classes` for class toggling.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    item() {
+        return {
+            classes: {
+                "is-active": this.state.active,
+            },
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 render: {
@@ -104,9 +200,30 @@ render: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 ## `style`
 
 Use `style` for inline style updates.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    panel() {
+        return {
+            style: {
+                display: this.state.open ? "block" : "none",
+            },
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 render: {
@@ -120,6 +237,9 @@ render: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 Behavior summary:
 
 - string values set the style property
@@ -129,6 +249,24 @@ Behavior summary:
 ## `dataset`
 
 Use `dataset` for `data-*` updates.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    item() {
+        return {
+            dataset: {
+                state: this.state.active ? "active" : "idle",
+            },
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 render: {
@@ -142,6 +280,9 @@ render: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 Behavior summary:
 
 - string values set the dataset property
@@ -151,6 +292,24 @@ Behavior summary:
 ## `events`
 
 Use `events` to attach event handlers.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    button() {
+        return {
+            events: {
+                click: () => this.methods.increment(),
+            },
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 render: {
@@ -164,9 +323,32 @@ render: {
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 ## Rendering lists with `index`
 
 When the rendered element is an array, Ornata passes `index` in the render context.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+render: {
+    items({ index }) {
+        const currentIndex = index ?? 0;
+
+        return {
+            classes: {
+                "is-active": currentIndex === this.state.activeIndex,
+            },
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
 
 ```ts
 render: {
@@ -181,6 +363,9 @@ render: {
     },
 }
 ```
+
+  </TabItem>
+</Tabs>
 
 This is especially useful for:
 

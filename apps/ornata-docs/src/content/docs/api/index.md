@@ -1,11 +1,10 @@
 ---
 title: API Overview
-description: The public runtime API surface currently exposed by Ornata.
+description: The public runtime API surface Ornata exposes for building and bootstrapping components in HTML-first environments.
 ---
 
-# API Overview
 
-Ornata currently exposes three runtime exports:
+Ornata currently exposes three runtime exports for defining components and enhancing HTML:
 
 - `defineComponent`
 - `createInitializer`
