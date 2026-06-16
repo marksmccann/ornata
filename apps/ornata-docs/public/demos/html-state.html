@@ -54,11 +54,6 @@
                 background: #fff;
             }
 
-            .status {
-                font-size: 0.92rem;
-                color: #6f5737;
-            }
-
             [data-count-button] {
                 justify-self: start;
                 border: 0;
@@ -79,12 +74,11 @@
     <body>
         <main class="demo-shell">
             <h1>HTML State Demo</h1>
-            <p>These initial values come from the server-rendered HTML, not the JavaScript definition.</p>
+            <p>The initial value comes from the server-rendered HTML, not the JavaScript definition. It is applied to the initial HTML attribute: <code>data-count="3"</code></p>
 
             <section data-counter data-count="3" data-label="Server count">
-                <p class="status">Initial HTML attributes: <code>data-count="3"</code> and <code>data-label="Server count"</code></p>
                 <p>
-                    <span data-count-label></span>:
+                    <span data-count-label>Server count:</span>
                     <strong data-count-value></strong>
                 </p>
                 <button type="button" data-count-button>Increment</button>
@@ -99,10 +93,8 @@
                 name: "Counter",
                 state: {
                     count: { default: 0, type: Number },
-                    label: { default: "Clicks", type: String },
                 },
                 elements: {
-                    label: { query: "[data-count-label]" },
                     value: { query: "[data-count-value]" },
                     button: { query: "[data-count-button]" },
                 },
@@ -112,11 +104,6 @@
                     },
                 },
                 render: {
-                    label() {
-                        return {
-                            text: this.state.label,
-                        };
-                    },
                     value() {
                         return {
                             text: String(this.state.count),

@@ -45,11 +45,6 @@
                 line-height: 1.5;
             }
 
-            .note {
-                font-size: 0.92rem;
-                color: #53637f;
-            }
-
             [role="tablist"] {
                 display: flex;
                 gap: 10px;
@@ -84,17 +79,14 @@
     <body>
         <main class="demo-shell">
             <h1>Element Safeguards Demo</h1>
-            <p>This component expects multiple related elements and uses structured resolution plus minimum counts.</p>
-            <p class="note">The demo itself behaves like tabs, but the real focus is the element contract behind it.</p>
-
+            <p>This component expects a specific DOM structure and validates it through custom resolution plus explicit element counts.</p>
             <section data-tabs>
-                <div role="tablist">
-                    <button type="button" data-tab>Overview</button>
-                    <button type="button" data-tab>Usage</button>
+                <div>
+                    <button type="button" data-tab>Tab 1</button>
+                    <button type="button" data-tab>Tab 2</button>
                 </div>
-
-                <section data-panel>Overview content</section>
-                <section data-panel hidden>Usage content</section>
+                <section data-panel>Tab 1 content</section>
+                <section data-panel hidden>Tab 2 content</section>
             </section>
         </main>
 
@@ -108,26 +100,45 @@
                     activeIndex: { default: 0, type: Number },
                 },
                 elements: {
-                    tabs: {
+                    tablist: {
                         resolve(root) {
-                            return Array.from(root.querySelectorAll("[data-tab]"));
+                            return (
+                                Array.from(root.children).find((child) => {
+                                    if (!(child instanceof HTMLDivElement)) return false;
+
+                                    return Array.from(child.children).some((grandchild) => {
+                                        return grandchild.hasAttribute("data-tab");
+                                    });
+                                }) ?? null
+                            );
                         },
+                        min: 1,
+                        max: 1,
+                    },
+                    tabs: {
+                        queryAll: ":scope > div > [data-tab]",
                         min: 2,
                     },
                     panels: {
-                        resolve(root) {
-                            return Array.from(root.querySelectorAll("[data-panel]"));
-                        },
+                        queryAll: ":scope > [data-panel]",
                         min: 2,
                     },
                 },
                 render: {
+                    tablist() {
+                        return {
+                            attributes: {
+                                role: "tablist",
+                            },
+                        };
+                    },
                     tabs({ index }) {
                         const currentIndex = index ?? 0;
                         const isActive = currentIndex === this.state.activeIndex;
 
                         return {
                             attributes: {
+                                type: "button",
                                 "aria-selected": String(isActive),
                             },
                             classes: {

@@ -2,9 +2,9 @@
 title: Getting Started
 description: Install Ornata, define a small component contract, and mount it onto existing HTML.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
 
-This guide takes you from installation to a working progressively enhanced component in an HTML-first environment.
+This guide takes you from installation to a working Ornata component in an HTML-first environment.
 
 ## Install
 
@@ -20,14 +20,18 @@ If you want to enhance a page without a bundler, load the browser build from a C
     const { defineComponent } = window.Ornata;
 </script>
 ```
-
-Pin a specific version in production so your deployed HTML always gets the same runtime.
+<Aside type="tip">
+    Pin a specific version in production so your deployed HTML always gets the same runtime.
+</Aside>
 
 ## Start with HTML
 
-Write server-rendered markup that already makes sense on its own.
+Write the initial markup for the desired component.
 
-Ornata treats that markup as the integration surface, then layers a reusable component on top.
+<Aside type="note">
+    Ornata treats markup as the integration surface. As the component author, you decide what
+    your component expects from that markup and how flexible that contract should be.
+</Aside>
 
 ```html
 <section data-counter>

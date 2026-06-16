@@ -5,7 +5,9 @@ description: Use render callbacks with index-aware list rendering for repeated D
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 
-This example shows how `index` helps when repeated HTML elements share state but still need individual DOM updates.
+This example shows how `index` helps when repeated HTML elements share one piece of state but still need individual DOM updates.
+
+In this example, a group of related elements is retrieved from the DOM, but each one needs to respond differently to the component's current state. For example, only one step can be active at a time, while the others may be complete or still upcoming. The framework-provided index value in the render context makes it possible to identify which element in the list is being rendered and apply the correct output to each one.
 
 ## Live Demo
 
@@ -21,16 +23,16 @@ This example shows how `index` helps when repeated HTML elements share state but
 ## HTML
 
 ```html
-<section data-tabs>
-    <div role="tablist">
-        <button type="button" data-tab>Overview</button>
-        <button type="button" data-tab>Usage</button>
-        <button type="button" data-tab>API</button>
+<section data-stepper>
+    <ol>
+        <li data-step>Step 1</li>
+        <li data-step>Step 2</li>
+        <li data-step>Step 3</li>
+    </ol>
+    <div>
+        <button data-prev>Previous</button>
+        <button data-next>Next</button>
     </div>
-
-    <section data-panel>Overview content</section>
-    <section data-panel hidden>Usage content</section>
-    <section data-panel hidden>API content</section>
 </section>
 ```
 
@@ -42,40 +44,64 @@ This example shows how `index` helps when repeated HTML elements share state but
 ```js
 import { defineComponent } from "ornata";
 
-export const Tabs = defineComponent({
-    name: "Tabs",
+export const Stepper = defineComponent({
+    name: "Stepper",
     state: {
         activeIndex: { default: 0, type: Number },
     },
     elements: {
-        tabs: { queryAll: "[data-tab]", min: 2 },
-        panels: { queryAll: "[data-panel]", min: 2 },
+        steps: { queryAll: "[data-step]", min: 2 },
+        prev: { query: "[data-prev]" },
+        next: { query: "[data-next]" },
+    },
+    methods: {
+        previous() {
+            this.state.activeIndex = Math.max(0, this.state.activeIndex - 1);
+        },
+        next() {
+            this.state.activeIndex = Math.min(
+                this.elements.steps.length - 1,
+                this.state.activeIndex + 1
+            );
+        },
     },
     render: {
-        tabs({ index }) {
+        // 👇 Use the element's index in the list to decide how it should render.
+        steps({ index }) {
             const currentIndex = index ?? 0;
             const isActive = currentIndex === this.state.activeIndex;
+            const isComplete = currentIndex < this.state.activeIndex;
 
             return {
                 attributes: {
-                    "aria-selected": String(isActive),
+                    "aria-current": isActive ? "step" : null,
                 },
                 classes: {
                     "is-active": isActive,
-                },
-                events: {
-                    click: () => {
-                        this.state.activeIndex = currentIndex;
-                    },
+                    "is-complete": isComplete,
                 },
             };
         },
-        panels({ index }) {
-            const currentIndex = index ?? 0;
-
+        prev() {
             return {
                 attributes: {
-                    hidden: currentIndex !== this.state.activeIndex,
+                    type: 'button',
+                    disabled: this.state.activeIndex === 0,
+                },
+                events: {
+                    click: () => this.methods.previous(),
+                },
+            };
+        },
+        next() {
+            return {
+                attributes: {
+                    type: 'button',
+                    disabled:
+                        this.state.activeIndex === this.elements.steps.length - 1,
+                },
+                events: {
+                    click: () => this.methods.next(),
                 },
             };
         },
@@ -89,62 +115,77 @@ export const Tabs = defineComponent({
 ```ts
 import { defineComponent } from "ornata";
 
-export const Tabs = defineComponent<{
+export const Stepper = defineComponent<{
     state: {
         activeIndex: number;
     };
     elements: {
-        tabs: HTMLButtonElement[];
-        panels: HTMLElement[];
+        steps: HTMLLIElement[];
+        prev: HTMLButtonElement | null;
+        next: HTMLButtonElement | null;
+    };
+    methods: {
+        previous(): void;
+        next(): void;
     };
 }>({
-    name: "Tabs",
+    name: "Stepper",
     state: {
         activeIndex: { default: 0, type: Number },
     },
     elements: {
-        tabs: {
-            resolve(root) {
-                return Array.from(
-                    root.querySelectorAll("[data-tab]")
-                ) as HTMLButtonElement[];
-            },
-            min: 2,
+        steps: { queryAll: "[data-step]", min: 2 },
+        prev: { query: "[data-prev]" },
+        next: { query: "[data-next]" },
+    },
+    methods: {
+        previous() {
+            this.state.activeIndex = Math.max(0, this.state.activeIndex - 1);
         },
-        panels: {
-            resolve(root) {
-                return Array.from(
-                    root.querySelectorAll("[data-panel]")
-                ) as HTMLElement[];
-            },
-            min: 2,
+        next() {
+            this.state.activeIndex = Math.min(
+                this.elements.steps.length - 1,
+                this.state.activeIndex + 1
+            );
         },
     },
     render: {
-        tabs({ index }) {
+        // 👇 Use the element's index in the list to decide how it should render.
+        steps({ index }) {
             const currentIndex = index ?? 0;
             const isActive = currentIndex === this.state.activeIndex;
+            const isComplete = currentIndex < this.state.activeIndex;
 
             return {
                 attributes: {
-                    "aria-selected": String(isActive),
+                    "aria-current": isActive ? "step" : null,
                 },
                 classes: {
                     "is-active": isActive,
-                },
-                events: {
-                    click: () => {
-                        this.state.activeIndex = currentIndex;
-                    },
+                    "is-complete": isComplete,
                 },
             };
         },
-        panels({ index }) {
-            const currentIndex = index ?? 0;
-
+        prev() {
             return {
                 attributes: {
-                    hidden: currentIndex !== this.state.activeIndex,
+                    type: 'button',
+                    disabled: this.state.activeIndex === 0,
+                },
+                events: {
+                    click: () => this.methods.previous(),
+                },
+            };
+        },
+        next() {
+            return {
+                attributes: {
+                    type: 'button',
+                    disabled:
+                        this.state.activeIndex === this.elements.steps.length - 1,
+                },
+                events: {
+                    click: () => this.methods.next(),
                 },
             };
         },
@@ -159,4 +200,4 @@ export const Tabs = defineComponent<{
 
 Without `index`, each repeated element would need more custom plumbing.
 
-With it, each tab and panel can respond to shared component state while still rendering individually.
+With it, each step can respond to shared component state while still rendering individually as active, complete, or upcoming.

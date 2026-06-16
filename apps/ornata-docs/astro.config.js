@@ -145,7 +145,10 @@ export default defineConfig({
                     label: "Examples",
                     items: [
                         { label: "Counter", slug: "examples/counter" },
-                        { label: "Disclosure", slug: "examples/disclosure" },
+                        {
+                            label: "Markup Augmentation",
+                            slug: "examples/markup-augmentation",
+                        },
                         {
                             label: "HTML State",
                             slug: "examples/html-state",

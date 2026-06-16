@@ -1,11 +1,12 @@
 ---
 title: HTML State
-description: Initialize component state from HTML data attributes, then override or react to it in JavaScript.
+description: See how component state can be initialized from HTML data attributes.
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
+This example shows one of Ornata's most useful HTML-first patterns: deriving initial component state from markup. It gives server-rendered data and configuration a direct path into component behavior at runtime.
 
-This example shows one of Ornata's most useful HTML-first patterns: letting markup provide the initial state.
+With the exception of more complex state properties, such as functions, component state can be initialized from corresponding data-* attributes on the component's root element. In this example, the server provides a count value in the HTML, which the Ornata component reads during initialization and uses as the starting point for its state.
 
 ## Live Demo
 
@@ -13,7 +14,7 @@ This example shows one of Ornata's most useful HTML-first patterns: letting mark
     src="../../demos/html-state.html"
     title="HTML state demo"
     loading="lazy"
-    style="width: 100%; min-height: 360px; border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: white;"
+    style="width: 100%; min-height: 400px; border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: white;"
 ></iframe>
 
 [Open this demo in a new tab](../../demos/html-state.html)
@@ -21,13 +22,10 @@ This example shows one of Ornata's most useful HTML-first patterns: letting mark
 ## HTML
 
 ```html
-<section
-    data-counter
-    data-count="3"
-    data-label="Server count"
->
+<!-- 👇 The server-provided state is applied directly to the root element -->
+<section data-counter data-count="3">
     <p>
-        <span data-count-label></span>:
+        <span>Server count:</span>
         <strong data-count-value></strong>
     </p>
     <button type="button" data-count-button>Increment</button>
@@ -46,10 +44,8 @@ export const Counter = defineComponent({
     name: "Counter",
     state: {
         count: { default: 0, type: Number },
-        label: { default: "Clicks", type: String },
     },
     elements: {
-        label: { query: "[data-count-label]" },
         value: { query: "[data-count-value]" },
         button: { query: "[data-count-button]" },
     },
@@ -59,11 +55,6 @@ export const Counter = defineComponent({
         },
     },
     render: {
-        label() {
-            return {
-                text: this.state.label,
-            };
-        },
         value() {
             return {
                 text: String(this.state.count),
@@ -86,33 +77,24 @@ export const Counter = defineComponent({
 ```ts
 import { defineComponent } from "ornata";
 
-interface CounterState {
-    count: number;
-    label: string;
-}
-
-interface CounterElements {
-    label: Element | null;
-    value: Element | null;
-    button: Element | null;
-}
-
-interface CounterMethods {
-    increment(): void;
-}
-
 export const Counter = defineComponent<{
-    state: CounterState;
-    elements: CounterElements;
-    methods: CounterMethods;
+    state: {
+        count: number;
+        label: string;
+    };
+    elements: {
+        value: Element | null;
+        button: Element | null;
+    };
+    methods: {
+        increment(): void;
+    };
 }>({
     name: "Counter",
     state: {
         count: { default: 0, type: Number },
-        label: { default: "Clicks", type: String },
     },
     elements: {
-        label: { query: "[data-count-label]" },
         value: { query: "[data-count-value]" },
         button: { query: "[data-count-button]" },
     },
@@ -122,11 +104,6 @@ export const Counter = defineComponent<{
         },
     },
     render: {
-        label() {
-            return {
-                text: this.state.label,
-            };
-        },
         value() {
             return {
                 text: String(this.state.count),
@@ -148,46 +125,27 @@ export const Counter = defineComponent<{
 
 ## Mount
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
 ```js
 Counter.mount("[data-counter]");
 ```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-Counter.mount("[data-counter]");
-```
-
-  </TabItem>
-</Tabs>
 
 ## What happens
 
 The component definition provides defaults:
 
 - `count: 0`
-- `label: "Clicks"`
 
 But the HTML root provides:
 
 - `data-count="3"`
-- `data-label="Server count"`
 
 So the mounted instance starts with:
 
 - `count = 3`
-- `label = "Server count"`
 
 ## Override from JavaScript
 
 If you mount with `initialState`, that wins over the HTML values:
-
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
 
 ```js
 Counter.mount("[data-counter]", {
@@ -195,16 +153,4 @@ Counter.mount("[data-counter]", {
 });
 ```
 
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-Counter.mount("[data-counter]", {
-    count: 10,
-});
-```
-
-  </TabItem>
-</Tabs>
-
-Now the starting `count` is `10`.
+Now the starting `count` would be `10` instead of `3`.

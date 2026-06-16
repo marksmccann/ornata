@@ -1,0 +1,390 @@
+---
+title: Markup Augmentation
+description: Enhance authored HTML by generating interactive supporting structure around it at runtime.
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+This example shows how Ornata can enhance existing HTML by generating additional markup that becomes a core part of the interaction.
+
+In this example, the slides already exist in the page markup, so the content remains authored in HTML. The component then augments that baseline structure by generating the controls, pagination, and status output needed to navigate the carousel at runtime.
+
+## Live Demo
+
+<iframe
+    src="../../demos/markup-augmentation.html"
+    title="Markup augmentation demo"
+    loading="lazy"
+    style="width: 100%; min-height: 420px; border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: white;"
+></iframe>
+
+[Open this demo in a new tab](../../demos/markup-augmentation.html)
+
+## HTML
+
+```html
+<section data-carousel>
+    <article data-slide>
+        <h3>Slide 1</h3>
+        <p>The content for slide 1.</p>
+    </article>
+    <article data-slide hidden>
+        <h3>Slide 2</h3>
+        <p>The content for slide 2.</p>
+    </article>
+    <article data-slide hidden>
+        <h3>Slide 3</h3>
+        <p>The content for slide 3.</p>
+    </article>
+</section>
+```
+
+## Component
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+import { defineComponent } from "ornata";
+
+export const Carousel = defineComponent({
+    name: "Carousel",
+    state: {
+        activeIndex: { default: 0, type: Number },
+    },
+    elements: {
+        slides: { queryAll: "[data-slide]", min: 2 },
+        controls: { create: "div" },
+        prev: { create: "button" },
+        next: { create: "button" },
+        pagination: { create: "div" },
+        status: { create: "output" },
+    },
+    lifecycle: {
+        mount() {
+            this.elements.controls.append(
+                this.elements.prev,
+                this.elements.pagination,
+                this.elements.next
+            );
+
+            this.elements.slides.forEach((_, index) => {
+                const button = document.createElement("button");
+
+                button.type = "button";
+                button.textContent = String(index + 1);
+                button.dataset.paginationIndex = String(index);
+                button.addEventListener("click", () => {
+                    this.methods.select(index);
+                });
+
+                this.elements.pagination.append(button);
+            });
+
+            this.root.append(this.elements.controls, this.elements.status);
+            this.methods.updatePagination();
+            this.methods.syncStatus();
+        },
+        unmount() {
+            this.elements.controls.remove();
+            this.elements.status.remove();
+        },
+    },
+    watch: {
+        activeIndex({ isInitial }) {
+            if (isInitial) return;
+
+            this.methods.updatePagination();
+            this.methods.syncStatus();
+        },
+    },
+    methods: {
+        updatePagination() {
+            Array.from(this.elements.pagination.children).forEach(
+                (button, index) => {
+                    button.setAttribute(
+                        "aria-current",
+                        index === this.state.activeIndex ? "true" : "false"
+                    );
+                }
+            );
+        },
+        syncStatus() {
+            this.elements.status.textContent = `Slide ${this.state.activeIndex + 1} of ${this.elements.slides.length}`;
+        },
+        select(index) {
+            this.state.activeIndex = index;
+        },
+        previous() {
+            this.methods.select(Math.max(0, this.state.activeIndex - 1));
+        },
+        next() {
+            this.methods.select(
+                Math.min(
+                    this.elements.slides.length - 1,
+                    this.state.activeIndex + 1
+                )
+            );
+        },
+    },
+    render: {
+        slides({ index }) {
+            const currentIndex = index ?? 0;
+
+            return {
+                attributes: {
+                    hidden: currentIndex !== this.state.activeIndex,
+                    "aria-hidden": String(currentIndex !== this.state.activeIndex),
+                },
+            };
+        },
+        prev() {
+            return {
+                text: "Previous",
+                attributes: {
+                    type: "button",
+                    disabled: this.state.activeIndex === 0,
+                },
+                events: {
+                    click: () => this.methods.previous(),
+                },
+            };
+        },
+        next() {
+            return {
+                text: "Next",
+                attributes: {
+                    type: "button",
+                    disabled:
+                        this.state.activeIndex === this.elements.slides.length - 1,
+                },
+                events: {
+                    click: () => this.methods.next(),
+                },
+            };
+        },
+        controls() {
+            return {
+                classes: {
+                    "carousel-controls": true,
+                },
+            };
+        },
+        pagination() {
+            return {
+                classes: {
+                    "carousel-pagination": true,
+                },
+            };
+        },
+        status() {
+            return {
+                attributes: {
+                    "aria-live": "polite",
+                },
+                classes: {
+                    "carousel-status": true,
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { defineComponent } from "ornata";
+
+export const Carousel = defineComponent<{
+    state: {
+        activeIndex: number;
+    };
+    elements: {
+        slides: HTMLElement[];
+        controls: HTMLDivElement;
+        prev: HTMLButtonElement;
+        next: HTMLButtonElement;
+        pagination: HTMLDivElement;
+        status: HTMLOutputElement;
+    };
+    methods: {
+        updatePagination(): void;
+        syncStatus(): void;
+        select(index: number): void;
+        previous(): void;
+        next(): void;
+    };
+}>({
+    name: "Carousel",
+    state: {
+        activeIndex: { default: 0, type: Number },
+    },
+    elements: {
+        slides: { queryAll: "[data-slide]", min: 2 },
+        controls: { create: "div" },
+        prev: { create: "button" },
+        next: { create: "button" },
+        pagination: { create: "div" },
+        status: { create: "output" },
+    },
+    lifecycle: {
+        mount() {
+            this.elements.controls.append(
+                this.elements.prev,
+                this.elements.pagination,
+                this.elements.next
+            );
+
+            this.elements.slides.forEach((_, index) => {
+                const button = document.createElement("button");
+
+                button.type = "button";
+                button.textContent = String(index + 1);
+                button.dataset.paginationIndex = String(index);
+                button.addEventListener("click", () => {
+                    this.methods.select(index);
+                });
+
+                this.elements.pagination.append(button);
+            });
+
+            this.root.append(this.elements.controls, this.elements.status);
+            this.methods.updatePagination();
+            this.methods.syncStatus();
+        },
+        unmount() {
+            this.elements.controls.remove();
+            this.elements.status.remove();
+        },
+    },
+    watch: {
+        activeIndex({ isInitial }) {
+            if (isInitial) return;
+
+            this.methods.updatePagination();
+            this.methods.syncStatus();
+        },
+    },
+    methods: {
+        updatePagination() {
+            Array.from(this.elements.pagination.children).forEach(
+                (button, index) => {
+                    button.setAttribute(
+                        "aria-current",
+                        index === this.state.activeIndex ? "true" : "false"
+                    );
+                }
+            );
+        },
+        syncStatus() {
+            this.elements.status.textContent = `Slide ${this.state.activeIndex + 1} of ${this.elements.slides.length}`;
+        },
+        select(index) {
+            this.state.activeIndex = index;
+        },
+        previous() {
+            this.methods.select(Math.max(0, this.state.activeIndex - 1));
+        },
+        next() {
+            this.methods.select(
+                Math.min(
+                    this.elements.slides.length - 1,
+                    this.state.activeIndex + 1
+                )
+            );
+        },
+    },
+    render: {
+        slides({ index }) {
+            const currentIndex = index ?? 0;
+
+            return {
+                attributes: {
+                    hidden: currentIndex !== this.state.activeIndex,
+                    "aria-hidden": String(currentIndex !== this.state.activeIndex),
+                },
+            };
+        },
+        prev() {
+            return {
+                text: "Previous",
+                attributes: {
+                    type: "button",
+                    disabled: this.state.activeIndex === 0,
+                },
+                events: {
+                    click: () => this.methods.previous(),
+                },
+            };
+        },
+        next() {
+            return {
+                text: "Next",
+                attributes: {
+                    type: "button",
+                    disabled:
+                        this.state.activeIndex === this.elements.slides.length - 1,
+                },
+                events: {
+                    click: () => this.methods.next(),
+                },
+            };
+        },
+        controls() {
+            return {
+                classes: {
+                    "carousel-controls": true,
+                },
+            };
+        },
+        pagination() {
+            return {
+                classes: {
+                    "carousel-pagination": true,
+                },
+            };
+        },
+        status() {
+            return {
+                attributes: {
+                    "aria-live": "polite",
+                },
+                classes: {
+                    "carousel-status": true,
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+</Tabs>
+
+## Mount
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+Carousel.mount("[data-carousel]");
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+Carousel.mount("[data-carousel]");
+```
+
+  </TabItem>
+</Tabs>
+
+## What this shows
+
+- authored HTML can remain the source of content while the component generates the interactive shell around it
+- `create` gives the component a clear place to define the supporting structure it owns
+- dedicated methods can keep generated-markup logic organized instead of embedding large HTML strings inline
+- generated markup can be a central part of the interaction, not just decorative output
+- render callbacks can update both authored elements and generated elements as one component contract

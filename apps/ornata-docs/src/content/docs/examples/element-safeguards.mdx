@@ -1,0 +1,212 @@
+---
+title: Element Safeguards
+description: See how Ornata's elements option can encode DOM expectations directly into a reusable component contract.
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+This example demonstrates how Ornata's `elements` option can encode DOM expectations directly into a reusable component contract. This is useful for ensuring that the required HTML structure is present when a component first mounts.
+
+If expected elements are missing, or if their required counts are not met, Ornata throws an error and reveals a mismatch between the HTML and the component's contract. In this example, elements are resolved with more precise selectors and custom resolution logic, and they must satisfy explicit `min` and `max` requirements.
+
+## Live Demo
+
+<iframe
+    src="../../demos/element-safeguards.html"
+    title="Element safeguards demo"
+    loading="lazy"
+    style="width: 100%; min-height: 380px; border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: white;"
+></iframe>
+
+[Open this demo in a new tab](../../demos/element-safeguards.html)
+
+## HTML
+
+```html
+<section data-tabs>
+    <div>
+        <button type="button" data-tab>Tab 1</button>
+        <button type="button" data-tab>Tab</button>
+    </div>
+    <section data-panel>Tab 1 content</section>
+    <section data-panel hidden>Tab 2 content</section>
+</section>
+```
+
+## Component
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+import { defineComponent } from 'ornata';
+
+export const Tabs = defineComponent({
+    name: 'Tabs',
+    state: {
+        activeIndex: { default: 0, type: Number },
+    },
+    elements: {
+        // 👇 Find the one direct div child expected to contain the tab buttons
+        tablist: {
+            resolve(root) {
+                return (
+                    Array.from(root.children).find((child) => {
+                        if (!(child instanceof HTMLDivElement)) return false;
+
+                        return Array.from(child.children).some((grandchild) => {
+                            return grandchild.hasAttribute('data-tab');
+                        });
+                    }) ?? null
+                );
+            },
+            min: 1,
+            max: 1,
+        },
+        // 👇 Find 2+ tab buttons that are direct children of a direct div child
+        tabs: {
+            queryAll: ':scope > div > [data-tab]',
+            min: 2,
+        },
+        // 👇 Find 2+ tab panels that are direct children
+        panels: {
+            queryAll: ':scope > [data-panel]',
+            min: 2,
+        },
+    },
+    render: {
+        tablist() {
+            return {
+                attributes: {
+                    role: 'tablist',
+                },
+            };
+        },
+        tabs({ index }) {
+            const currentIndex = index ?? 0;
+            const isActive = currentIndex === this.state.activeIndex;
+
+            return {
+                attributes: {
+                    type: 'button',
+                    'aria-selected': String(isActive),
+                },
+                classes: {
+                    'is-active': isActive,
+                },
+                events: {
+                    click: () => {
+                        this.state.activeIndex = currentIndex;
+                    },
+                },
+            };
+        },
+        panels({ index }) {
+            return {
+                attributes: {
+                    hidden: (index ?? 0) !== this.state.activeIndex,
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+import { defineComponent } from 'ornata';
+
+export const Tabs = defineComponent<{
+    state: {
+        activeIndex: number;
+    };
+    elements: {
+        tablist: HTMLDivElement;
+        tabs: HTMLButtonElement[];
+        panels: HTMLElement[];
+    };
+}>({
+    name: 'Tabs',
+    state: {
+        activeIndex: { default: 0, type: Number },
+    },
+    elements: {
+        // 👇 Find the one direct div child expected to contain the tab buttons
+        tablist: {
+            resolve(root) {
+                return (
+                    Array.from(root.children).find((child) => {
+                        if (!(child instanceof HTMLDivElement)) return false;
+
+                        return Array.from(child.children).some((grandchild) => {
+                            return grandchild.hasAttribute('data-tab');
+                        });
+                    }) ?? null
+                );
+            },
+            min: 1,
+            max: 1,
+        },
+        // 👇 Find 2+ tab buttons that are direct children of a direct div child
+        tabs: {
+            queryAll: ':scope > div > [data-tab]',
+            min: 2,
+        },
+        // 👇 Find 2+ tab panels that are direct children
+        panels: {
+            queryAll: ':scope > [data-panel]',
+            min: 2,
+        },
+    },
+    render: {
+        tablist() {
+            return {
+                attributes: {
+                    role: 'tablist',
+                },
+            };
+        },
+        tabs({ index }) {
+            const currentIndex = index ?? 0;
+            const isActive = currentIndex === this.state.activeIndex;
+
+            return {
+                attributes: {
+                    type: 'button',
+                    'aria-selected': String(isActive),
+                },
+                classes: {
+                    'is-active': isActive,
+                },
+                events: {
+                    click: () => {
+                        this.state.activeIndex = currentIndex;
+                    },
+                },
+            };
+        },
+        panels({ index }) {
+            return {
+                attributes: {
+                    hidden: (index ?? 0) !== this.state.activeIndex,
+                },
+            };
+        },
+    },
+});
+```
+
+  </TabItem>
+</Tabs>
+
+## What this shows
+
+- `resolve()` gives you more precise control over how elements are retrieved from the DOM
+- `min` and `max` document a structural requirement directly in the component
+- the component’s DOM dependencies are visible in one place
+- render logic stays focused because the lookup work is already done
+
+This is a good pattern for components like tabs, accordions, menus, and list-driven interactions.
+
+For a render-focused version of this pattern, see [List Rendering](/ornata/examples/list-rendering/).

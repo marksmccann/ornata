@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Ornata Markup Augmentation Demo</title>
+        <style>
+            :root {
+                color-scheme: light;
+                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                background: #f4f6fb;
+                color: #192235;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: grid;
+                place-items: center;
+                padding: 24px;
+                background:
+                    radial-gradient(circle at top, #fdfdff 0, #eef2fb 46%, #dfe7f8 100%);
+            }
+
+            .demo-shell {
+                width: min(100%, 520px);
+                padding: 24px;
+                border: 1px solid #cfd8ee;
+                border-radius: 22px;
+                background: rgba(255, 255, 255, 0.96);
+                box-shadow: 0 18px 40px rgba(36, 56, 104, 0.12);
+            }
+
+            h1 {
+                margin: 0 0 8px;
+                font-size: 1.25rem;
+            }
+
+            p {
+                margin: 0 0 18px;
+                line-height: 1.5;
+            }
+
+            [data-carousel] {
+                display: grid;
+                gap: 16px;
+            }
+
+            [data-slide] {
+                padding: 18px;
+                border-radius: 18px;
+                background: #eef4ff;
+                border: 1px solid #cdd9f6;
+            }
+
+            [data-slide] h3 {
+                margin: 0 0 8px;
+                font-size: 1rem;
+            }
+
+            [data-slide] p {
+                margin: 0;
+            }
+
+            .carousel-controls {
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+                gap: 12px;
+                align-items: center;
+            }
+
+            .carousel-controls > button,
+            .carousel-pagination button {
+                border: 1px solid #cad8f3;
+                border-radius: 999px;
+                padding: 0.75rem 1rem;
+                font: inherit;
+                font-weight: 700;
+                background: #f7f9fe;
+                color: #294474;
+                cursor: pointer;
+            }
+
+            .carousel-controls > button[disabled] {
+                cursor: not-allowed;
+                opacity: 0.45;
+            }
+
+            .carousel-pagination {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .carousel-pagination button[aria-current="true"] {
+                color: white;
+                border-color: #224fae;
+                background: linear-gradient(135deg, #346bdd, #1c3f86);
+            }
+
+            .carousel-status {
+                font-size: 0.92rem;
+                color: #53637f;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <main class="demo-shell">
+            <h1>Markup Augmentation Demo</h1>
+            <p>The slides already exist in the HTML. Ornata generates the controls, pagination, and status output around them.</p>
+
+            <section data-carousel>
+                <article data-slide>
+                    <h3>Slide 1</h3>
+                    <p>The content for slide 1.</p>
+                </article>
+                <article data-slide hidden>
+                    <h3>Slide 2</h3>
+                    <p>The content for slide 2.</p>
+                </article>
+                <article data-slide hidden>
+                    <h3>Slide 3</h3>
+                    <p>The content for slide 3.</p>
+                </article>
+            </section>
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/ornata/dist/index.global.js"></script>
+        <script>
+            const { defineComponent } = window.Ornata;
+
+            const Carousel = defineComponent({
+                name: "Carousel",
+                state: {
+                    activeIndex: { default: 0, type: Number },
+                },
+                elements: {
+                    slides: {
+                        queryAll: "[data-slide]",
+                        min: 2,
+                    },
+                    controls: { create: "div" },
+                    prev: { create: "button" },
+                    next: { create: "button" },
+                    pagination: { create: "div" },
+                    status: { create: "output" },
+                },
+                lifecycle: {
+                    mount() {
+                        this.elements.controls.append(
+                            this.elements.prev,
+                            this.elements.pagination,
+                            this.elements.next
+                        );
+
+                        this.elements.slides.forEach((_, index) => {
+                            const button = document.createElement("button");
+
+                            button.type = "button";
+                            button.textContent = String(index + 1);
+                            button.dataset.paginationIndex = String(index);
+                            button.addEventListener("click", () => {
+                                this.methods.select(index);
+                            });
+
+                            this.elements.pagination.append(button);
+                        });
+
+                        this.root.append(this.elements.controls, this.elements.status);
+                        this.methods.updatePagination();
+                        this.methods.syncStatus();
+                    },
+                    unmount() {
+                        this.elements.controls.remove();
+                        this.elements.status.remove();
+                    },
+                },
+                watch: {
+                    activeIndex({ isInitial }) {
+                        if (isInitial) return;
+
+                        this.methods.updatePagination();
+                        this.methods.syncStatus();
+                    },
+                },
+                methods: {
+                    updatePagination() {
+                        Array.from(this.elements.pagination.children).forEach(
+                            (button, index) => {
+                                button.setAttribute(
+                                    "aria-current",
+                                    index === this.state.activeIndex
+                                        ? "true"
+                                        : "false"
+                                );
+                            }
+                        );
+                    },
+                    syncStatus() {
+                        this.elements.status.textContent = `Slide ${this.state.activeIndex + 1} of ${this.elements.slides.length}`;
+                    },
+                    select(index) {
+                        this.state.activeIndex = index;
+                    },
+                    previous() {
+                        this.methods.select(Math.max(0, this.state.activeIndex - 1));
+                    },
+                    next() {
+                        this.methods.select(
+                            Math.min(
+                                this.elements.slides.length - 1,
+                                this.state.activeIndex + 1
+                            )
+                        );
+                    },
+                },
+                render: {
+                    slides({ index }) {
+                        const currentIndex = index ?? 0;
+
+                        return {
+                            attributes: {
+                                hidden: currentIndex !== this.state.activeIndex,
+                                "aria-hidden": String(
+                                    currentIndex !== this.state.activeIndex
+                                ),
+                            },
+                        };
+                    },
+                    prev() {
+                        return {
+                            text: "Previous",
+                            attributes: {
+                                type: "button",
+                                disabled: this.state.activeIndex === 0,
+                            },
+                            events: {
+                                click: () => this.methods.previous(),
+                            },
+                        };
+                    },
+                    next() {
+                        return {
+                            text: "Next",
+                            attributes: {
+                                type: "button",
+                                disabled:
+                                    this.state.activeIndex ===
+                                    this.elements.slides.length - 1,
+                            },
+                            events: {
+                                click: () => this.methods.next(),
+                            },
+                        };
+                    },
+                    controls() {
+                        return {
+                            classes: {
+                                "carousel-controls": true,
+                            },
+                        };
+                    },
+                    pagination() {
+                        return {
+                            classes: {
+                                "carousel-pagination": true,
+                            },
+                        };
+                    },
+                    status() {
+                        return {
+                            attributes: {
+                                "aria-live": "polite",
+                            },
+                            classes: {
+                                "carousel-status": true,
+                            },
+                        };
+                    },
+                },
+            });
+
+            Carousel.mount("[data-carousel]");
+        </script>
+    </body>
+</html>
