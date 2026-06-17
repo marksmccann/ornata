@@ -12,6 +12,8 @@ That balance is useful in HTML-first environments where some components are decl
 
 You can mount a component with either an element or a selector.
 
+Every mounted instance is tied to one root element. That root is the component boundary: Ornata resolves elements inside it, initializes state from it, and uses it to look up the instance again later.
+
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">
 
@@ -127,6 +129,7 @@ That makes the mounting API stricter and easier to trust.
 
 ## A good mental model
 
+- every instance has one root element
 - `mount()` creates an instance
 - `getInstance()` retrieves an existing one and throws if missing
 - `findInstance()` retrieves an existing one or returns `null`

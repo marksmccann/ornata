@@ -34,6 +34,8 @@ If you omit it, Ornata falls back to `"UnnamedComponent"`.
 
 Use `root.matches` when you want to validate that the mounted root matches a selector.
 
+Every Ornata component instance has exactly one root element. That root is the boundary of the component instance: state can initialize from it, element lookups are scoped within it, and mounting or unmounting always happen relative to it.
+
 ```ts
 root: {
     matches: "[data-counter]",

@@ -196,10 +196,12 @@ export const Carousel = defineComponent({
 ```ts
 import { defineComponent } from "ornata";
 
+interface CarouselState {
+    activeIndex: number;
+};
+
 export const Carousel = defineComponent<{
-    state: {
-        activeIndex: number;
-    };
+    state: CarouselState;
     elements: {
         slides: HTMLElement[];
         controls: HTMLDivElement;

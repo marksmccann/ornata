@@ -3,7 +3,6 @@ title: Why Ornata?
 description: Understand the problems Ornata is designed to solve and where it fits in the frontend ecosystem.
 ---
 
-
 Understand the problems Ornata is designed to solve and where it fits in the frontend ecosystem.
 
 ## In short
@@ -46,9 +45,7 @@ There are already many excellent tools for building interactive front-end experi
 
 Each of these tools is useful. Ornata is not trying to replace them.
 
-Ornata was designed specifically for teams that need both a familiar component model for authoring reusable UI libraries and the flexibility to integrate those components into HTML-first environments.
-
-It exists for cases where components should be encapsulated, portable, and maintainable, but the consuming application may produce HTML through a CMS, server template, static page, or another framework.
+Ornata was designed specifically for teams that need both a familiar component model for authoring UI libraries and the flexibility to integrate those components into HTML-first environments.
 
 ## Where Ornata fits
 

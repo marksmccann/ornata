@@ -2,23 +2,25 @@
 title: Your First Component
 description: Build a small progressively enhanced component and learn the core Ornata authoring pattern.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
 
 The easiest way to learn Ornata is to enhance a small piece of existing HTML with a clear component contract.
 
 ## The markup
 
+<Aside type="note">
+    Even without JavaScript, the HTML can still provide meaningful content from the start. How much it provides
+    depends on you, the constraints of your environment, and the kind of component you are building.
+</Aside>
+
 ```html
-<section data-counter>
-    <p>
-        <span data-count-label>Clicks</span>:
-        <strong data-count-value>0</strong>
-    </p>
-    <button type="button" data-count-button>Increment</button>
+<section data-disclosure>
+    <button data-disclosure-button>Show details</button>
+    <div hidden data-disclosure-panel>
+        <p>Details ...</p>
+    </div>
 </section>
 ```
-
-Even without JavaScript, this markup still renders understandable content.
 
 ## The component
 
@@ -28,49 +30,52 @@ Even without JavaScript, this markup still renders understandable content.
 ```js
 import { defineComponent } from "ornata";
 
-const Counter = defineComponent({
-    name: "Counter",
+const Disclosure = defineComponent({
+    name: "Disclosure",
     state: {
-        count: { default: 0 },
-        label: { default: "Clicks" },
+        open: { default: false, type: Boolean },
+        openLabel: { default: "Hide details" },
+        closedLabel: { default: "Show details" },
     },
     elements: {
-        label: { query: "[data-count-label]" },
-        value: { query: "[data-count-value]" },
-        button: { query: "[data-count-button]" },
+        button: { query: "[data-disclosure-button]" },
+        panel: { query: "[data-disclosure-panel]" },
     },
     methods: {
-        increment() {
-            this.state.count += 1;
+        toggle() {
+            this.state.open = !this.state.open;
         },
     },
     watch: {
-        count({ newValue, oldValue, isInitial }) {
+        open({ newValue, oldValue, isInitial }) {
             if (isInitial) return;
 
-            console.log(`Count changed from ${oldValue} to ${newValue}`);
+            console.log(`Disclosure's open state changed from ${oldValue} to ${newValue}`);
         },
     },
     computed: {
-        total() {
-            return this.state.count;
+        buttonLabel() {
+            if (this.state.open) return this.state.openLabel;
+            return this.state.closedLabel;
         },
     },
     render: {
-        label() {
-            return {
-                text: this.state.label,
-            };
-        },
-        value() {
-            return {
-                text: String(this.computed.total),
-            };
-        },
         button() {
             return {
+                text: this.computed.buttonLabel,
+                attributes: {
+                    type: "button",
+                    "aria-expanded": String(this.state.open),
+                },
                 events: {
-                    click: () => this.methods.increment(),
+                    click: () => this.methods.toggle(),
+                },
+            };
+        },
+        panel() {
+            return {
+                attributes: {
+                    hidden: !this.state.open,
                 },
             };
         },
@@ -84,73 +89,70 @@ const Counter = defineComponent({
 ```ts
 import { defineComponent } from "ornata";
 
-interface CounterState {
-    count: number;
-    label: string;
+interface DisclosureState {
+    open: boolean;
+    openLabel: string;
+    closedLabel: string;
 }
 
-interface CounterElements {
-    label: Element | null;
-    value: Element | null;
-    button: Element | null;
-}
-
-interface CounterMethods {
-    increment(): void;
-}
-
-interface CounterComputed {
-    total: number;
-}
-
-const Counter = defineComponent<{
-    state: CounterState;
-    elements: CounterElements;
-    methods: CounterMethods;
-    computed: CounterComputed;
+const Disclosure = defineComponent<{
+    state: DisclosureState;
+    elements: {
+        button: Element | null;
+        panel: Element | null;
+    };
+    methods: {
+        toggle(): void;
+    };
+    computed: {
+        buttonLabel: string;
+    };
 }>({
-    name: "Counter",
+    name: "Disclosure",
     state: {
-        count: { default: 0 },
-        label: { default: "Clicks" },
+        open: { default: false, type: Boolean },
+        openLabel: { default: "Hide details" },
+        closedLabel: { default: "Show details" },
     },
     elements: {
-        label: { query: "[data-count-label]" },
-        value: { query: "[data-count-value]" },
-        button: { query: "[data-count-button]" },
+        button: { query: "[data-disclosure-button]" },
+        panel: { query: "[data-disclosure-panel]" },
     },
     methods: {
-        increment() {
-            this.state.count += 1;
+        toggle() {
+            this.state.open = !this.state.open;
         },
     },
     watch: {
-        count({ newValue, oldValue, isInitial }) {
+        open({ newValue, oldValue, isInitial }) {
             if (isInitial) return;
 
-            console.log(`Count changed from ${oldValue} to ${newValue}`);
+            console.log(`Disclosure's open state changed from ${oldValue} to ${newValue}`);
         },
     },
     computed: {
-        total() {
-            return this.state.count;
+        buttonLabel() {
+            if (this.state.open) return this.state.openLabel;
+            return this.state.closedLabel;
         },
     },
     render: {
-        label() {
-            return {
-                text: this.state.label,
-            };
-        },
-        value() {
-            return {
-                text: String(this.computed.total),
-            };
-        },
         button() {
             return {
+                text: this.computed.buttonLabel,
+                attributes: {
+                    type: "button",
+                    "aria-expanded": String(this.state.open),
+                },
                 events: {
-                    click: () => this.methods.increment(),
+                    click: () => this.methods.toggle(),
+                },
+            };
+        },
+        panel() {
+            return {
+                attributes: {
+                    hidden: !this.state.open,
                 },
             };
         },
@@ -163,30 +165,21 @@ const Counter = defineComponent<{
 
 ## The mounting code
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
-```js
-const root = document.querySelector("[data-counter]");
-
-if (root) {
-    Counter.mount(root);
-}
-```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
 ```ts
-const root = document.querySelector("[data-counter]");
-
-if (root) {
-    Counter.mount(root);
-}
+const disclosure = Disclosure.mount("[data-disclosure]");
 ```
 
-  </TabItem>
-</Tabs>
+<Aside type="note">
+    `mount()` returns the component instance, so surrounding integration code can interact with
+    its public state or dispose of it later.
+
+    ```ts
+    console.log(disclosure.state.open);
+    disclosure.state.open = true;
+    disclosure.dispose();
+    ```
+</Aside>
+
 
 ## How to read this component
 
@@ -200,41 +193,6 @@ Each top-level option has a clear job:
 - `render` applies DOM updates to resolved elements
 
 That separation is one of Ornata's main strengths. It keeps the contract between markup, behavior, and state visible, which makes the component easier to reuse in larger HTML-first systems.
-
-This example intentionally shows several top-level sections together. Smaller components do not need every section, but the shape stays consistent across the library.
-
-If you want a deeper look at action-oriented component logic, read [Methods](/ornata/guides/methods/).
-
-## Add stronger typing
-
-When you want clearer contracts, provide typed component parts:
-
-```ts
-interface CounterState {
-    count: number;
-    label: string;
-}
-
-interface CounterMethods {
-    increment(): void;
-}
-
-const Counter = defineComponent<{
-    state: CounterState;
-    methods: CounterMethods;
-}>({
-    name: "Counter",
-    state: {
-        count: { default: 0 },
-        label: { default: "Clicks" },
-    },
-    methods: {
-        increment() {
-            this.state.count += 1;
-        },
-    },
-});
-```
 
 ## Next
 

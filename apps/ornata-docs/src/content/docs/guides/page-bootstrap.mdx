@@ -1,8 +1,8 @@
 ---
 title: Page Bootstrap
-description: Mount components declaratively from HTML with createInitializer and a small page-level registry.
+description: Mount components declaratively from HTML with `createInitializer` and a small page-level registry.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
 
 Once a page has more than one component, the next question is usually how to bootstrap everything without scattering manual `mount()` calls across page code.
 
@@ -14,23 +14,25 @@ It lets the page's HTML declare which components should enhance which roots, whi
 
 Add a `data-ornata` attribute whose value matches the component name you want to initialize.
 
+<Aside type="note">
+    The `data-ornata` value must match a real Ornata component constructor in the initializer map.
+    If it does not, Ornata will report an error and skip that root.
+</Aside>
+
 ```html
 <section data-ornata="Counter" data-counter>
     <span data-count-value>0</span>
-    <button type="button" data-count-button>Increment</button>
+    <button data-count-button>Increment</button>
 </section>
 
 <section data-ornata="Disclosure" data-disclosure>
-    <button type="button" data-disclosure-button>Toggle</button>
+    <button data-disclosure-button>Toggle</button>
     <div data-disclosure-panel hidden>Panel content</div>
 </section>
 ```
 
 ## Build a component registry
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
 ```js
 import { Counter } from "./counter";
 import { Disclosure } from "./disclosure";
@@ -40,71 +42,23 @@ export const components = {
     Disclosure,
 };
 ```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-import { Counter } from "./counter";
-import { Disclosure } from "./disclosure";
-
-export const components = {
-    Counter,
-    Disclosure,
-};
-```
-
-  </TabItem>
-</Tabs>
 
 ## Create the initializer
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
 ```js
 import { createInitializer } from "ornata";
 import { components } from "./components";
 
 const initialize = createInitializer(components);
 ```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-import { createInitializer } from "ornata";
-import { components } from "./components";
-
-const initialize = createInitializer(components);
-```
-
-  </TabItem>
-</Tabs>
 
 ## Run it once for the page
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
 ```js
 const instances = initialize();
 ```
 
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-const instances = initialize();
-```
-
-  </TabItem>
-</Tabs>
-
-You can also inline the pattern when the registry already exists:
-
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
+You can also inline the pattern if preferred:
 
 ```js
 import { createInitializer } from "ornata";
@@ -112,19 +66,6 @@ import { components } from "./components";
 
 createInitializer(components)();
 ```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-import { createInitializer } from "ornata";
-import { components } from "./components";
-
-createInitializer(components)();
-```
-
-  </TabItem>
-</Tabs>
 
 ## What happens during bootstrap
 
@@ -136,10 +77,6 @@ The initializer:
 - mounts each root
 - removes the `data-ornata` attribute afterward
 - returns the mounted instances
-
-## Important detail
-
-The `data-ornata` value must match a real Ornata component constructor in the initializer map. If it does not, Ornata will report an error and skip that root.
 
 ## Why this pattern scales
 

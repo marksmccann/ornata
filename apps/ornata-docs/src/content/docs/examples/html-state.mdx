@@ -28,7 +28,7 @@ With the exception of more complex state properties, such as functions, componen
         <span>Server count:</span>
         <strong data-count-value></strong>
     </p>
-    <button type="button" data-count-button>Increment</button>
+    <button data-count-button>Increment</button>
 </section>
 ```
 
@@ -62,6 +62,9 @@ export const Counter = defineComponent({
         },
         button() {
             return {
+                attributes: {
+                    type: "button",
+                },
                 events: {
                     click: () => this.methods.increment(),
                 },
@@ -77,11 +80,13 @@ export const Counter = defineComponent({
 ```ts
 import { defineComponent } from "ornata";
 
+interface CounterState {
+    count: number;
+    label: string;
+};
+
 export const Counter = defineComponent<{
-    state: {
-        count: number;
-        label: string;
-    };
+    state: CounterState;
     elements: {
         value: Element | null;
         button: Element | null;
@@ -111,6 +116,9 @@ export const Counter = defineComponent<{
         },
         button() {
             return {
+                attributes: {
+                    type: "button",
+                },
                 events: {
                     click: () => this.methods.increment(),
                 },

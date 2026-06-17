@@ -24,8 +24,8 @@ If expected elements are missing, or if their required counts are not met, Ornat
 ```html
 <section data-tabs>
     <div>
-        <button type="button" data-tab>Tab 1</button>
-        <button type="button" data-tab>Tab</button>
+        <button data-tab>Tab 1</button>
+        <button data-tab>Tab</button>
     </div>
     <section data-panel>Tab 1 content</section>
     <section data-panel hidden>Tab 2 content</section>
@@ -117,10 +117,12 @@ export const Tabs = defineComponent({
 ```ts
 import { defineComponent } from 'ornata';
 
+interface TabsState {
+    activeIndex: number;
+};
+
 export const Tabs = defineComponent<{
-    state: {
-        activeIndex: number;
-    };
+    state: TabsState;
     elements: {
         tablist: HTMLDivElement;
         tabs: HTMLButtonElement[];

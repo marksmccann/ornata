@@ -115,10 +115,12 @@ export const Stepper = defineComponent({
 ```ts
 import { defineComponent } from "ornata";
 
+interface StepperState {
+    activeIndex: number;
+};
+
 export const Stepper = defineComponent<{
-    state: {
-        activeIndex: number;
-    };
+    state: StepperState;
     elements: {
         steps: HTMLLIElement[];
         prev: HTMLButtonElement | null;

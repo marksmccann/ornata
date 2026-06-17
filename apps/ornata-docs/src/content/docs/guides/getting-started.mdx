@@ -91,21 +91,17 @@ import { defineComponent } from "ornata";
 
 interface CounterState {
     count: number;
-}
-
-interface CounterElements {
-    value: Element | null;
-    button: Element | null;
-}
-
-interface CounterMethods {
-    increment(): void;
-}
+};
 
 const Counter = defineComponent<{
     state: CounterState;
-    elements: CounterElements;
-    methods: CounterMethods;
+    elements: {
+        value: Element | null;
+        button: Element | null;
+    };
+    methods: {
+        increment(): void;
+    };
 }>({
     name: "Counter",
     state: {
@@ -142,8 +138,11 @@ const Counter = defineComponent<{
 
 ## Mount it
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
+<Aside type="note">
+    Every Ornata component instance is mounted to a single root element. In this example, the
+    `<section data-counter>` element is the root. It defines the boundary of the instance and
+    scopes the state, elements, and behavior associated with it.
+</Aside>
 
 ```js
 const root = document.querySelector("[data-counter]");
@@ -153,34 +152,16 @@ if (root) {
 }
 ```
 
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-const root = document.querySelector("[data-counter]");
-
-if (root) {
-    Counter.mount(root);
-}
-```
-
-  </TabItem>
-</Tabs>
-
 ## What happens when it mounts
 
 When `mount()` runs, Ornata:
 
-- resolves the root element
+- resolves the required root element
 - reads and prepares state
 - resolves configured elements
 - binds methods to the internal component instance
 - runs the mount lifecycle hook if present
 - performs an initial render pass for each state property
-
-That state can come from component defaults, HTML `data-*` attributes on the root element, or an `initialState` object passed to `mount()`.
-
-Together, those pieces form a small component contract: the HTML stays visible, the state has a clear home, and the enhancement logic remains reusable.
 
 ## Where to go next
 

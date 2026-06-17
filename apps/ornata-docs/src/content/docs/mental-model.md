@@ -3,7 +3,6 @@ title: Mental Model
 description: Understand how Ornata thinks about components, HTML-first environments, and reusable UI libraries.
 ---
 
-
 Understand how Ornata thinks about components, HTML-first environments, and reusable UI libraries.
 
 ## In short
@@ -24,9 +23,17 @@ As the component author, you decide what the component expects from the surround
 
 An Ornata component defines a contract between interactive behavior and the HTML it enhances.
 
-That contract may include required elements, optional elements, attributes, classes, generated structure, configuration, events, and fallback behavior. Some components may only enhance existing markup. Others may render supporting structure or manage more of their internal DOM.
+That contract may include which elements must already exist, which configuration can come from markup, and which parts of the DOM the component is allowed to create or manage. Some components only enhance existing HTML. Others add supporting structure around authored content.
 
 The important part is that these expectations are intentional and visible in the component definition.
+
+## Every component has a root
+
+Each Ornata component instance is tied to a single root element.
+
+The root is the HTML element a component mounts to. It defines the boundary of the instance and scopes the markup the component uses.
+
+That relationship lasts for the lifetime of the instance. Ornata uses the same root when mounting, finding, getting, and unmounting the instance. State can be initialized from it, element lookups are scoped within it, and lifecycle behavior is anchored to it.
 
 ## Conventions make components repeatable
 
