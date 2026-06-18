@@ -28,6 +28,42 @@ describe('defineComponent', () => {
         instance.dispose();
     });
 
+    it('should unmount all mounted instances', () => {
+        const onUnmount = vi.fn();
+        const Test = defineComponent({
+            name: 'Test',
+            lifecycle: { unmount: onUnmount },
+        });
+        const rootA = document.createElement('div');
+        const rootB = document.createElement('div');
+
+        Test.mount(rootA);
+        Test.mount(rootB);
+
+        Test.unmountAll();
+
+        expect(Test.findInstance(rootA)).toBeNull();
+        expect(Test.findInstance(rootB)).toBeNull();
+        expect(onUnmount).toHaveBeenCalledTimes(2);
+    });
+
+    it('should only unmount instances for the current component constructor', () => {
+        const TestA = defineComponent({ name: 'TestA' });
+        const TestB = defineComponent({ name: 'TestB' });
+        const rootA = document.createElement('div');
+        const rootB = document.createElement('div');
+
+        TestA.mount(rootA);
+        const instanceB = TestB.mount(rootB);
+
+        TestA.unmountAll();
+
+        expect(TestA.findInstance(rootA)).toBeNull();
+        expect(TestB.findInstance(rootB)).toBe(instanceB);
+
+        instanceB.dispose();
+    });
+
     it('should infer typed state for mount and instance.state', () => {
         const Test = defineComponent({
             name: 'Test',

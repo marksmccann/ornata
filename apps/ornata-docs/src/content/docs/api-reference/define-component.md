@@ -38,6 +38,7 @@ const instance = Counter.mount(root);
 const sameInstance = Counter.getInstance(root);
 const maybeInstance = Counter.findInstance(root);
 Counter.unmount(root);
+Counter.unmountAll();
 ```
 
 ## Options

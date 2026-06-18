@@ -126,7 +126,10 @@ The component constructor also provides instance-management helpers:
 - `getInstance(root)`
 - `findInstance(root)`
 - `unmount(root)`
+- `unmountAll()`
 
 Use `getInstance()` when absence should throw, and `findInstance()` when absence is an expected branch.
+
+Use `unmountAll()` when integration code needs to dispose every mounted instance for that component constructor, such as test cleanup or page-level teardown.
 
 For a fuller walkthrough, read [Instances and Mounting](/ornata/guides/instances-and-mounting/).

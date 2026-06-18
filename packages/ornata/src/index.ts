@@ -593,6 +593,12 @@ namespace Ornata {
          * @since v0.3.0
          */
         unmount(instanceRoot: string | Element | null | undefined): void;
+
+        /**
+         * Unmount all mounted instances of the component; calls instance.dispose() on each one.
+         * @since v0.4.0
+         */
+        unmountAll(): void;
     }
 
     /**

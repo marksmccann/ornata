@@ -97,6 +97,25 @@ Counter.unmount("[data-counter]");
   </TabItem>
 </Tabs>
 
+When you need to tear down every mounted instance for the same component constructor, use `unmountAll()`:
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+Counter.unmountAll();
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+Counter.unmountAll();
+```
+
+  </TabItem>
+</Tabs>
+
 Or dispose from the instance:
 
 <Tabs syncKey="code-language">
@@ -135,4 +154,5 @@ That makes the mounting API stricter and easier to trust.
 - `getInstance()` retrieves an existing one and throws if missing
 - `findInstance()` retrieves an existing one or returns `null`
 - `unmount()` removes an instance by root
+- `unmountAll()` removes every mounted instance for that constructor
 - `dispose()` removes the current instance directly

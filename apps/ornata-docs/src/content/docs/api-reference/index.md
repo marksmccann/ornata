@@ -38,5 +38,6 @@ A component constructor returned by `defineComponent()` includes:
 - `getInstance()`
 - `findInstance()`
 - `unmount()`
+- `unmountAll()`
 
 See [Component Instance](/ornata/api/component-instance/) for the mounted instance API and lifecycle details.

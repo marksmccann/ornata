@@ -92,6 +92,7 @@ function defineComponent<T extends Ornata.InternalInstance>(
         Element,
         Ornata.ComponentInstance<T>
     >();
+    const mountedInstances = new Set<Ornata.ComponentInstance<T>>();
     const internalInstances = new WeakMap<
         Ornata.ComponentInstance<T>,
         Ornata.InternalInstance
@@ -357,6 +358,7 @@ function defineComponent<T extends Ornata.InternalInstance>(
 
             internalInstances.set(this, internalInstance);
             externalInstances.set(root, this);
+            mountedInstances.add(this);
         }
 
         dispose: Ornata.ComponentInstance<T>['dispose'] = () => {
@@ -381,6 +383,7 @@ function defineComponent<T extends Ornata.InternalInstance>(
             );
             externalInstances.delete(this.root);
             internalInstances.delete(this);
+            mountedInstances.delete(this);
         };
 
         addStateListener: Ornata.ComponentInstance<T>['addStateListener'] = (
@@ -531,6 +534,13 @@ function defineComponent<T extends Ornata.InternalInstance>(
                 }
 
                 instance.dispose();
+            };
+
+        static unmountAll: Ornata.ComponentConstructor<T>['unmountAll'] =
+            () => {
+                Array.from(mountedInstances).forEach((instance) => {
+                    instance.dispose();
+                });
             };
     };
 }
