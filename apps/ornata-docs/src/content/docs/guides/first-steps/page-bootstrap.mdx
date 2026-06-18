@@ -1,13 +1,13 @@
 ---
 title: Page Bootstrap
 slug: "guides/page-bootstrap"
-description: Mount components declaratively from HTML with `createInitializer` and a small page-level registry.
+description: Mount components declaratively from HTML with `mountAll` and a small page-level registry.
 ---
-import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+import { Aside } from "@astrojs/starlight/components";
 
 Once a page has more than one component, the next question is usually how to bootstrap everything without scattering manual `mount()` calls across page code.
 
-That is what `createInitializer()` is for.
+That is what `mountAll()` is for.
 
 It lets the page's HTML declare which components should enhance which roots, while JavaScript provides the small registry that connects those names to real component constructors.
 
@@ -44,33 +44,18 @@ export const components = {
 };
 ```
 
-## Create the initializer
+## Mount the registry
 
 ```js
-import { createInitializer } from "ornata";
+import { mountAll } from "ornata";
 import { components } from "./components";
 
-const initialize = createInitializer(components);
-```
-
-## Run it once for the page
-
-```js
-const instances = initialize();
-```
-
-You can also inline the pattern if preferred:
-
-```js
-import { createInitializer } from "ornata";
-import { components } from "./components";
-
-createInitializer(components)();
+const instances = mountAll(components);
 ```
 
 ## What happens during bootstrap
 
-The initializer:
+`mountAll()`:
 
 - finds all `[data-ornata]` roots
 - reads the component name from `data-ornata`
@@ -95,4 +80,4 @@ you let the HTML and the registry describe how the page gets enhanced.
 
 Use `mount()` for direct single-root setup.
 
-Use `createInitializer()` when the page's HTML should declare which components get enhanced.
+Use `mountAll()` when the page's HTML should declare which components get enhanced.

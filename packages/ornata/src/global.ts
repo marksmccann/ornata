@@ -5,5 +5,5 @@
 export {
     defineComponent,
     isComponent,
-    createInitializer,
+    mountAll,
 } from './index';

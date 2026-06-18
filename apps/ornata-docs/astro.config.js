@@ -130,8 +130,8 @@ export default defineConfig({
                             slug: "api/define-component",
                         },
                         {
-                            label: "createInitializer",
-                            slug: "api/create-initializer",
+                            label: "mountAll",
+                            slug: "api/mount-all",
                         },
                         { label: "isComponent", slug: "api/is-component" },
                         {

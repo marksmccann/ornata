@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it, expectTypeOf, vi } from 'vitest';
-import { createInitializer, defineComponent } from './index.js';
+import { defineComponent, mountAll } from './index.js';
 
-describe('createInitializer', () => {
+describe('mountAll', () => {
     it('should infer the returned instance array from a single constructor', () => {
         const ComponentA = defineComponent({
             name: 'ComponentA',
@@ -13,9 +13,9 @@ describe('createInitializer', () => {
                 },
             },
         });
-        const initialize = createInitializer({ ComponentA });
+        const instances = mountAll({ ComponentA });
 
-        expectTypeOf<ReturnType<typeof initialize>>().toEqualTypeOf<
+        expectTypeOf(instances).toEqualTypeOf<
             Array<InstanceType<typeof ComponentA>>
         >();
     });
@@ -38,9 +38,9 @@ describe('createInitializer', () => {
                 },
             },
         });
-        const initialize = createInitializer({ ComponentA, ComponentB });
+        const instances = mountAll({ ComponentA, ComponentB });
 
-        expectTypeOf<ReturnType<typeof initialize>>().toEqualTypeOf<
+        expectTypeOf(instances).toEqualTypeOf<
             Array<
                 | InstanceType<typeof ComponentA>
                 | InstanceType<typeof ComponentB>
@@ -48,7 +48,7 @@ describe('createInitializer', () => {
         >();
     });
 
-    it('should initialize matching components from the document', () => {
+    it('should mount matching components from the document', () => {
         const ComponentA = defineComponent({ name: 'ComponentA' });
         const root = document.createElement('div');
         root.dataset.ornata = 'ComponentA';
@@ -57,8 +57,7 @@ describe('createInitializer', () => {
             .spyOn(console, 'error')
             .mockImplementation(() => {});
 
-        const initialize = createInitializer({ ComponentA });
-        const instances = initialize();
+        const instances = mountAll({ ComponentA });
 
         expect(instances).toHaveLength(1);
         expect(instances[0]).toBeInstanceOf(ComponentA);

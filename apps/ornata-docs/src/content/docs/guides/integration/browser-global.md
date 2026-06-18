@@ -13,7 +13,7 @@ Use a pinned version in production.
 ```html
 <script src="https://cdn.jsdelivr.net/npm/ornata@0.2.0/dist/index.global.js"></script>
 <script>
-    const { defineComponent, createInitializer, isComponent } = window.Ornata;
+    const { defineComponent, mountAll, isComponent } = window.Ornata;
 </script>
 ```
 

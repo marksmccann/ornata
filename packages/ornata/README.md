@@ -33,7 +33,7 @@ Use a pinned version in production so your pages do not change unexpectedly when
 ```html
 <script src="https://cdn.jsdelivr.net/npm/ornata@0.2.0/dist/index.global.js"></script>
 <script>
-    const { defineComponent, createInitializer, isComponent } = window.Ornata;
+    const { defineComponent, mountAll, isComponent } = window.Ornata;
 </script>
 ```
 
@@ -58,7 +58,7 @@ const Counter = defineComponent({
 Counter.mount('[data-counter]');
 ```
 
-For the full component authoring model, typed usage, `createInitializer()`, DOM element safeguards, and richer examples, see the documentation site.
+For the full component authoring model, typed usage, `mountAll()`, DOM element safeguards, and richer examples, see the documentation site.
 
 ## License
 

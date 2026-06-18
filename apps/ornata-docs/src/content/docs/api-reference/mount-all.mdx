@@ -1,12 +1,12 @@
 ---
-title: createInitializer
-slug: "api/create-initializer"
-description: Create a document-level initializer that mounts components from data-ornata attributes in HTML.
+title: mountAll
+slug: "api/mount-all"
+description: Mount matching components from data-ornata attributes across the current document.
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 
-`createInitializer()` creates a function that mounts Ornata components from HTML.
+`mountAll()` mounts Ornata components from HTML immediately.
 
 It is the API that lets the markup declare which components should enhance the page.
 
@@ -14,14 +14,14 @@ It is the API that lets the markup declare which components should enhance the p
   <TabItem label="JavaScript">
 
 ```js
-import { createInitializer } from "ornata";
+import { mountAll } from "ornata";
 ```
 
   </TabItem>
   <TabItem label="TypeScript">
 
 ```ts
-import { createInitializer } from "ornata";
+import { mountAll } from "ornata";
 ```
 
   </TabItem>
@@ -33,24 +33,20 @@ import { createInitializer } from "ornata";
   <TabItem label="JavaScript">
 
 ```js
-const initialize = createInitializer({
+const instances = mountAll({
     Counter,
     Disclosure,
 });
-
-initialize();
 ```
 
   </TabItem>
   <TabItem label="TypeScript">
 
 ```ts
-const initialize = createInitializer({
+const instances = mountAll({
     Counter,
     Disclosure,
 });
-
-initialize();
 ```
 
   </TabItem>
@@ -58,31 +54,37 @@ initialize();
 
 ## Expected HTML
 
-The initializer looks for elements with a `data-ornata` attribute:
+`mountAll()` looks for elements with a `data-ornata` attribute:
 
 ```html
 <section data-ornata="Counter"></section>
 <section data-ornata="Disclosure"></section>
 ```
 
-The attribute value must match a key in the constructor map you pass to `createInitializer()`.
+The attribute value must match a key in the constructor map you pass to `mountAll()`.
 
 ## Return value
 
-Calling the returned initializer function returns an array of mounted instances.
+Calling `mountAll()` returns an array of mounted instances.
 
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">
 
 ```js
-const instances = initialize();
+const instances = mountAll({
+    Counter,
+    Disclosure,
+});
 ```
 
   </TabItem>
   <TabItem label="TypeScript">
 
 ```ts
-const instances = initialize();
+const instances = mountAll({
+    Counter,
+    Disclosure,
+});
 ```
 
   </TabItem>

@@ -8,10 +8,10 @@ description: The public runtime API surface Ornata exposes for building and boot
 Ornata currently exposes three runtime exports for defining components and enhancing HTML:
 
 - `defineComponent`
-- `createInitializer`
+- `mountAll`
 - `isComponent`
 
-The main authoring workflow starts with `defineComponent()`, then uses `mount()` directly or `createInitializer()` for declarative bootstrapping.
+The main authoring workflow starts with `defineComponent()`, then uses `mount()` directly or `mountAll()` for declarative bootstrapping.
 
 Use the guides when you want conceptual explanations and authoring patterns. Use the API reference when you want exact runtime behavior, callback shapes, and public method details.
 
@@ -21,9 +21,9 @@ Use the guides when you want conceptual explanations and authoring patterns. Use
 
 Creates an Ornata component constructor from typed component options.
 
-### `createInitializer()`
+### `mountAll()`
 
-Creates a function that scans the document for `data-ornata` roots and mounts matching components.
+Scans the document for `data-ornata` roots and mounts matching components immediately.
 
 ### `isComponent()`
 
