@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/marksmccann/ornata/compare/v0.3.1...v0.4.0) (2026-06-18)
+
+### Features
+
+- **ornata:** add component unmountAll helper ([89df27a](https://github.com/marksmccann/ornata/commit/89df27a4670655408d0ce496d6eec65fa93d5b2b))
+
 ## [0.3.1](https://github.com/marksmccann/ornata/compare/v0.3.0...v0.3.1) (2026-06-06)
 
 **Note:** Version bump only for package ornata-docs
