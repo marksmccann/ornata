@@ -11,6 +11,7 @@ export default defineConfig({
             title: "Ornata",
             description:
                 "A progressive enhancement framework for HTML-first applications",
+            favicon: "/favicon.ico",
             social: [
                 {
                     icon: "github",
@@ -20,6 +21,7 @@ export default defineConfig({
             ],
             plugins: [starlightThemeNord()],
             components: {
+                Head: "./src/components/Head.astro",
                 SiteTitle: "./src/components/SiteTitle.astro",
             },
             customCss: ["/src/styles/home.css"],

@@ -1,0 +1,22 @@
+---
+import DefaultHead from "@astrojs/starlight/components/Head.astro";
+
+const withBase = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
+---
+
+<DefaultHead />
+<link rel="icon" href={withBase("/favicon.ico")} sizes="any" />
+<link
+    rel="icon"
+    type="image/png"
+    sizes="32x32"
+    href={withBase("/favicon-32x32.png")}
+/>
+<link
+    rel="icon"
+    type="image/png"
+    sizes="16x16"
+    href={withBase("/favicon-16x16.png")}
+/>
+<link rel="apple-touch-icon" href={withBase("/apple-touch-icon.png")} />
+<link rel="manifest" href={withBase("/site.webmanifest")} />
