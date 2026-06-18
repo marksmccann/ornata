@@ -1,5 +1,6 @@
 ---
 title: Getting Started
+slug: "guides/getting-started"
 description: Install Ornata, define a small component contract, and mount it onto existing HTML.
 ---
 import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
@@ -145,11 +146,7 @@ const Counter = defineComponent<{
 </Aside>
 
 ```js
-const root = document.querySelector("[data-counter]");
-
-if (root) {
-    Counter.mount(root);
-}
+Counter.mount("[data-counter]");
 ```
 
 ## What happens when it mounts

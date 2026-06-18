@@ -1,5 +1,6 @@
 ---
 title: Safeguards
+slug: "guides/safeguards"
 description: Understand Ornata's runtime safeguards around roots, state, elements, and component contracts.
 ---
 

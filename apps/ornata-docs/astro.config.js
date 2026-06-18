@@ -29,7 +29,7 @@ export default defineConfig({
                     label: "Guides",
                     items: [
                         {
-                            label: "Essentials",
+                            label: "First Steps",
                             items: [
                                 {
                                     label: "Getting Started",
@@ -46,7 +46,7 @@ export default defineConfig({
                             ],
                         },
                         {
-                            label: "Core Concepts",
+                            label: "Component Model",
                             items: [
                                 {
                                     label: "Component Anatomy",
@@ -57,37 +57,20 @@ export default defineConfig({
                                     slug: "guides/state",
                                 },
                                 {
-                                    label: "Computed",
-                                    slug: "guides/computed",
-                                },
-                                {
-                                    label: "Methods",
-                                    slug: "guides/methods",
-                                },
-                                {
-                                    label: "Data",
-                                    slug: "guides/data",
-                                },
-                                {
-                                    label: "Safe DOM References",
-                                    slug: "guides/safe-dom-references",
+                                    label: "Elements",
+                                    slug: "guides/elements",
                                 },
                                 {
                                     label: "Render Options",
                                     slug: "guides/render-options",
                                 },
                                 {
-                                    label: "Lifecycle",
-                                    slug: "guides/lifecycle",
+                                    label: "Update Flow",
+                                    slug: "guides/update-flow",
                                 },
-                            ],
-                        },
-                        {
-                            label: "Reactivity",
-                            items: [
                                 {
-                                    label: "Rendering and Reaction",
-                                    slug: "guides/rendering-and-reaction",
+                                    label: "Computed",
+                                    slug: "guides/computed",
                                 },
                                 {
                                     label: "Watchers",
@@ -97,10 +80,22 @@ export default defineConfig({
                                     label: "State Listeners",
                                     slug: "guides/state-listeners",
                                 },
+                                {
+                                    label: "Methods",
+                                    slug: "guides/methods",
+                                },
+                                {
+                                    label: "Lifecycle",
+                                    slug: "guides/lifecycle",
+                                },
+                                {
+                                    label: "Data",
+                                    slug: "guides/data",
+                                },
                             ],
                         },
                         {
-                            label: "Reference Patterns",
+                            label: "Integration",
                             items: [
                                 {
                                     label: "Instances and Mounting",

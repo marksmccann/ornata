@@ -1,5 +1,6 @@
 ---
 title: API Overview
+slug: "api"
 description: The public runtime API surface Ornata exposes for building and bootstrapping components in HTML-first environments.
 ---
 
@@ -11,6 +12,8 @@ Ornata currently exposes three runtime exports for defining components and enhan
 - `isComponent`
 
 The main authoring workflow starts with `defineComponent()`, then uses `mount()` directly or `createInitializer()` for declarative bootstrapping.
+
+Use the guides when you want conceptual explanations and authoring patterns. Use the API reference when you want exact runtime behavior, callback shapes, and public method details.
 
 ## Main exports
 

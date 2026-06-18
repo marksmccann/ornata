@@ -1,5 +1,6 @@
 ---
 title: Mental Model
+slug: "mental-model"
 description: Understand how Ornata thinks about components, HTML-first environments, and reusable UI libraries.
 ---
 

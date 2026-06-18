@@ -1,5 +1,6 @@
 ---
 title: Why Ornata?
+slug: "why-ornata"
 description: Understand the problems Ornata is designed to solve and where it fits in the frontend ecosystem.
 ---
 

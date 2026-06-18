@@ -1,5 +1,6 @@
 ---
 title: isComponent
+slug: "api/is-component"
 description: Check whether a value is an Ornata component constructor.
 ---
 

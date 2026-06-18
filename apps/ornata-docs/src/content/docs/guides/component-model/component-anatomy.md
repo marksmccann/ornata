@@ -1,0 +1,179 @@
+---
+title: Component Anatomy
+slug: 'guides/component-anatomy'
+description: Learn how the `defineComponent` options form a component contract around state, DOM resolution, rendering, and lifecycle behavior.
+---
+
+`defineComponent()` is the main authoring API in Ornata. It is where you describe how a reusable component fits into existing HTML, what it expects from the DOM, and how it reacts over time.
+
+```ts
+const Component = defineComponent({
+    name: 'Example',
+    root: {},
+    state: {},
+    elements: {},
+    lifecycle: {},
+    watch: {},
+    methods: {},
+    computed: {},
+    data: {},
+    render: {},
+});
+```
+
+You will not use every section in every component, but each one has a clear role.
+
+## `name`
+
+`name` sets the display name used in debugging and error reporting.
+
+If you omit it, Ornata falls back to `"UnnamedComponent"`.
+
+## `root`
+
+`root` configures settings related to the component's root element.
+
+It currently supports `matches`, which validates that the mounted root matches a selector. If it does not, Ornata logs an error to the console so integration mistakes are easier to spot and the component can enforce its expected root element.
+
+```ts
+root: {
+    matches: "[data-counter]",
+}
+```
+
+## `state`
+
+`state` defines reactive properties for the component.
+
+`default`, `type`, and `parse` shape how a state value is initialized and validated. `private` and `readonly` control how public code can interact with it.
+
+A state definition might look like this:
+
+```ts
+state: {
+    count: { default: 0, type: Number },
+    label: { default: "Clicks", readonly: true },
+}
+```
+
+State in Ornata can be initialized from component defaults, root HTML `data-*` attributes, or mount-time `initialState`. For a focused walkthrough, see [State](/ornata/guides/state/).
+
+## `elements`
+
+`elements` defines the important DOM references a component uses.
+
+Use `query`, `queryAll`, `create`, or `resolve` to define how each reference is obtained. Element resolution is scoped to the component root by default, and each entry should use only one of these strategies.
+
+Use `min` and `max` when the component needs to enforce structural expectations about how many matching elements must exist.
+
+An elements definition might look like this:
+
+```ts
+elements: {
+    button: { query: "[data-count-button]" },
+    items: { queryAll: "[data-item]" },
+}
+```
+
+This is one of Ornata’s most valuable features because it makes DOM resolution an explicit part of the component contract instead of scattering lookups across the implementation. For a dedicated walkthrough, see [Elements](/ornata/guides/elements/).
+
+## `methods`
+
+`methods` defines internal reusable actions.
+
+Methods are bound to the internal instance, so they can safely reference instance data such as `this.state`, `this.elements`, `this.computed`, and `this.data`.
+
+```ts
+methods: {
+    increment() {
+        this.state.count += 1;
+    },
+}
+```
+
+Methods are useful for keeping render callbacks small and for centralizing named component actions. For a focused walkthrough, see [Methods](/ornata/guides/methods/).
+
+## `computed`
+
+`computed` derives values from state changes.
+
+A computed definition might look like this:
+
+```ts
+computed: {
+    total() {
+        return this.state.count;
+    },
+}
+```
+
+For callback details and usage patterns, see [Computed](/ornata/guides/computed/) and [defineComponent](/ornata/api/define-component/).
+
+## `watch`
+
+`watch` reacts to state changes.
+
+A watch definition might look like this:
+
+```ts
+watch: {
+    count({ isInitial, newValue }) {
+        if (!isInitial) {
+            console.log("Updated:", newValue);
+        }
+    },
+}
+```
+
+For callback details and usage patterns, see [Watchers](/ornata/guides/watchers/) and [defineComponent](/ornata/api/define-component/).
+
+## `data`
+
+`data` stores additional user-defined values on the internal instance.
+
+Use it for values that do not need to be reactive.
+
+```ts
+data: {
+    analyticsKey: "counter",
+}
+```
+
+`data` is useful for persistent internal values like timer IDs, observer instances, caches, and third-party integration objects. For a focused walkthrough, see [Data](/ornata/guides/data/).
+
+## `render`
+
+`render` maps resolved elements to DOM updates.
+
+A render definition might look like this:
+
+```ts
+render: {
+    value() {
+        return {
+            text: String(this.state.count),
+        };
+    },
+}
+```
+
+Render callbacks receive context such as `index` when rendering element arrays, and can return DOM update keys like `text`, `attributes`, `classes`, and `events`. For a deeper walkthrough, see [Render Options](/ornata/guides/render-options/) and [defineComponent](/ornata/api/define-component/).
+
+## `lifecycle`
+
+`lifecycle` defines setup and cleanup hooks for the component instance.
+
+A lifecycle definition might look like this:
+
+```ts
+lifecycle: {
+    mount() {
+        console.log("Mounted");
+    },
+    unmount() {
+        console.log("Cleaned up");
+    },
+}
+```
+
+`mount` runs when the component is created, and `unmount` runs when it is disposed. Lifecycle hooks are best for setup and cleanup work rather than DOM output. For a deeper walkthrough, see [Lifecycle](/ornata/guides/lifecycle/) and [defineComponent](/ornata/api/define-component/).

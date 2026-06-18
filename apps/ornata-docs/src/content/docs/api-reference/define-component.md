@@ -1,5 +1,6 @@
 ---
 title: defineComponent
+slug: "api/define-component"
 description: Define a reusable component contract with state, elements, methods, computed values, watch callbacks, and render behavior.
 ---
 
@@ -51,6 +52,8 @@ Root validation options. Currently supports:
 
 - `matches`
 
+For conceptual guidance, see [Component Anatomy](/ornata/guides/component-anatomy/) and [Instances and Mounting](/ornata/guides/instances-and-mounting/).
+
 ### `state`
 
 Reactive state configuration keyed by property name.
@@ -77,6 +80,8 @@ When more than one source is present, later sources win:
 
 After mount, state updates trigger Ornata’s update flow automatically.
 
+For conceptual guidance and examples, see [State](/ornata/guides/state/).
+
 ### `elements`
 
 DOM resolution options keyed by property name.
@@ -90,12 +95,9 @@ Each property supports:
 - `min`
 - `max`
 
-These options do more than just save query boilerplate:
+Each element entry should use a single resolution strategy. `query`, `queryAll`, `create`, and `resolve` are mutually exclusive, so combining them does not provide additional behavior.
 
-- lookups are scoped to the component root
-- `min` and `max` validate expected counts
-- duplicate references are reported
-- `resolve()` supports custom and more strongly typed resolution logic
+For conceptual guidance and examples, see [Elements](/ornata/guides/elements/).
 
 ### `lifecycle`
 
@@ -105,6 +107,8 @@ Lifecycle hooks:
 - `unmount()`
 
 Use lifecycle hooks for setup and teardown work associated with the component existing.
+
+For conceptual guidance and examples, see [Lifecycle](/ornata/guides/lifecycle/).
 
 ### `watch`
 
@@ -125,11 +129,15 @@ Use `watch` for internal reactions owned by the component itself.
 
 When external code needs to observe public state updates, prefer `addStateListener()` on the mounted instance instead.
 
+For conceptual guidance and examples, see [Watchers](/ornata/guides/watchers/) and [State Listeners](/ornata/guides/state-listeners/).
+
 ### `methods`
 
 Internal reusable actions bound to the component instance.
 
 Methods can access the component’s internal `state`, `elements`, `methods`, `data`, and `computed` values. They are a good fit for named actions like `toggle()`, `increment()`, `reset()`, or `setActiveIndex(index)`.
+
+For conceptual guidance and examples, see [Methods](/ornata/guides/methods/).
 
 ### `computed`
 
@@ -145,11 +153,15 @@ Each callback receives:
 }
 ```
 
+For conceptual guidance and examples, see [Computed](/ornata/guides/computed/).
+
 ### `data`
 
 Additional user-defined internal data that does not trigger reactive updates.
 
 Use `data` for persistent internal values such as timer IDs, observer instances, caches, or integration objects that should survive for the life of the component instance without becoming reactive state.
+
+For conceptual guidance and examples, see [Data](/ornata/guides/data/).
 
 ### `render`
 
@@ -166,6 +178,8 @@ Each render callback returns `RenderOptions`, which may include:
 - `text`
 
 When the rendered element is an array, the render context also includes `index`.
+
+For conceptual guidance and examples, see [Render Options](/ornata/guides/render-options/).
 
 ## Typing patterns
 
@@ -189,3 +203,5 @@ const Counter = defineComponent<{
 ```
 
 Use explicit parts when you want stable named interfaces, clearer contracts, or richer editor documentation.
+
+For broader TypeScript guidance, see [TypeScript](/ornata/guides/typescript/).

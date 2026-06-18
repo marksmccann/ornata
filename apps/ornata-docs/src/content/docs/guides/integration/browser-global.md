@@ -1,5 +1,6 @@
 ---
 title: Browser Global
+slug: "guides/browser-global"
 description: Use Ornata directly in the browser without a bundler by loading its global build into an HTML-first page.
 ---
 

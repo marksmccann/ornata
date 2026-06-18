@@ -1,6 +1,7 @@
 ---
 title: State
-description: Initialize state from JavaScript or HTML, react to updates, and use Ornata's built-in safety controls for public state access.
+slug: "guides/state"
+description: Understand how Ornata components define and use reactive state.
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
@@ -30,7 +31,7 @@ The current order is:
 
 That means mount-time JavaScript wins over HTML, and HTML wins over definition defaults.
 
-## Example: start from HTML
+For example:
 
 ```html
 <section
@@ -51,15 +52,15 @@ const Counter = defineComponent({
     },
 });
 
-Counter.mount("[data-counter]");
+Counter.mount("[data-counter]", {
+    count: 10,
+});
 ```
 
   </TabItem>
   <TabItem label="TypeScript">
 
 ```ts
-import { defineComponent } from "ornata";
-
 interface CounterState {
     count: number;
     label: string;
@@ -74,7 +75,9 @@ const Counter = defineComponent<{
     },
 });
 
-Counter.mount("[data-counter]");
+Counter.mount("[data-counter]", {
+    count: 10,
+});
 ```
 
   </TabItem>
@@ -82,33 +85,8 @@ Counter.mount("[data-counter]");
 
 The mounted instance starts with:
 
-- `count = 5`
+- `count = 10`
 - `label = "Server count"`
-
-## Example: override HTML with JavaScript
-
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
-```js
-Counter.mount("[data-counter]", {
-    count: 10,
-});
-```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-Counter.mount("[data-counter]", {
-    count: 10,
-});
-```
-
-  </TabItem>
-</Tabs>
-
-Now `count` starts at `10`, even if the HTML contained `data-count="5"`.
 
 ## State is reactive
 
@@ -124,9 +102,6 @@ That includes:
 
 This means state updates drive the component directly.
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
 ```js
 methods: {
     increment() {
@@ -135,25 +110,9 @@ methods: {
 }
 ```
 
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-interface CounterMethods {
-    increment(): void;
-}
-
-methods: {
-    increment() {
-        this.state.count += 1;
-    },
-}
-```
-
-  </TabItem>
-</Tabs>
-
 You do not need a separate setter API to trigger updates. Updating the state property is the update.
+
+The same update flow also applies when writable public state is updated from a mounted instance. Whether state changes inside the component or from surrounding integration code, Ornata reacts to the update the same way.
 
 ## Reacting to state changes
 
@@ -179,8 +138,7 @@ Each state property can define:
 - `private`
 - `readonly`
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
+In practive, those safegurads might look like this:
 
 ```js
 state: {
@@ -189,20 +147,6 @@ state: {
     label: { default: "Clicks", readonly: true },
 }
 ```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-state: {
-    count: { default: 0, type: Number },
-    token: { private: true },
-    label: { default: "Clicks", readonly: true },
-}
-```
-
-  </TabItem>
-</Tabs>
 
 These options support a few useful guarantees:
 
@@ -215,18 +159,20 @@ These options support a few useful guarantees:
 
 When state is read from HTML, Ornata uses the state property options to decide how to parse the value.
 
-Depending on the configuration, it can parse:
+Depending on the configuration, it can parse: strings, numbers, booleans, arrays, objects.
 
-- strings
-- numbers
-- booleans
-- arrays
-- objects
+For arrays and objects, HTML values should be valid JSON strings. 
 
-You can also supply `parse()` when you want custom parsing logic.
+When the default parsing options are not a good fit, use `parse()` to define custom parsing logic.
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
+For example, if you wanted to convert a comma separate list of strings into an array, you could do something like this:
+
+```html
+<section
+    data-search
+    data-filters="red,blue,green"
+></section>
+```
 
 ```js
 state: {
@@ -237,22 +183,6 @@ state: {
     },
 }
 ```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-state: {
-    filters: {
-        parse(value: string) {
-            return value.split(",");
-        },
-    },
-}
-```
-
-  </TabItem>
-</Tabs>
 
 ## A good mental model
 
@@ -265,8 +195,3 @@ Ornata state is:
 
 That makes it a strong fit for HTML-first environments that need interactive behavior without giving up control over where the initial data comes from.
 
-## State is not the only place to keep values
-
-If a value should persist for the life of the component instance but should not be reactive, use `data` instead.
-
-Read [Data](/ornata/guides/data/) for that pattern.

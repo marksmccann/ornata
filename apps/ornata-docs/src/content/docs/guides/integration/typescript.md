@@ -1,5 +1,6 @@
 ---
 title: TypeScript
+slug: "guides/typescript"
 description: Use Ornata with strong type inference or explicit component contracts for state, elements, methods, data, and computed values.
 ---
 
