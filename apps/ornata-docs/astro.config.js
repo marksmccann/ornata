@@ -11,6 +11,13 @@ export default defineConfig({
             title: "Ornata",
             description:
                 "A progressive enhancement framework for HTML-first applications",
+            social: [
+                {
+                    icon: "github",
+                    label: "GitHub",
+                    href: "https://github.com/marksmccann/ornata",
+                },
+            ],
             plugins: [starlightThemeNord()],
             components: {
                 SiteTitle: "./src/components/SiteTitle.astro",
