@@ -113,6 +113,10 @@ export default defineConfig({
                                     label: "Browser Global",
                                     slug: "guides/browser-global",
                                 },
+                                {
+                                    label: "Testing with Vitest",
+                                    slug: "guides/testing-with-vitest",
+                                },
                             ],
                         },
                     ],

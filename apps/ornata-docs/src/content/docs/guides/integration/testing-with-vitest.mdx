@@ -1,0 +1,113 @@
+---
+title: Testing with Vitest
+slug: "guides/testing-with-vitest"
+description: Learn how to test write unit tests for Ornata components
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Testing an Ornata component is usually pretty simple: mount it onto real HTML, interact with it, make assertions, then clean it up.
+
+Most Ornata tests come down to this:
+
+1. put real fixture markup in `document.body`
+1. call `Component.mount(...)`
+1. click, type, or update state
+1. check the DOM or `instance.state`
+1. call `Component.unmountAll()` in cleanup
+
+## Test through the public API
+
+Test Ornata components the same way other code would use them.
+
+- `Component.mount(root)` to create an instance
+- `instance.state` to check or update public state
+- `instance.addStateListener()` to observe state changes from outside the component
+- `instance.dispose()` to clean up one mounted instance
+- `Component.unmount(root)` to remove a specific mounted instance by root
+- `Component.unmountAll()` to clean up every mounted instance for that component
+
+## Use real HTML
+
+Ornata is built to enhance existing HTML, so your test fixtures should look like the real markup the component expects.
+
+```ts
+document.body.innerHTML = `
+    <section data-disclosure>
+        <button type="button" data-trigger>Toggle</button>
+        <div data-panel hidden>Panel</div>
+    </section>
+`;
+```
+
+## Mount the component in the test
+
+In most Ornata tests, you will start by putting the expected HTML into the document, then mounting the component onto that markup.
+
+```ts
+const instance = Disclosure.mount("[data-disclosure]");
+```
+
+This is usually the most useful way to start a test because it matches how Ornata is used in real pages. The component gets real markup, mounts to a real root element, and returns an instance you can use in the rest of the test.
+
+## Assert the component behavior
+
+You will usually check one of a few things.
+
+<Aside>
+    These examples use Testing Library for DOM queries and interactions, but
+    Ornata does not require Testing Library. You can use any test helpers that
+    fit your setup.
+</Aside>
+
+**Visible DOM output**
+
+```ts
+Disclosure.mount("[data-disclosure]");
+
+await user.click(screen.getByRole("button", { name: "Toggle" }));
+
+expect(screen.getByText("Open")).toBeInTheDocument();
+```
+
+**Public state**
+
+```ts
+const instance = Counter.mount("[data-counter]");
+
+instance.state.count = 1;
+
+expect(instance.state.count).toBe(1);
+```
+
+**Listener or lifecycle calls**
+
+```ts
+const listener = vi.fn();
+const instance = Counter.mount(document.createElement("div"));
+
+instance.addStateListener("count", listener);
+instance.state.count = 1;
+
+expect(listener).toHaveBeenCalledWith({
+    property: "count",
+    newValue: 1,
+    oldValue: 0,
+    target: instance,
+});
+```
+
+## Clean up between tests
+
+If a file reuses the same component constructor across multiple tests, `unmountAll()` is the easiest cleanup.
+
+```ts
+afterEach(() => {
+    Disclosure.unmountAll();
+    document.body.innerHTML = "";
+});
+```
+
+This is especially handy when one test mounts more than one root, or when several tests reuse the same component.
+
+If a test only creates one instance and you already have that reference, `instance.dispose()` is fine too.
