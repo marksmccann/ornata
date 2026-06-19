@@ -3,11 +3,9 @@ title: Render Options
 slug: "guides/render-options"
 description: Use render callbacks to map component state back into existing or generated DOM, including lists with index-aware rendering.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { Aside, Tabs, TabItem } from "@astrojs/starlight/components";
 
-`render` is how Ornata turns component state back into DOM output inside the component's HTML contract.
-
-Each render callback returns a `RenderOptions` object for one resolved element or one item in a resolved element list.
+`render` is how Ornata turns component state back into DOM output inside the component's HTML contract. Each render callback returns a `RenderOptions` object for one resolved element or one item in a resolved element list.
 
 ## Basic shape
 
@@ -28,6 +26,10 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface CounterElements {
+    value: HTMLElement
+};
+
 render: {
     value() {
         return {
@@ -42,19 +44,9 @@ render: {
 
 ## Available render outputs
 
-Render callbacks can return:
+Render callbacks can return: `text`, `html`, `attributes`, `classes`, `style`, `dataset`, and/or `events`. These options can be combined in a single render result.
 
-- `text`
-- `html`
-- `attributes`
-- `classes`
-- `style`
-- `dataset`
-- `events`
-
-These options can be combined in a single render result.
-
-## `text`
+### `text`
 
 Set `text` when you want to update `textContent`.
 
@@ -75,6 +67,10 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface ExampleElements {
+    label: HTMLElement;
+}
+
 render: {
     label() {
         return {
@@ -87,9 +83,13 @@ render: {
   </TabItem>
 </Tabs>
 
-## `html`
+### `html`
 
 Set `html` when you want to update `innerHTML`.
+
+<Aside type="caution" title="Use trusted HTML only">
+    `html` writes directly to `innerHTML`. Only use it with trusted content or content you have sanitized first. If you only need to show plain text, prefer `text` instead.
+</Aside>
 
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">
@@ -108,6 +108,10 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface ExampleElements {
+    output: HTMLElement;
+}
+
 render: {
     output() {
         return {
@@ -120,7 +124,7 @@ render: {
   </TabItem>
 </Tabs>
 
-## `attributes`
+### `attributes`
 
 Use `attributes` for standard and boolean attributes.
 
@@ -144,6 +148,10 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface ExampleElements {
+    panel: HTMLElement;
+}
+
 render: {
     panel() {
         return {
@@ -167,7 +175,7 @@ Behavior summary:
 - `null` removes the attribute
 - `undefined` leaves it unchanged
 
-## `classes`
+### `classes`
 
 Use `classes` for class toggling.
 
@@ -190,6 +198,10 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface ExampleElements {
+    item: HTMLElement;
+}
+
 render: {
     item() {
         return {
@@ -204,7 +216,12 @@ render: {
   </TabItem>
 </Tabs>
 
-## `style`
+Behavior summary:
+
+- `true` adds the key to the class list
+- `false` removes the key from the class list
+
+### `style`
 
 Use `style` for inline style updates.
 
@@ -227,6 +244,10 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface ExampleElements {
+    panel: HTMLElement;
+}
+
 render: {
     panel() {
         return {
@@ -247,7 +268,7 @@ Behavior summary:
 - `null` removes the property
 - `undefined` leaves it unchanged
 
-## `dataset`
+### `dataset`
 
 Use `dataset` for `data-*` updates.
 
@@ -270,6 +291,10 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface ExampleElements {
+    item: HTMLElement;
+}
+
 render: {
     item() {
         return {
@@ -290,7 +315,7 @@ Behavior summary:
 - `null` removes the dataset property
 - `undefined` leaves it unchanged
 
-## `events`
+### `events`
 
 Use `events` to attach event handlers.
 
@@ -313,6 +338,10 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface ExampleElements {
+    button: HTMLButtonElement;
+}
+
 render: {
     button() {
         return {
@@ -352,6 +381,10 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface ExampleElements {
+    items: HTMLElement[];
+}
+
 render: {
     items({ index }) {
         const currentIndex = index ?? 0;
@@ -378,10 +411,11 @@ This is especially useful for:
 
 ## A good mental model
 
-Render callbacks should describe DOM output, not general side effects.
+Render callbacks should describe DOM output, not general side effects or reusable business logic.
 
 That usually means:
 
 - `render` for visual and attribute updates
-- `watch` for internal side effects
-- lifecycle hooks for setup and cleanup
+- `watch` for internal side effects and more complex DOM updates
+- `methods` for named reusable actions and event handlers
+- `computed` for derived state values

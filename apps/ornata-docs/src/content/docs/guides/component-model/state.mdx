@@ -3,11 +3,9 @@ title: State
 slug: "guides/state"
 description: Understand how Ornata components define and use reactive state.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
 
-State is one of the core building blocks in Ornata.
-
-It is designed to work well with HTML-first markup, progressive enhancement, and direct component updates.
+State is one of the core building blocks in Ornata. It is designed to work well with HTML-first markup, progressive enhancement, and direct component updates.
 
 ## State can start in more than one place
 
@@ -17,7 +15,7 @@ Ornata can build a component's initial state from:
 - `data-*` values on the root HTML element
 - `initialState` passed to `mount()`
 
-That makes state flexible in an HTML-first environment because a server template, CMS, or other markup source can provide initial values while JavaScript still refines or overrides them at mount time.
+That makes state flexible in an HTML-first environment because a server template, CMS, or other markup source can provide initial values while JavaScript still refines or overrides them at run time.
 
 ## Initial state precedence
 
@@ -100,7 +98,9 @@ That includes:
 - calling matching watch callbacks
 - notifying external state listeners
 
-This means state updates drive the component directly.
+For the full sequence, see [State Update Flow](/ornata/guides/update-flow/).
+
+This means state updates drive the component directly. To update the state and trigger an update, assign a new value directly like this:
 
 ```js
 methods: {
@@ -110,9 +110,13 @@ methods: {
 }
 ```
 
-You do not need a separate setter API to trigger updates. Updating the state property is the update.
+The same goes for external updates on the public state:
 
-The same update flow also applies when writable public state is updated from a mounted instance. Whether state changes inside the component or from surrounding integration code, Ornata reacts to the update the same way.
+```js
+const instance = Counter.mount('[data-counter]');
+
+instance.state.count += 1;
+```
 
 ## Reacting to state changes
 
@@ -133,12 +137,11 @@ Ornata also protects state access at the component boundary.
 
 Each state property can define:
 
-- `type`
-- `parse`
-- `private`
-- `readonly`
+- `type` validates and describes the expected runtime value type
+- `private` hides the property from external reads and writes on the mounted public state
+- `readonly` allows external code to read the property but prevents external writes
 
-In practive, those safegurads might look like this:
+In practice, those safeguards might look like this:
 
 ```js
 state: {
@@ -151,21 +154,16 @@ state: {
 These options support a few useful guarantees:
 
 - invalid values can be reported
-- HTML dataset values can be parsed into the expected type
 - private state cannot be read or written externally
 - readonly state cannot be written externally
 
 ## HTML parsing behavior
 
-When state is read from HTML, Ornata uses the state property options to decide how to parse the value.
+When Ornata reads state from HTML, it uses the `default` and `type` state properties to infer the expected value type. If it can infer the type, it parses the HTML string into that type automatically. If it cannot, Ornata logs a warning and falls back to treating the value as a string.
 
-Depending on the configuration, it can parse: strings, numbers, booleans, arrays, objects.
+Depending on the configuration, Ornata can parse values as `string`, `number`, `boolean`, `array`, or `object`. For arrays and objects, the HTML value must be valid JSON.
 
-For arrays and objects, HTML values should be valid JSON strings. 
-
-When the default parsing options are not a good fit, use `parse()` to define custom parsing logic.
-
-For example, if you wanted to convert a comma separate list of strings into an array, you could do something like this:
+When the built-in parsing behavior is not a good fit, use `parse()` to define custom parsing logic. For example, if you want to convert a comma-separated string into an array, you can do this:
 
 ```html
 <section
@@ -194,4 +192,3 @@ Ornata state is:
 - guarded at the public boundary
 
 That makes it a strong fit for HTML-first environments that need interactive behavior without giving up control over where the initial data comes from.
-

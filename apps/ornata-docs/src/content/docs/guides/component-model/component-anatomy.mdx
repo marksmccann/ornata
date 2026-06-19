@@ -1,8 +1,10 @@
 ---
 title: Component Anatomy
-slug: 'guides/component-anatomy'
+slug: "guides/component-anatomy"
 description: Learn how the `defineComponent` options form a component contract around state, DOM resolution, rendering, and lifecycle behavior.
 ---
+
+import { Aside } from "@astrojs/starlight/components";
 
 `defineComponent()` is the main authoring API in Ornata. It is where you describe how a reusable component fits into existing HTML, what it expects from the DOM, and how it reacts over time.
 
@@ -35,9 +37,13 @@ If you omit it, Ornata falls back to `"UnnamedComponent"`.
 
 It currently supports `matches`, which validates that the mounted root matches a selector. If it does not, Ornata logs an error to the console so integration mistakes are easier to spot and the component can enforce its expected root element.
 
+<Aside type="note" title="When this is useful">
+    The "matches" option is especially useful when a component only works correctly with a specific kind of root element. For example, a `TextInput` component may need its root to be an actual `<input>` element so it can reliably read and update the element's value.
+</Aside>
+
 ```ts
 root: {
-    matches: "[data-counter]",
+    matches: "input",
 }
 ```
 

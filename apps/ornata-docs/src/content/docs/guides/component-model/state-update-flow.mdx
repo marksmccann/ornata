@@ -1,5 +1,5 @@
 ---
-title: Update Flow
+title: State Update Flow
 slug: "guides/update-flow"
 description: Understand how state updates trigger computed values, watch callbacks, and DOM rendering.
 ---
@@ -134,6 +134,6 @@ During mount, Ornata performs an initial update pass for each state property. Th
 
 ## External subscriptions
 
-When code outside the component needs to react to public state changes, use `addStateListener()` on the mounted instance instead of putting that logic in `watch`.
+When code outside the component needs to react to public state changes, use `addStateListener()` on the mounted instance.
 
 See [State Listeners](/ornata/guides/state-listeners/) for that pattern.

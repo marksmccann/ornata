@@ -66,15 +66,7 @@ export default defineConfig({
                                     slug: "guides/state",
                                 },
                                 {
-                                    label: "Elements",
-                                    slug: "guides/elements",
-                                },
-                                {
-                                    label: "Render Options",
-                                    slug: "guides/render-options",
-                                },
-                                {
-                                    label: "Update Flow",
+                                    label: "State Update Flow",
                                     slug: "guides/update-flow",
                                 },
                                 {
@@ -100,6 +92,14 @@ export default defineConfig({
                                 {
                                     label: "Data",
                                     slug: "guides/data",
+                                },
+                                {
+                                    label: "Elements",
+                                    slug: "guides/elements",
+                                },
+                                {
+                                    label: "Render Options",
+                                    slug: "guides/render-options",
                                 },
                             ],
                         },

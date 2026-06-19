@@ -7,102 +7,98 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 `watch` lets a component react to changes in its own state.
 
-This is the internal reaction mechanism in Ornata. It lives inside `defineComponent()` and runs as part of the component update flow.
-
-## What a watcher receives
-
-Each watcher is keyed by a state property name and receives a context object:
-
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
-```js
-watch: {
-    count({ newValue, oldValue, isInitial }) {
-        console.log(newValue, oldValue, isInitial);
-    },
-}
-```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-watch: {
-    count({ newValue, oldValue, isInitial }) {
-        console.log(newValue, oldValue, isInitial);
-    },
-}
-```
-
-  </TabItem>
-</Tabs>
-
-The context includes:
-
-- `newValue`
-- `oldValue`
-- `isInitial`
-- `type`, which is always `"watch"`
-
-## Initial watcher runs
-
-Watchers also run during the initial mount update pass.
-
-That is why `isInitial` exists:
-
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
-```js
-watch: {
-    count({ isInitial, newValue }) {
-        if (isInitial) return;
-
-        console.log("Count changed:", newValue);
-    },
-}
-```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-watch: {
-    count({ isInitial, newValue }) {
-        if (isInitial) return;
-
-        console.log("Count changed:", newValue);
-    },
-}
-```
-
-  </TabItem>
-</Tabs>
-
-In practice, this usually means you should decide whether your watcher is meant to handle initialization, later updates, or both.
-
-## When to use a watcher
+## What watchers are good for
 
 Use `watch` for internal side effects such as:
 
 - logging
 - analytics
 - timers
-- imperative integrations
+- imperative integrations and DOM work
 - syncing non-render concerns to state changes
 
-## When not to use a watcher
+## What a watcher receives
 
-Use other parts of Ornata when they fit better:
+Each watcher is keyed by a state property name and receives a context object that includes:
 
-- use `render` for DOM output
-- use `computed` for derived values
-- use `addStateListener()` when code outside the component needs to observe public state changes
+- `newValue` the incoming state value after the update
+- `oldValue` the outgoing state value before the update
+- `isInitial` whether the watcher is running as part of the initial mount update pass
+
+These properties help you compare values, filter side effects, and decide how to respond to initialization, later updates, or both.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+watch: {
+    count({ newValue, oldValue, isInitial }) {
+        console.log(newValue, oldValue, isInitial);
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterState {
+    count: number
+};
+
+watch: {
+    count({ newValue, oldValue, isInitial }) {
+        console.log(newValue, oldValue, isInitial);
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## Initial watcher runs
+
+Watchers also run during the initial mount update pass.
+
+The `isInitial` property in the context object lets you decide whether a watcher should handle initialization, later updates, or both.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+watch: {
+    count({ isInitial, newValue }) {
+        if (isInitial) return;
+
+        console.log("Count changed:", newValue);
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterState {
+    count: number
+};
+
+watch: {
+    count({ isInitial, newValue }) {
+        if (isInitial) return;
+
+        console.log("Count changed:", newValue);
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
 
 ## Watchers versus render
 
-If the goal is to update DOM state, prefer `render`.
+`render` is the best fit for DOM changes on elements the component has already resolved.
 
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">
@@ -123,6 +119,10 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface DisclosureElements {
+    panel: HTMLElement
+}
+
 render: {
     panel() {
         return {
@@ -137,7 +137,9 @@ render: {
   </TabItem>
 </Tabs>
 
-If the goal is to trigger a side effect because the state changed, use `watch`.
+However, `watch` is where imperative DOM work that goes beyond those render outputs should be managed. That includes tasks such as: restructuring DOM nodes, reordering elements, injecting new elements, and removing existing elements.
+
+In other words, if you need to perform DOM work that `render` is not meant to describe, use `watch`.
 
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">
@@ -145,8 +147,14 @@ If the goal is to trigger a side effect because the state changed, use `watch`.
 ```js
 watch: {
     open({ isInitial, newValue }) {
-        if (!isInitial && newValue) {
-            console.log("Disclosure opened");
+        if (isInitial) return;
+
+        if (newValue) {
+            const detailsElement = document.createElement("p");
+            detailsElement.textContent = "Additional details are now visible.";
+            this.root.append(detailsElement);
+        } else {
+            this.root.lastElementChild?.remove();
         }
     },
 }
@@ -156,10 +164,20 @@ watch: {
   <TabItem label="TypeScript">
 
 ```ts
+interface DisclosureState {
+    open: boolean;
+}
+
 watch: {
     open({ isInitial, newValue }) {
-        if (!isInitial && newValue) {
-            console.log("Disclosure opened");
+        if (isInitial) return;
+
+        if (newValue) {
+            const detailsElement = document.createElement("p");
+            detailsElement.textContent = "Additional details are now visible.";
+            this.root.append(detailsElement);
+        } else {
+            this.root.lastElementChild?.remove();
         }
     },
 }
@@ -168,14 +186,7 @@ watch: {
   </TabItem>
 </Tabs>
 
-## Watchers versus computed
-
-Use `computed` when you need a derived value that other component logic can read.
-
-Use `watch` when you need behavior to happen because a value changed.
 
 ## A good mental model
 
-Watchers are for internal reactions.
-
-They belong to the component definition and are best when the component itself needs to respond to its own state changes.
+Watchers are for internal reactions. They belong to the component definition and are best when the component itself needs to respond to its own state changes.
