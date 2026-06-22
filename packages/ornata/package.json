@@ -1,6 +1,6 @@
 {
     "name": "ornata",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "type": "module",
     "description": "Ornata is a type-safe framework for building and distributing interactive UI components on HTML-first applications",
     "main": "dist/index.cjs",
