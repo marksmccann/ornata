@@ -1,29 +1,27 @@
 ---
 title: Methods
 slug: "guides/methods"
-description: Use methods to name and centralize the actions your Ornata component performs.
+description: Use methods to name and centralize reusable internal actions for your component.
 ---
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 `methods` gives an Ornata component a place to define reusable internal actions.
 
-These are the named behaviors your component performs when something happens, such as a click, a toggle, a reset, or a selection change.
-
 ## Why methods matter
 
-Methods help keep a component readable.
-
-Instead of putting the same imperative logic inside multiple render callbacks or event handlers, you define the action once and call it where needed.
+Methods help keep a component readable and organized. Instead of putting the same imperative logic inside multiple render callbacks or event handlers, you define the action once and call it where needed.
 
 ## A simple example
+
+To define a method, add a function to the `methods` option and put the component action you want to reuse inside it.
 
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">
 
 ```js
 methods: {
-    increment() {
-        this.state.count += 1;
+    getPanelLabel() {
+        return this.state.open ? "Collapse panel" : "Expand panel";
     },
 }
 ```
@@ -32,9 +30,13 @@ methods: {
   <TabItem label="TypeScript">
 
 ```ts
+interface DisclosureMethods {
+    getPanelLabel: () => string
+};
+
 methods: {
-    increment() {
-        this.state.count += 1;
+    getPanelLabel() {
+        return this.state.open ? "Collapse panel" : "Expand panel";
     },
 }
 ```
@@ -42,7 +44,7 @@ methods: {
   </TabItem>
 </Tabs>
 
-That method can then be called from render events or from other methods:
+That method can then be called from other parts of the component including `render`, `watchers`, `lifecycle`, and other methods.
 
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">
@@ -51,8 +53,57 @@ That method can then be called from render events or from other methods:
 render: {
     button() {
         return {
+            text: this.methods.getPanelLabel(),
+        };
+    },
+}
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface DisclosureMethods {
+    getPanelLabel: () => string
+};
+
+interface DisclosureElements {
+    button: HTMLButtonElement
+};
+
+render: {
+    button() {
+        return {
+            text: this.methods.getPanelLabel(),
+        };
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## Methods as event handlers
+
+One of the most common uses for methods is handling UI events. Instead of defining the event logic inline in `render`, point the event directly at a named method.
+
+That keeps the render callback focused on wiring and makes the event behavior reusable and easy to name.
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+methods: {
+    handleClick() {
+        this.state.open = !this.state.open;
+    },
+},
+
+render: {
+    button() {
+        return {
             events: {
-                click: () => this.methods.increment(),
+                click: this.methods.handleClick,
             },
         };
     },
@@ -63,11 +114,25 @@ render: {
   <TabItem label="TypeScript">
 
 ```ts
+interface DisclosureMethods {
+    handleClick: (event: MouseEvent) => void
+};
+
+interface DisclosureElements {
+    button: HTMLButtonElement
+};
+
+methods: {
+    handleClick() {
+        this.state.open = !this.state.open;
+    },
+},
+
 render: {
     button() {
         return {
             events: {
-                click: () => this.methods.increment(),
+                click: this.methods.handleClick,
             },
         };
     },
@@ -81,7 +146,7 @@ render: {
 
 Methods are bound to the internal component instance.
 
-That means they can work with:
+That means they can access anything that is attached to the internal object including:
 
 - `this.state`
 - `this.elements`
@@ -90,38 +155,6 @@ That means they can work with:
 - `this.computed`
 
 This makes them a natural place for action-oriented component logic.
-
-## Good uses for methods
-
-Methods are especially useful for:
-
-- event-driven actions
-- toggles and counters
-- focus management
-- selection logic
-- logic shared across multiple event handlers
-
-Examples:
-
-- `increment()`
-- `toggle()`
-- `setActiveIndex(index)`
-- `focusFirstItem()`
-- `reset()`
-
-## Methods versus render
-
-Use `render` to describe DOM output.
-
-Use `methods` to perform actions.
-
-That separation keeps render callbacks smaller and easier to scan.
-
-## Methods versus watch
-
-Use `watch` when behavior should happen because a state property changed.
-
-Use `methods` when you want to name an action and call it intentionally.
 
 ## A good mental model
 

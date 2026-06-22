@@ -7,16 +7,6 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 `watch` lets a component react to changes in its own state.
 
-## What watchers are good for
-
-Use `watch` for internal side effects such as:
-
-- logging
-- analytics
-- timers
-- imperative integrations and DOM work
-- syncing non-render concerns to state changes
-
 ## What a watcher receives
 
 Each watcher is keyed by a state property name and receives a context object that includes:
@@ -185,6 +175,16 @@ watch: {
 
   </TabItem>
 </Tabs>
+
+## When to use state watchers
+
+Use `watch` for internal side effects such as:
+
+- logging
+- analytics
+- timers
+- imperative integrations and DOM work
+- syncing non-render concerns to state changes
 
 
 ## A good mental model
