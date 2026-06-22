@@ -28,6 +28,53 @@ describe('defineComponent', () => {
         instance.dispose();
     });
 
+    it('should give each instance its own nested data defaults', () => {
+        interface TestData {
+            cache: {
+                entries: string[];
+            };
+        }
+
+        const caches: Array<{ entries: string[] }> = [];
+        const Test = defineComponent<{
+            data: TestData;
+        }>({
+            name: 'Test',
+            data: {
+                cache: {
+                    entries: [],
+                },
+            },
+            lifecycle: {
+                mount() {
+                    caches.push(this.data.cache as { entries: string[] });
+                },
+            },
+        });
+        const instanceA = Test.mount(document.createElement('div'));
+        const instanceB = Test.mount(document.createElement('div'));
+        const [firstCache, secondCache] = caches;
+
+        expect(firstCache).toBeDefined();
+        expect(secondCache).toBeDefined();
+
+        if (!firstCache || !secondCache) {
+            throw new Error(
+                'Expected both component instances to capture data.'
+            );
+        }
+
+        firstCache.entries.push('alpha');
+
+        expect(firstCache).not.toBe(secondCache);
+        expect(firstCache.entries).not.toBe(secondCache.entries);
+        expect(firstCache.entries).toStrictEqual(['alpha']);
+        expect(secondCache.entries).toStrictEqual([]);
+
+        instanceA.dispose();
+        instanceB.dispose();
+    });
+
     it('should unmount all mounted instances', () => {
         const onUnmount = vi.fn();
         const Test = defineComponent({

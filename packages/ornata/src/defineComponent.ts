@@ -12,6 +12,7 @@ import resolveStateOptions from './resolveStateOptions';
 import validateState from './validateState';
 import resolveElementOptions from './resolveElementOptions';
 import resolveMethodOptions from './resolveMethodOptions';
+import resolveDataOptions from './resolveDataOptions';
 import renderComponent from './renderComponent';
 import getWatchCallback from './getWatchCallback';
 import resolveComputedOptions from './resolveComputedOptions';
@@ -211,6 +212,8 @@ function defineComponent<T extends Ornata.InternalInstance>(
                 methodOptions
             ) as T['methods'];
 
+            const data = resolveDataOptions(dataOptions) as T['data'];
+
             const internalState = new Proxy(state, {
                 get(target, key) {
                     if (typeof key === 'symbol') {
@@ -327,7 +330,7 @@ function defineComponent<T extends Ornata.InternalInstance>(
             internalInstance.state = internalState;
             internalInstance.elements = elements;
             internalInstance.methods = methods;
-            internalInstance.data = dataOptions as T['data'];
+            internalInstance.data = data;
             internalInstance.computed = computed;
 
             // Set up the external instance
@@ -506,35 +509,37 @@ function defineComponent<T extends Ornata.InternalInstance>(
             return instance;
         };
 
-        static findInstance: Ornata.ComponentConstructor<T>['findInstance'] =
-            (instanceRoot: string | Element | null | undefined) => {
-                try {
-                    return this.getInstance(instanceRoot);
-                } catch (error) {
-                    return null;
-                }
-            };
+        static findInstance: Ornata.ComponentConstructor<T>['findInstance'] = (
+            instanceRoot: string | Element | null | undefined
+        ) => {
+            try {
+                return this.getInstance(instanceRoot);
+            } catch (error) {
+                return null;
+            }
+        };
 
-        static unmount: Ornata.ComponentConstructor<T>['unmount'] =
-            (instanceRoot: string | Element | null | undefined) => {
-                const root = getRootElement<T['root']>(
-                    displayName,
-                    instanceRoot,
-                    'unmount'
-                );
+        static unmount: Ornata.ComponentConstructor<T>['unmount'] = (
+            instanceRoot: string | Element | null | undefined
+        ) => {
+            const root = getRootElement<T['root']>(
+                displayName,
+                instanceRoot,
+                'unmount'
+            );
 
-                const instance = externalInstances.get(root);
+            const instance = externalInstances.get(root);
 
-                if (!instance) {
-                    throw reporter.fail('ERR04', {
-                        componentName: displayName,
-                        action: 'unmount',
-                        root: describeElement(root),
-                    });
-                }
+            if (!instance) {
+                throw reporter.fail('ERR04', {
+                    componentName: displayName,
+                    action: 'unmount',
+                    root: describeElement(root),
+                });
+            }
 
-                instance.dispose();
-            };
+            instance.dispose();
+        };
 
         static unmountAll: Ornata.ComponentConstructor<T>['unmountAll'] =
             () => {
