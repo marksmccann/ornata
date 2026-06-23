@@ -1,6 +1,6 @@
 ---
 title: Browser Global
-slug: "guides/browser-global"
+slug: 'guides/browser-global'
 description: Use Ornata directly in the browser without a bundler by loading its global build into an HTML-first page.
 ---
 
@@ -23,20 +23,24 @@ The same build is also available on UNPKG:
 <script src="https://unpkg.com/ornata@0.2.0/dist/index.global.js"></script>
 ```
 
+Ornata also ships a development global build at `dist/index.global.dev.js`. Unlike the production build, it is not minified, which makes it better for debugging and preserves Ornata’s full error messaging.
+
 ## Define a component in the browser
+
+Define a component much like you normally would, but use the package exports from the `window.Ornata` global instead of importing them from a module.
 
 ```html
 <script>
     const { defineComponent } = window.Ornata;
 
     const Counter = defineComponent({
-        name: "Counter",
+        name: 'Counter',
         state: {
             count: { default: 0 },
         },
     });
 
-    Counter.mount("[data-counter]");
+    Counter.mount('[data-counter]');
 </script>
 ```
 

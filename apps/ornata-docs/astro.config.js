@@ -48,10 +48,6 @@ export default defineConfig({
                                     label: "Your First Component",
                                     slug: "guides/your-first-component",
                                 },
-                                {
-                                    label: "Page Bootstrap",
-                                    slug: "guides/page-bootstrap",
-                                },
                             ],
                         },
                         {
@@ -107,8 +103,12 @@ export default defineConfig({
                             label: "Integration",
                             items: [
                                 {
-                                    label: "Instances and Mounting",
-                                    slug: "guides/instances-and-mounting",
+                                    label: "Mounting Instances",
+                                    slug: "guides/mounting-instances",
+                                },
+                                {
+                                    label: "Instance Management",
+                                    slug: "guides/instance-management",
                                 },
                                 {
                                     label: "Safeguards",

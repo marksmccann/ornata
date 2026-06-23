@@ -1,0 +1,114 @@
+---
+title: Instance Management
+slug: "guides/instance-management"
+description: Retrieve, observe, and dispose mounted instances whether they came from `mount()` or `mountAll()`.
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+Once a component is mounted with `mount()` or `mountAll()`, the resulting instance becomes the main point of direct interaction. It can be stored, referenced, and manipulated as needed.
+
+## Work from the returned instance
+
+Both mounting APIs return the mounted instance directly. This is the simplest way to work with an instance when you already have access to it in the same scope.
+
+```js
+const one = Counter.mount("[data-counter]");
+
+const many = mountAll({
+    Counter,
+    Disclosure,
+});
+```
+
+## Retrieving an instance
+
+Every component constructor provides methods for retrieving an already mounted component instance. This is useful when you need to access an instance from a different scope than the one where it was originally created.
+
+Use `getInstance()` when you expect the instance to exist and want its absence to throw.
+
+```js
+const instance = Counter.getInstance("[data-counter]");
+```
+
+Use `findInstance()` when the instance may or may not exist.
+
+```js
+const maybeInstance = Counter.findInstance("[data-counter]");
+```
+
+## What can you do with an instance?
+
+Once you have access to an instance, it becomes the main way to interact with the component from surrounding code.
+
+The public instance exposes:
+
+- `root` is the resolved element the component was mounted on.
+- `state` is the public reactive state object
+- `dispose()` disposes of a component when it is no longer needed
+- `addStateListener()` can be used to subscribe to state changes
+
+## Read and update public state
+
+One of the main reasons to work with a mounted instance is access to its public state.
+
+The instance's state object exposes the component's public reactive state from outside the component. This allows surrounding code to read current values and, when appropriate, update them directly.
+
+```js
+const instance = Counter.mount("[data-counter]");
+
+console.log(instance.state.count);
+
+instance.state.count += 1;
+```
+
+When public state is updated successfully, Ornata runs the normal update flow for that component.
+
+## Subscribe to state changes
+
+Use `addStateListener()` to subscribe to changes for a specific public state property on a mounted instance. This enables surrounding code to react to state changes without owning the state update itself.
+
+```js
+const instance = Counter.mount("[data-counter]");
+
+const cleanup = instance.addStateListener("count", (event) => {
+    console.log(event.newValue);
+});
+```
+
+This is useful when page code needs to observe component behavior from the outside, such as syncing another part of the interface, triggering related logic, or responding to state updates across component boundaries.
+
+The returned `cleanup()` function can be used to remove the listener when it is no longer needed.
+
+## Tear instances down
+
+When a component is no longer needed, it can be unmounted in multiple different ways.
+
+When you know the root, you can unmount from the constructor:
+
+```js
+Counter.unmount("[data-counter]");
+```
+
+When you need to tear down every mounted instance for the same component constructor, use `unmountAll()`:
+
+```js
+Counter.unmountAll();
+```
+
+When you already have the instance reference, you can dispose of it directly:
+
+```js
+const instance = Counter.mount("[data-counter]");
+
+instance.dispose();
+```
+
+## A good mental model
+
+- `getInstance()` retrieves an existing one and throws if missing
+- `findInstance()` retrieves an existing one or returns `null`
+- `state` lets you read and update public state
+- `addStateListener()` lets outside code observe public state changes
+- `unmount()` removes an instance by root
+- `unmountAll()` removes every mounted instance for that constructor
+- `dispose()` removes the current instance directly

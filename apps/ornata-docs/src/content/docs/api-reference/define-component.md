@@ -53,7 +53,7 @@ Root validation options. Currently supports:
 
 - `matches`
 
-For conceptual guidance, see [Component Anatomy](/ornata/guides/component-anatomy/) and [Instances and Mounting](/ornata/guides/instances-and-mounting/).
+For conceptual guidance, see [Component Anatomy](/ornata/guides/component-anatomy/), [Mounting Instances](/ornata/guides/mounting-instances/), and [Instance Management](/ornata/guides/instance-management/).
 
 ### `state`
 

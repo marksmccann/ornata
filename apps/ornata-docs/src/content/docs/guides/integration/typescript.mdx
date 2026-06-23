@@ -1,0 +1,118 @@
+---
+title: TypeScript
+slug: 'guides/typescript'
+description: Use Ornata with explicit component types for state, elements, methods, data, and computed values.
+---
+import { Aside } from "@astrojs/starlight/components";
+
+Ornata was designed to be TypeScript-friendly. For the best TypeScript experience, define the component’s typed parts explicitly.
+
+## Type component parts explicitly
+
+Define the parts of the internal component instance (`this`) explicitly when you want stronger typing throughout the component. This allows the types for `state`, `elements`, `methods`, `data`, or `computed` to flow through wherever those parts are referenced.
+
+<Aside type="note">
+    Only the parts you use need to be defined. Any part of the instance that is not relevant can be omitted.
+</Aside>
+
+```ts
+interface CounterState {
+    count: number;
+    label: string;
+}
+
+const Counter = defineComponent<{
+    state: CounterState;
+    methods: {
+        increment(): void;
+    };
+    computed: {
+        summary: string;
+    };
+}>({
+    name: 'Counter',
+    state: {
+        count: { default: 0 },
+        label: { default: 'Clicks' },
+    },
+    methods: {
+        increment() {
+            this.state.count += 1;
+        },
+    },
+    computed: {
+        summary() {
+            return `${this.state.label}: ${this.state.count}`;
+        },
+    },
+});
+```
+
+## Type `state` as part of the component API
+
+Explicit `state` types do more than improve authoring inside the component. They also shape the public contract that downstream code works with through the constructor, mounted instance, and state listeners.
+
+```ts
+interface DisclosureState {
+    /** Whether the disclosure is currently expanded. */
+    open: boolean;
+
+    /** Text announced to external code and visible UI. */
+    label: string;
+}
+
+const Disclosure = defineComponent<{
+    state: DisclosureState;
+}>({
+    state: {
+        open: { default: false },
+        label: { default: "Details" },
+    },
+});
+```
+
+That means well-typed state and good JSDoc comments can improve:
+
+- authoring inside the component through clearer `this.state` access
+- mounted instance usage through better `instance.state` autocomplete and docs
+- state listener usage through clearer property names and value types
+
+## Typing `elements` with `resolve()`
+
+When you use `resolve()` to return a custom element shape or a narrower DOM type, cast the returned value so it matches the type declared for that element on the component.
+
+```ts
+interface LiveFilterState {
+    query: string;
+}
+
+const LiveFilter = defineComponent<{
+    state: LiveFilterState;
+    elements: {
+        input: HTMLInputElement | null;
+        items: HTMLElement[];
+    };
+}>({
+    state: {
+        query: { default: '' },
+    },
+    elements: {
+        input: {
+            resolve(root) {
+                const input = root.querySelector('[data-filter-input]');
+                return input as HTMLInputElement | null;
+            },
+        },
+        items: {
+            resolve(root) {
+                const items = root.querySelectorAll('[data-filter-item]');
+                return Array.from(items) as HTMLElement[];
+            },
+        },
+    },
+});
+```
+
+## A good mental model
+
+In Ornata, types are part of the component contract. When you type a component explicitly, you are not only improving authoring inside the component itself. You are also shaping the API that downstream code will interact with.

@@ -1,0 +1,89 @@
+---
+title: Mounting Instances
+slug: "guides/mounting-instances"
+description: Compare `mount()` and `mountAll()` so you can choose the right mounting pattern for each page.
+---
+import { Aside, Tabs, TabItem } from "@astrojs/starlight/components";
+
+Ornata has two main ways to create mounted component instances: `mount()` and `mountAll()`. Both methods create the same kind of mounted instance, but they take different paths to get there. Your particular use case and environment will likely dictate which one you choose, and some projects may use both.
+
+## Every instance has a root
+
+Every Ornata component instance is tied to a single root element. That root defines the boundary of the instance: it is where the component mounts, where state can be initialized from, and where later instance lookup begins. Both `mount()` and `mountAll()` create the same kind of mounted instance. The difference is how each API finds and mounts that root.
+
+## Mount with `mount()`
+
+The `mount()` method is the explicit API for creating an individual component instance. It mounts a component from JavaScript using a direct reference to the component constructor and a specific root element. This is the most straightforward way to create an instance.
+
+To create an instance, pass mount() a direct reference to the root as either an element or a selector:
+
+```js
+const instanceA = Counter.mount(document.querySelector("[data-counter]"));
+const instanceB = Counter.mount("[data-counter]");
+```
+
+## Mount with `mountAll()`
+
+The `mountAll()` method is Ornata’s declarative HTML API. Instead of mounting one known root directly from JavaScript, it mounts components that have already been declared in the HTML. This makes it a good fit for instantiating multiple components in bulk.
+
+Using this approach takes three simple steps:
+
+### 1. Mark up roots in HTML
+
+Add a `data-ornata` attribute whose value matches the component name you want to initialize.
+
+```html
+<section data-ornata="Counter" data-counter>
+    <span data-count-value>0</span>
+    <button data-count-button>Increment</button>
+</section>
+
+<section data-ornata="Disclosure" data-disclosure>
+    <button data-disclosure-button>Toggle</button>
+    <div data-disclosure-panel hidden>Panel content</div>
+</section>
+```
+
+## 2. Build a component registry
+
+Create a small registry that maps component names to their constructors.
+
+<Aside type="note">
+    The value of every `data-ornata` attribute in the HTML must match a key from this component registry.
+    If it does not, Ornata will report an error and skip that root.
+</Aside>
+
+```js
+import { Counter } from "./counter";
+import { Disclosure } from "./disclosure";
+
+export const components = {
+    Counter,
+    Disclosure,
+};
+```
+
+### 3. Mount the registry
+
+Pass the registry to `mountAll()` to mount every matching `data-ornata` root in the HTML at once.
+
+```js
+import { mountAll } from "ornata";
+import { components } from "./components";
+
+const instances = mountAll(components);
+```
+
+**What happens during mounting**
+
+- finds all `[data-ornata]` roots
+- reads the component name from `data-ornata`
+- validates that the name maps to a real Ornata component constructor
+- mounts each root
+- removes the `data-ornata` attribute afterward
+- returns the mounted instances
+
+## A good mental model
+
+- `mount()` is targeted setup for one root at a time
+- `mountAll()` is declarative discovery plus bulk mounting
