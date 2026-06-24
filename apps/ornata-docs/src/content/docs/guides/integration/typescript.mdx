@@ -3,7 +3,8 @@ title: TypeScript
 slug: 'guides/typescript'
 description: Use Ornata with explicit component types for state, elements, methods, data, and computed values.
 ---
-import { Aside } from "@astrojs/starlight/components";
+
+import { Aside } from '@astrojs/starlight/components';
 
 Ornata was designed to be TypeScript-friendly. For the best TypeScript experience, define the component’s typed parts explicitly.
 
@@ -12,7 +13,8 @@ Ornata was designed to be TypeScript-friendly. For the best TypeScript experienc
 Define the parts of the internal component instance (`this`) explicitly when you want stronger typing throughout the component. This allows the types for `state`, `elements`, `methods`, `data`, or `computed` to flow through wherever those parts are referenced.
 
 <Aside type="note">
-    Only the parts you use need to be defined. Any part of the instance that is not relevant can be omitted.
+    Only the parts you use need to be defined. Any part of the instance that is
+    not relevant can be omitted.
 </Aside>
 
 ```ts
@@ -66,7 +68,7 @@ const Disclosure = defineComponent<{
 }>({
     state: {
         open: { default: false },
-        label: { default: "Details" },
+        label: { default: 'Details' },
     },
 });
 ```

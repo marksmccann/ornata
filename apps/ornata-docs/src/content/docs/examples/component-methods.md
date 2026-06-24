@@ -3,7 +3,6 @@ title: Component Methods
 description: Keep event handlers small by moving action logic into named component methods that belong to the component contract.
 ---
 
-
 This example shows how methods keep action logic out of inline event handlers so behavior stays portable and easy to grow.
 
 ## Live Demo
@@ -20,16 +19,16 @@ This example shows how methods keep action logic out of inline event handlers so
 ## Component
 
 ```ts
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 export const Disclosure = defineComponent({
-    name: "Disclosure",
+    name: 'Disclosure',
     state: {
         open: { default: false, type: Boolean },
     },
     elements: {
-        button: { query: "[data-disclosure-button]" },
-        panel: { query: "[data-disclosure-panel]" },
+        button: { query: '[data-disclosure-button]' },
+        panel: { query: '[data-disclosure-panel]' },
     },
     methods: {
         open() {
@@ -46,7 +45,7 @@ export const Disclosure = defineComponent({
         button() {
             return {
                 attributes: {
-                    "aria-expanded": String(this.state.open),
+                    'aria-expanded': String(this.state.open),
                 },
                 events: {
                     click: () => this.methods.toggle(),

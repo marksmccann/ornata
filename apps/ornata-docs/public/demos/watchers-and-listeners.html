@@ -7,7 +7,7 @@
         <style>
             :root {
                 color-scheme: light;
-                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                font-family: 'Avenir Next', 'Segoe UI', sans-serif;
                 background: #f6f4fb;
                 color: #201d33;
             }
@@ -22,8 +22,12 @@
                 display: grid;
                 place-items: center;
                 padding: 24px;
-                background:
-                    radial-gradient(circle at top, #fffeff 0, #f2effb 48%, #e3dcf5 100%);
+                background: radial-gradient(
+                    circle at top,
+                    #fffeff 0,
+                    #f2effb 48%,
+                    #e3dcf5 100%
+                );
             }
 
             .demo-shell {
@@ -84,7 +88,10 @@
     <body>
         <main class="demo-shell">
             <h1>Watchers and Listeners Demo</h1>
-            <p>Each click triggers both an internal watcher and an external state listener.</p>
+            <p>
+                Each click triggers both an internal watcher and an external
+                state listener.
+            </p>
 
             <section data-counter>
                 <div class="row">
@@ -99,22 +106,22 @@
         <script src="https://cdn.jsdelivr.net/npm/ornata/dist/index.global.js"></script>
         <script>
             const { defineComponent } = window.Ornata;
-            const logRoot = document.querySelector("[data-log]");
+            const logRoot = document.querySelector('[data-log]');
 
             const addLog = (message) => {
-                const entry = document.createElement("li");
+                const entry = document.createElement('li');
                 entry.textContent = message;
                 logRoot.prepend(entry);
             };
 
             const Counter = defineComponent({
-                name: "Counter",
+                name: 'Counter',
                 state: {
                     count: { default: 0, type: Number },
                 },
                 elements: {
-                    value: { query: "[data-count-value]" },
-                    button: { query: "[data-count-button]" },
+                    value: { query: '[data-count-value]' },
+                    button: { query: '[data-count-button]' },
                 },
                 methods: {
                     increment() {
@@ -144,9 +151,9 @@
                 },
             });
 
-            const instance = Counter.mount("[data-counter]");
+            const instance = Counter.mount('[data-counter]');
 
-            instance.addStateListener("count", ({ newValue, oldValue }) => {
+            instance.addStateListener('count', ({ newValue, oldValue }) => {
                 addLog(`External listener: ${oldValue} -> ${newValue}`);
             });
         </script>

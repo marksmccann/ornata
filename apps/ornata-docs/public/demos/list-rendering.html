@@ -7,7 +7,7 @@
         <style>
             :root {
                 color-scheme: light;
-                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                font-family: 'Avenir Next', 'Segoe UI', sans-serif;
                 background: #f2f5fb;
                 color: #192335;
             }
@@ -22,8 +22,12 @@
                 display: grid;
                 place-items: center;
                 padding: 24px;
-                background:
-                    radial-gradient(circle at top, #fcfdff 0, #eef2fb 48%, #dde6f8 100%);
+                background: radial-gradient(
+                    circle at top,
+                    #fcfdff 0,
+                    #eef2fb 48%,
+                    #dde6f8 100%
+                );
             }
 
             .demo-shell {
@@ -108,7 +112,10 @@
     <body>
         <main class="demo-shell">
             <h1>List Rendering Demo</h1>
-            <p>Each step responds to shared state through list rendering with <code>index</code>.</p>
+            <p>
+                Each step responds to shared state through list rendering with
+                <code>index</code>.
+            </p>
 
             <section data-stepper>
                 <ol>
@@ -129,18 +136,21 @@
             const { defineComponent } = window.Ornata;
 
             const Stepper = defineComponent({
-                name: "Stepper",
+                name: 'Stepper',
                 state: {
                     activeIndex: { default: 0, type: Number },
                 },
                 elements: {
-                    steps: { queryAll: "[data-step]", min: 2 },
-                    prev: { query: "[data-prev]" },
-                    next: { query: "[data-next]" },
+                    steps: { queryAll: '[data-step]', min: 2 },
+                    prev: { query: '[data-prev]' },
+                    next: { query: '[data-next]' },
                 },
                 methods: {
                     previous() {
-                        this.state.activeIndex = Math.max(0, this.state.activeIndex - 1);
+                        this.state.activeIndex = Math.max(
+                            0,
+                            this.state.activeIndex - 1
+                        );
                     },
                     next() {
                         this.state.activeIndex = Math.min(
@@ -152,16 +162,18 @@
                 render: {
                     steps({ index }) {
                         const currentIndex = index ?? 0;
-                        const isActive = currentIndex === this.state.activeIndex;
-                        const isComplete = currentIndex < this.state.activeIndex;
+                        const isActive =
+                            currentIndex === this.state.activeIndex;
+                        const isComplete =
+                            currentIndex < this.state.activeIndex;
 
                         return {
                             attributes: {
-                                "aria-current": isActive ? "step" : null,
+                                'aria-current': isActive ? 'step' : null,
                             },
                             classes: {
-                                "is-active": isActive,
-                                "is-complete": isComplete,
+                                'is-active': isActive,
+                                'is-complete': isComplete,
                             },
                         };
                     },
@@ -192,7 +204,7 @@
                 },
             });
 
-            Stepper.mount("[data-stepper]");
+            Stepper.mount('[data-stepper]');
         </script>
     </body>
 </html>

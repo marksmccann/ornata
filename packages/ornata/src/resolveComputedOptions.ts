@@ -1,5 +1,5 @@
-import type { ComputedOptions, InternalInstance } from "./runtime.js";
-import reporter from "./reporter.js";
+import type { ComputedOptions, InternalInstance } from './runtime.js';
+import reporter from './reporter.js';
 
 /**
  * Recomputes every computed property for a component after a state change and

@@ -7,7 +7,7 @@
         <style>
             :root {
                 color-scheme: light;
-                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                font-family: 'Avenir Next', 'Segoe UI', sans-serif;
                 background: #f4f6fb;
                 color: #192235;
             }
@@ -22,8 +22,12 @@
                 display: grid;
                 place-items: center;
                 padding: 24px;
-                background:
-                    radial-gradient(circle at top, #fdfdff 0, #eef2fb 46%, #dfe7f8 100%);
+                background: radial-gradient(
+                    circle at top,
+                    #fdfdff 0,
+                    #eef2fb 46%,
+                    #dfe7f8 100%
+                );
             }
 
             .demo-shell {
@@ -96,7 +100,7 @@
                 gap: 10px;
             }
 
-            .carousel-pagination button[aria-current="true"] {
+            .carousel-pagination button[aria-current='true'] {
                 color: white;
                 border-color: #224fae;
                 background: linear-gradient(135deg, #346bdd, #1c3f86);
@@ -112,7 +116,10 @@
     <body>
         <main class="demo-shell">
             <h1>Markup Augmentation Demo</h1>
-            <p>The slides already exist in the HTML. Ornata generates the controls, pagination, and status output around them.</p>
+            <p>
+                The slides already exist in the HTML. Ornata generates the
+                controls, pagination, and status output around them.
+            </p>
 
             <section data-carousel>
                 <article data-slide>
@@ -135,20 +142,20 @@
             const { defineComponent } = window.Ornata;
 
             const Carousel = defineComponent({
-                name: "Carousel",
+                name: 'Carousel',
                 state: {
                     activeIndex: { default: 0, type: Number },
                 },
                 elements: {
                     slides: {
-                        queryAll: "[data-slide]",
+                        queryAll: '[data-slide]',
                         min: 2,
                     },
-                    controls: { create: "div" },
-                    prev: { create: "button" },
-                    next: { create: "button" },
-                    pagination: { create: "div" },
-                    status: { create: "output" },
+                    controls: { create: 'div' },
+                    prev: { create: 'button' },
+                    next: { create: 'button' },
+                    pagination: { create: 'div' },
+                    status: { create: 'output' },
                 },
                 lifecycle: {
                     mount() {
@@ -159,19 +166,22 @@
                         );
 
                         this.elements.slides.forEach((_, index) => {
-                            const button = document.createElement("button");
+                            const button = document.createElement('button');
 
-                            button.type = "button";
+                            button.type = 'button';
                             button.textContent = String(index + 1);
                             button.dataset.paginationIndex = String(index);
-                            button.addEventListener("click", () => {
+                            button.addEventListener('click', () => {
                                 this.methods.select(index);
                             });
 
                             this.elements.pagination.append(button);
                         });
 
-                        this.root.append(this.elements.controls, this.elements.status);
+                        this.root.append(
+                            this.elements.controls,
+                            this.elements.status
+                        );
                         this.methods.updatePagination();
                         this.methods.syncStatus();
                     },
@@ -193,10 +203,10 @@
                         Array.from(this.elements.pagination.children).forEach(
                             (button, index) => {
                                 button.setAttribute(
-                                    "aria-current",
+                                    'aria-current',
                                     index === this.state.activeIndex
-                                        ? "true"
-                                        : "false"
+                                        ? 'true'
+                                        : 'false'
                                 );
                             }
                         );
@@ -208,7 +218,9 @@
                         this.state.activeIndex = index;
                     },
                     previous() {
-                        this.methods.select(Math.max(0, this.state.activeIndex - 1));
+                        this.methods.select(
+                            Math.max(0, this.state.activeIndex - 1)
+                        );
                     },
                     next() {
                         this.methods.select(
@@ -226,7 +238,7 @@
                         return {
                             attributes: {
                                 hidden: currentIndex !== this.state.activeIndex,
-                                "aria-hidden": String(
+                                'aria-hidden': String(
                                     currentIndex !== this.state.activeIndex
                                 ),
                             },
@@ -234,9 +246,9 @@
                     },
                     prev() {
                         return {
-                            text: "Previous",
+                            text: 'Previous',
                             attributes: {
-                                type: "button",
+                                type: 'button',
                                 disabled: this.state.activeIndex === 0,
                             },
                             events: {
@@ -246,9 +258,9 @@
                     },
                     next() {
                         return {
-                            text: "Next",
+                            text: 'Next',
                             attributes: {
-                                type: "button",
+                                type: 'button',
                                 disabled:
                                     this.state.activeIndex ===
                                     this.elements.slides.length - 1,
@@ -261,31 +273,31 @@
                     controls() {
                         return {
                             classes: {
-                                "carousel-controls": true,
+                                'carousel-controls': true,
                             },
                         };
                     },
                     pagination() {
                         return {
                             classes: {
-                                "carousel-pagination": true,
+                                'carousel-pagination': true,
                             },
                         };
                     },
                     status() {
                         return {
                             attributes: {
-                                "aria-live": "polite",
+                                'aria-live': 'polite',
                             },
                             classes: {
-                                "carousel-status": true,
+                                'carousel-status': true,
                             },
                         };
                     },
                 },
             });
 
-            Carousel.mount("[data-carousel]");
+            Carousel.mount('[data-carousel]');
         </script>
     </body>
 </html>

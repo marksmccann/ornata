@@ -3,18 +3,13 @@ title: Build a Disclosure
 description: Build a progressively enhanced disclosure component contract step by step.
 ---
 
-
 This tutorial walks through a small disclosure component from plain HTML to reusable interactive behavior.
 
 ## Step 1: Write the baseline HTML
 
 ```html
 <section data-disclosure>
-    <button
-        type="button"
-        aria-expanded="false"
-        data-disclosure-button
-    >
+    <button type="button" aria-expanded="false" data-disclosure-button>
         More details
     </button>
 
@@ -82,16 +77,16 @@ render: {
 ## Full component
 
 ```ts
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 export const Disclosure = defineComponent({
-    name: "Disclosure",
+    name: 'Disclosure',
     state: {
         open: { default: false, type: Boolean },
     },
     elements: {
-        button: { query: "[data-disclosure-button]" },
-        panel: { query: "[data-disclosure-panel]" },
+        button: { query: '[data-disclosure-button]' },
+        panel: { query: '[data-disclosure-panel]' },
     },
     methods: {
         toggle() {
@@ -102,7 +97,7 @@ export const Disclosure = defineComponent({
         button() {
             return {
                 attributes: {
-                    "aria-expanded": String(this.state.open),
+                    'aria-expanded': String(this.state.open),
                 },
                 events: {
                     click: () => this.methods.toggle(),
@@ -123,7 +118,7 @@ export const Disclosure = defineComponent({
 ## Step 6: Mount it
 
 ```ts
-Disclosure.mount("[data-disclosure]");
+Disclosure.mount('[data-disclosure]');
 ```
 
 ## What this tutorial shows

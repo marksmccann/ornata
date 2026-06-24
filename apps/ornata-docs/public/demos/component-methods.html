@@ -7,7 +7,7 @@
         <style>
             :root {
                 color-scheme: light;
-                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                font-family: 'Avenir Next', 'Segoe UI', sans-serif;
                 background: #f5f7fc;
                 color: #1b2231;
             }
@@ -22,8 +22,12 @@
                 display: grid;
                 place-items: center;
                 padding: 24px;
-                background:
-                    radial-gradient(circle at top, #ffffff 0, #eff3fb 48%, #dfe7f8 100%);
+                background: radial-gradient(
+                    circle at top,
+                    #ffffff 0,
+                    #eff3fb 48%,
+                    #dfe7f8 100%
+                );
             }
 
             .demo-shell {
@@ -78,7 +82,10 @@
     <body>
         <main class="demo-shell">
             <h1>Component Methods Demo</h1>
-            <p>The render layer stays small because the named actions live in methods.</p>
+            <p>
+                The render layer stays small because the named actions live in
+                methods.
+            </p>
 
             <section data-disclosure>
                 <div class="button-row">
@@ -88,7 +95,8 @@
                 </div>
 
                 <div hidden data-disclosure-panel>
-                    These buttons all call named methods instead of duplicating inline state mutation.
+                    These buttons all call named methods instead of duplicating
+                    inline state mutation.
                 </div>
             </section>
         </main>
@@ -98,15 +106,15 @@
             const { defineComponent } = window.Ornata;
 
             const Disclosure = defineComponent({
-                name: "Disclosure",
+                name: 'Disclosure',
                 state: {
                     open: { default: false, type: Boolean },
                 },
                 elements: {
-                    openButton: { query: "[data-open-button]" },
-                    closeButton: { query: "[data-close-button]" },
-                    toggleButton: { query: "[data-toggle-button]" },
-                    panel: { query: "[data-disclosure-panel]" },
+                    openButton: { query: '[data-open-button]' },
+                    closeButton: { query: '[data-close-button]' },
+                    toggleButton: { query: '[data-toggle-button]' },
+                    panel: { query: '[data-disclosure-panel]' },
                 },
                 methods: {
                     open() {
@@ -151,7 +159,7 @@
                 },
             });
 
-            Disclosure.mount("[data-disclosure]");
+            Disclosure.mount('[data-disclosure]');
         </script>
     </body>
 </html>

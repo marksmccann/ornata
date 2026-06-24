@@ -3,7 +3,6 @@ title: Persistent Data
 description: Use data to keep internal values alive across lifecycle hooks and component behavior without making them reactive state.
 ---
 
-
 This example shows why `data` is useful for values that need to persist inside a reusable component without participating in rendering.
 
 ## Live Demo
@@ -20,21 +19,21 @@ This example shows why `data` is useful for values that need to persist inside a
 ## Component
 
 ```ts
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 export const Clock = defineComponent<{
     data: {
         intervalId: number | null;
     };
 }>({
-    name: "Clock",
+    name: 'Clock',
     data: {
         intervalId: null,
     },
     lifecycle: {
         mount() {
             this.data.intervalId = window.setInterval(() => {
-                console.log("tick");
+                console.log('tick');
             }, 1000);
         },
         unmount() {

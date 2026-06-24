@@ -2,7 +2,8 @@
 title: Markup Augmentation
 description: Enhance authored HTML by generating interactive supporting structure around it at runtime.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 This example shows how Ornata can enhance existing HTML by generating additional markup that becomes a core part of the interaction.
 
@@ -44,20 +45,20 @@ In this example, the slides already exist in the page markup, so the content rem
   <TabItem label="JavaScript">
 
 ```js
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 export const Carousel = defineComponent({
-    name: "Carousel",
+    name: 'Carousel',
     state: {
         activeIndex: { default: 0, type: Number },
     },
     elements: {
-        slides: { queryAll: "[data-slide]", min: 2 },
-        controls: { create: "div" },
-        prev: { create: "button" },
-        next: { create: "button" },
-        pagination: { create: "div" },
-        status: { create: "output" },
+        slides: { queryAll: '[data-slide]', min: 2 },
+        controls: { create: 'div' },
+        prev: { create: 'button' },
+        next: { create: 'button' },
+        pagination: { create: 'div' },
+        status: { create: 'output' },
     },
     lifecycle: {
         mount() {
@@ -68,12 +69,12 @@ export const Carousel = defineComponent({
             );
 
             this.elements.slides.forEach((_, index) => {
-                const button = document.createElement("button");
+                const button = document.createElement('button');
 
-                button.type = "button";
+                button.type = 'button';
                 button.textContent = String(index + 1);
                 button.dataset.paginationIndex = String(index);
-                button.addEventListener("click", () => {
+                button.addEventListener('click', () => {
                     this.methods.select(index);
                 });
 
@@ -102,8 +103,8 @@ export const Carousel = defineComponent({
             Array.from(this.elements.pagination.children).forEach(
                 (button, index) => {
                     button.setAttribute(
-                        "aria-current",
-                        index === this.state.activeIndex ? "true" : "false"
+                        'aria-current',
+                        index === this.state.activeIndex ? 'true' : 'false'
                     );
                 }
             );
@@ -133,15 +134,17 @@ export const Carousel = defineComponent({
             return {
                 attributes: {
                     hidden: currentIndex !== this.state.activeIndex,
-                    "aria-hidden": String(currentIndex !== this.state.activeIndex),
+                    'aria-hidden': String(
+                        currentIndex !== this.state.activeIndex
+                    ),
                 },
             };
         },
         prev() {
             return {
-                text: "Previous",
+                text: 'Previous',
                 attributes: {
-                    type: "button",
+                    type: 'button',
                     disabled: this.state.activeIndex === 0,
                 },
                 events: {
@@ -151,11 +154,12 @@ export const Carousel = defineComponent({
         },
         next() {
             return {
-                text: "Next",
+                text: 'Next',
                 attributes: {
-                    type: "button",
+                    type: 'button',
                     disabled:
-                        this.state.activeIndex === this.elements.slides.length - 1,
+                        this.state.activeIndex ===
+                        this.elements.slides.length - 1,
                 },
                 events: {
                     click: () => this.methods.next(),
@@ -165,24 +169,24 @@ export const Carousel = defineComponent({
         controls() {
             return {
                 classes: {
-                    "carousel-controls": true,
+                    'carousel-controls': true,
                 },
             };
         },
         pagination() {
             return {
                 classes: {
-                    "carousel-pagination": true,
+                    'carousel-pagination': true,
                 },
             };
         },
         status() {
             return {
                 attributes: {
-                    "aria-live": "polite",
+                    'aria-live': 'polite',
                 },
                 classes: {
-                    "carousel-status": true,
+                    'carousel-status': true,
                 },
             };
         },
@@ -194,11 +198,11 @@ export const Carousel = defineComponent({
   <TabItem label="TypeScript">
 
 ```ts
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 interface CarouselState {
     activeIndex: number;
-};
+}
 
 export const Carousel = defineComponent<{
     state: CarouselState;
@@ -218,17 +222,17 @@ export const Carousel = defineComponent<{
         next(): void;
     };
 }>({
-    name: "Carousel",
+    name: 'Carousel',
     state: {
         activeIndex: { default: 0, type: Number },
     },
     elements: {
-        slides: { queryAll: "[data-slide]", min: 2 },
-        controls: { create: "div" },
-        prev: { create: "button" },
-        next: { create: "button" },
-        pagination: { create: "div" },
-        status: { create: "output" },
+        slides: { queryAll: '[data-slide]', min: 2 },
+        controls: { create: 'div' },
+        prev: { create: 'button' },
+        next: { create: 'button' },
+        pagination: { create: 'div' },
+        status: { create: 'output' },
     },
     lifecycle: {
         mount() {
@@ -239,12 +243,12 @@ export const Carousel = defineComponent<{
             );
 
             this.elements.slides.forEach((_, index) => {
-                const button = document.createElement("button");
+                const button = document.createElement('button');
 
-                button.type = "button";
+                button.type = 'button';
                 button.textContent = String(index + 1);
                 button.dataset.paginationIndex = String(index);
-                button.addEventListener("click", () => {
+                button.addEventListener('click', () => {
                     this.methods.select(index);
                 });
 
@@ -273,8 +277,8 @@ export const Carousel = defineComponent<{
             Array.from(this.elements.pagination.children).forEach(
                 (button, index) => {
                     button.setAttribute(
-                        "aria-current",
-                        index === this.state.activeIndex ? "true" : "false"
+                        'aria-current',
+                        index === this.state.activeIndex ? 'true' : 'false'
                     );
                 }
             );
@@ -304,15 +308,17 @@ export const Carousel = defineComponent<{
             return {
                 attributes: {
                     hidden: currentIndex !== this.state.activeIndex,
-                    "aria-hidden": String(currentIndex !== this.state.activeIndex),
+                    'aria-hidden': String(
+                        currentIndex !== this.state.activeIndex
+                    ),
                 },
             };
         },
         prev() {
             return {
-                text: "Previous",
+                text: 'Previous',
                 attributes: {
-                    type: "button",
+                    type: 'button',
                     disabled: this.state.activeIndex === 0,
                 },
                 events: {
@@ -322,11 +328,12 @@ export const Carousel = defineComponent<{
         },
         next() {
             return {
-                text: "Next",
+                text: 'Next',
                 attributes: {
-                    type: "button",
+                    type: 'button',
                     disabled:
-                        this.state.activeIndex === this.elements.slides.length - 1,
+                        this.state.activeIndex ===
+                        this.elements.slides.length - 1,
                 },
                 events: {
                     click: () => this.methods.next(),
@@ -336,24 +343,24 @@ export const Carousel = defineComponent<{
         controls() {
             return {
                 classes: {
-                    "carousel-controls": true,
+                    'carousel-controls': true,
                 },
             };
         },
         pagination() {
             return {
                 classes: {
-                    "carousel-pagination": true,
+                    'carousel-pagination': true,
                 },
             };
         },
         status() {
             return {
                 attributes: {
-                    "aria-live": "polite",
+                    'aria-live': 'polite',
                 },
                 classes: {
-                    "carousel-status": true,
+                    'carousel-status': true,
                 },
             };
         },
@@ -370,14 +377,14 @@ export const Carousel = defineComponent<{
   <TabItem label="JavaScript">
 
 ```js
-Carousel.mount("[data-carousel]");
+Carousel.mount('[data-carousel]');
 ```
 
   </TabItem>
   <TabItem label="TypeScript">
 
 ```ts
-Carousel.mount("[data-carousel]");
+Carousel.mount('[data-carousel]');
 ```
 
   </TabItem>

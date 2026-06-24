@@ -15,7 +15,9 @@ describe('resolveDataOptions', () => {
             },
         };
 
-        const resolvedData = resolveDataOptions(dataOptions) as typeof dataOptions;
+        const resolvedData = resolveDataOptions(
+            dataOptions
+        ) as typeof dataOptions;
 
         expect(resolvedData).toStrictEqual(dataOptions);
         expect(resolvedData).not.toBe(dataOptions);
@@ -32,7 +34,9 @@ describe('resolveDataOptions', () => {
             timestamp,
         };
 
-        const resolvedData = resolveDataOptions(dataOptions) as typeof dataOptions;
+        const resolvedData = resolveDataOptions(
+            dataOptions
+        ) as typeof dataOptions;
 
         expect(resolvedData.timestamp).toBe(timestamp);
     });

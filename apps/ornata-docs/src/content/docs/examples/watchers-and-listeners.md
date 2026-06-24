@@ -3,7 +3,6 @@ title: Watchers and Listeners
 description: Compare internal watch callbacks with external addStateListener subscriptions.
 ---
 
-
 This example shows the difference between `watch` and `addStateListener()` when a component needs both internal reactions and external integration hooks.
 
 ## Live Demo
@@ -20,10 +19,10 @@ This example shows the difference between `watch` and `addStateListener()` when 
 ## Component
 
 ```ts
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 export const Counter = defineComponent({
-    name: "Counter",
+    name: 'Counter',
     state: {
         count: { default: 0, type: Number },
     },
@@ -36,9 +35,7 @@ export const Counter = defineComponent({
         count({ isInitial, newValue, oldValue }) {
             if (isInitial) return;
 
-            console.log(
-                `Internal watcher: ${oldValue} -> ${newValue}`
-            );
+            console.log(`Internal watcher: ${oldValue} -> ${newValue}`);
         },
     },
 });
@@ -47,9 +44,9 @@ export const Counter = defineComponent({
 ## External subscription
 
 ```ts
-const instance = Counter.mount("[data-counter]");
+const instance = Counter.mount('[data-counter]');
 
-const cleanup = instance.addStateListener("count", ({ newValue, oldValue }) => {
+const cleanup = instance.addStateListener('count', ({ newValue, oldValue }) => {
     console.log(`External listener: ${oldValue} -> ${newValue}`);
 });
 ```

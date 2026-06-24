@@ -41,20 +41,11 @@ export default function renderElement(
                 data
             );
         } else if (option === 'style') {
-            renderStyle(
-                entry[1] as Ornata.RenderOptions['style'],
-                data
-            );
+            renderStyle(entry[1] as Ornata.RenderOptions['style'], data);
         } else if (option === 'classes') {
-            renderClasses(
-                entry[1] as Ornata.RenderOptions['classes'],
-                data
-            );
+            renderClasses(entry[1] as Ornata.RenderOptions['classes'], data);
         } else if (option === 'dataset') {
-            renderDataset(
-                entry[1] as Ornata.RenderOptions['dataset'],
-                data
-            );
+            renderDataset(entry[1] as Ornata.RenderOptions['dataset'], data);
         } else if (option === 'events') {
             eventsCleanup = attachEvents.call(
                 this,

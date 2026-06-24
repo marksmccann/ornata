@@ -7,7 +7,7 @@
         <style>
             :root {
                 color-scheme: light;
-                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                font-family: 'Avenir Next', 'Segoe UI', sans-serif;
                 background: #f7f2ea;
                 color: #241d15;
             }
@@ -22,8 +22,12 @@
                 display: grid;
                 place-items: center;
                 padding: 24px;
-                background:
-                    radial-gradient(circle at top, #fffcf7 0, #f6efe3 48%, #eadfce 100%);
+                background: radial-gradient(
+                    circle at top,
+                    #fffcf7 0,
+                    #f6efe3 48%,
+                    #eadfce 100%
+                );
             }
 
             .demo-shell {
@@ -74,7 +78,11 @@
     <body>
         <main class="demo-shell">
             <h1>HTML State Demo</h1>
-            <p>The initial value comes from the server-rendered HTML, not the JavaScript definition. It is applied to the initial HTML attribute: <code>data-count="3"</code></p>
+            <p>
+                The initial value comes from the server-rendered HTML, not the
+                JavaScript definition. It is applied to the initial HTML
+                attribute: <code>data-count="3"</code>
+            </p>
 
             <section data-counter data-count="3" data-label="Server count">
                 <p>
@@ -90,13 +98,13 @@
             const { defineComponent } = window.Ornata;
 
             const Counter = defineComponent({
-                name: "Counter",
+                name: 'Counter',
                 state: {
                     count: { default: 0, type: Number },
                 },
                 elements: {
-                    value: { query: "[data-count-value]" },
-                    button: { query: "[data-count-button]" },
+                    value: { query: '[data-count-value]' },
+                    button: { query: '[data-count-button]' },
                 },
                 methods: {
                     increment() {
@@ -119,7 +127,7 @@
                 },
             });
 
-            Counter.mount("[data-counter]");
+            Counter.mount('[data-counter]');
         </script>
     </body>
 </html>

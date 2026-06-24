@@ -1,17 +1,19 @@
 ---
 title: Your First Component
-slug: "guides/your-first-component"
+slug: 'guides/your-first-component'
 description: Build a small progressively enhanced component and learn the core Ornata authoring pattern.
 ---
-import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
 The easiest way to learn Ornata is to enhance a small piece of existing HTML with a clear component contract.
 
 ## The markup
 
 <Aside type="note">
-    Even without JavaScript, the HTML can still provide meaningful content from the start. How much it provides
-    depends on you, the constraints of your environment, and the kind of component you are building.
+    Even without JavaScript, the HTML can still provide meaningful content from
+    the start. How much it provides depends on you, the constraints of your
+    environment, and the kind of component you are building.
 </Aside>
 
 ```html
@@ -29,18 +31,18 @@ The easiest way to learn Ornata is to enhance a small piece of existing HTML wit
   <TabItem label="JavaScript">
 
 ```js
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 const Disclosure = defineComponent({
-    name: "Disclosure",
+    name: 'Disclosure',
     state: {
         open: { default: false, type: Boolean },
-        openLabel: { default: "Hide details" },
-        closedLabel: { default: "Show details" },
+        openLabel: { default: 'Hide details' },
+        closedLabel: { default: 'Show details' },
     },
     elements: {
-        button: { query: "[data-disclosure-button]" },
-        panel: { query: "[data-disclosure-panel]" },
+        button: { query: '[data-disclosure-button]' },
+        panel: { query: '[data-disclosure-panel]' },
     },
     methods: {
         toggle() {
@@ -51,7 +53,9 @@ const Disclosure = defineComponent({
         open({ newValue, oldValue, isInitial }) {
             if (isInitial) return;
 
-            console.log(`Disclosure's open state changed from ${oldValue} to ${newValue}`);
+            console.log(
+                `Disclosure's open state changed from ${oldValue} to ${newValue}`
+            );
         },
     },
     computed: {
@@ -65,8 +69,8 @@ const Disclosure = defineComponent({
             return {
                 text: this.computed.buttonLabel,
                 attributes: {
-                    type: "button",
-                    "aria-expanded": String(this.state.open),
+                    type: 'button',
+                    'aria-expanded': String(this.state.open),
                 },
                 events: {
                     click: () => this.methods.toggle(),
@@ -88,7 +92,7 @@ const Disclosure = defineComponent({
   <TabItem label="TypeScript">
 
 ```ts
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 interface DisclosureState {
     open: boolean;
@@ -109,15 +113,15 @@ const Disclosure = defineComponent<{
         buttonLabel: string;
     };
 }>({
-    name: "Disclosure",
+    name: 'Disclosure',
     state: {
         open: { default: false, type: Boolean },
-        openLabel: { default: "Hide details" },
-        closedLabel: { default: "Show details" },
+        openLabel: { default: 'Hide details' },
+        closedLabel: { default: 'Show details' },
     },
     elements: {
-        button: { query: "[data-disclosure-button]" },
-        panel: { query: "[data-disclosure-panel]" },
+        button: { query: '[data-disclosure-button]' },
+        panel: { query: '[data-disclosure-panel]' },
     },
     methods: {
         toggle() {
@@ -128,7 +132,9 @@ const Disclosure = defineComponent<{
         open({ newValue, oldValue, isInitial }) {
             if (isInitial) return;
 
-            console.log(`Disclosure's open state changed from ${oldValue} to ${newValue}`);
+            console.log(
+                `Disclosure's open state changed from ${oldValue} to ${newValue}`
+            );
         },
     },
     computed: {
@@ -142,8 +148,8 @@ const Disclosure = defineComponent<{
             return {
                 text: this.computed.buttonLabel,
                 attributes: {
-                    type: "button",
-                    "aria-expanded": String(this.state.open),
+                    type: 'button',
+                    'aria-expanded': String(this.state.open),
                 },
                 events: {
                     click: () => this.methods.toggle(),
@@ -167,7 +173,7 @@ const Disclosure = defineComponent<{
 ## The mounting code
 
 ```ts
-const disclosure = Disclosure.mount("[data-disclosure]");
+const disclosure = Disclosure.mount('[data-disclosure]');
 ```
 
 <Aside type="note">
@@ -179,8 +185,8 @@ const disclosure = Disclosure.mount("[data-disclosure]");
     disclosure.state.open = true;
     disclosure.dispose();
     ```
-</Aside>
 
+</Aside>
 
 ## How to read this component
 

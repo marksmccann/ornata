@@ -7,7 +7,7 @@
         <style>
             :root {
                 color-scheme: light;
-                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                font-family: 'Avenir Next', 'Segoe UI', sans-serif;
                 background: #f4f6fb;
                 color: #1b2333;
             }
@@ -22,8 +22,12 @@
                 display: grid;
                 place-items: center;
                 padding: 24px;
-                background:
-                    radial-gradient(circle at top, #ffffff 0, #eef2fb 48%, #e0e7f8 100%);
+                background: radial-gradient(
+                    circle at top,
+                    #ffffff 0,
+                    #eef2fb 48%,
+                    #e0e7f8 100%
+                );
             }
 
             .demo-shell {
@@ -45,7 +49,7 @@
                 line-height: 1.5;
             }
 
-            [role="tablist"] {
+            [role='tablist'] {
                 display: flex;
                 gap: 10px;
                 margin-bottom: 16px;
@@ -79,7 +83,10 @@
     <body>
         <main class="demo-shell">
             <h1>Element Safeguards Demo</h1>
-            <p>This component expects a specific DOM structure and validates it through custom resolution plus explicit element counts.</p>
+            <p>
+                This component expects a specific DOM structure and validates it
+                through custom resolution plus explicit element counts.
+            </p>
             <section data-tabs>
                 <div>
                     <button type="button" data-tab>Tab 1</button>
@@ -95,7 +102,7 @@
             const { defineComponent } = window.Ornata;
 
             const Tabs = defineComponent({
-                name: "Tabs",
+                name: 'Tabs',
                 state: {
                     activeIndex: { default: 0, type: Number },
                 },
@@ -104,11 +111,16 @@
                         resolve(root) {
                             return (
                                 Array.from(root.children).find((child) => {
-                                    if (!(child instanceof HTMLDivElement)) return false;
+                                    if (!(child instanceof HTMLDivElement))
+                                        return false;
 
-                                    return Array.from(child.children).some((grandchild) => {
-                                        return grandchild.hasAttribute("data-tab");
-                                    });
+                                    return Array.from(child.children).some(
+                                        (grandchild) => {
+                                            return grandchild.hasAttribute(
+                                                'data-tab'
+                                            );
+                                        }
+                                    );
                                 }) ?? null
                             );
                         },
@@ -116,11 +128,11 @@
                         max: 1,
                     },
                     tabs: {
-                        queryAll: ":scope > div > [data-tab]",
+                        queryAll: ':scope > div > [data-tab]',
                         min: 2,
                     },
                     panels: {
-                        queryAll: ":scope > [data-panel]",
+                        queryAll: ':scope > [data-panel]',
                         min: 2,
                     },
                 },
@@ -128,21 +140,22 @@
                     tablist() {
                         return {
                             attributes: {
-                                role: "tablist",
+                                role: 'tablist',
                             },
                         };
                     },
                     tabs({ index }) {
                         const currentIndex = index ?? 0;
-                        const isActive = currentIndex === this.state.activeIndex;
+                        const isActive =
+                            currentIndex === this.state.activeIndex;
 
                         return {
                             attributes: {
-                                type: "button",
-                                "aria-selected": String(isActive),
+                                type: 'button',
+                                'aria-selected': String(isActive),
                             },
                             classes: {
-                                "is-active": isActive,
+                                'is-active': isActive,
                             },
                             events: {
                                 click: () => {
@@ -161,7 +174,7 @@
                 },
             });
 
-            Tabs.mount("[data-tabs]");
+            Tabs.mount('[data-tabs]');
         </script>
     </body>
 </html>

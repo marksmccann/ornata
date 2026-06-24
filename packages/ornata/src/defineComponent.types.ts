@@ -130,7 +130,7 @@ type InferComputedFromOptions<TOptions> = TOptions extends object
               ? WidenLiteral<TReturn>
               : TOptions[K] extends (...args: any[]) => infer TReturn
                 ? WidenLiteral<TReturn>
-              : never;
+                : never;
       }
     : {};
 

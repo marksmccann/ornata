@@ -75,11 +75,7 @@ describe('getStateFromElement', () => {
             .mockImplementation(() => {});
         const element = document.createElement('div');
         element.dataset.count = '123';
-        const state = getStateFromElement(
-            { count: {} },
-            'Test',
-            element
-        );
+        const state = getStateFromElement({ count: {} }, 'Test', element);
 
         expect(consoleWarn).toHaveBeenCalledWith(
             reporter.message('WRN02', {

@@ -1,16 +1,17 @@
 ---
 title: State Listeners
-slug: "guides/state-listeners"
+slug: 'guides/state-listeners'
 description: Use `addStateListener` to subscribe to public state changes from outside a mounted Ornata component.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 `addStateListener()` is the public subscription API on a mounted Ornata component instance. It lets code outside the component observe changes to a specific public state property.
 
 ```js
-const instance = Counter.mount("[data-counter]");
+const instance = Counter.mount('[data-counter]');
 
-const cleanup = instance.addStateListener("count", (event) => {
+const cleanup = instance.addStateListener('count', (event) => {
     console.log(event.newValue);
 });
 ```
@@ -25,9 +26,12 @@ The listener receives an event object with:
 - `target`: the mounted component instance that emitted the change
 
 ```js
-instance.addStateListener("count", ({ property, newValue, oldValue, target }) => {
-    console.log(property, newValue, oldValue, target);
-});
+instance.addStateListener(
+    'count',
+    ({ property, newValue, oldValue, target }) => {
+        console.log(property, newValue, oldValue, target);
+    }
+);
 ```
 
 ## Cleanup
@@ -35,7 +39,7 @@ instance.addStateListener("count", ({ property, newValue, oldValue, target }) =>
 `addStateListener()` returns a cleanup function.
 
 ```js
-const cleanup = instance.addStateListener("count", (event) => {
+const cleanup = instance.addStateListener('count', (event) => {
     console.log(event.newValue);
 });
 

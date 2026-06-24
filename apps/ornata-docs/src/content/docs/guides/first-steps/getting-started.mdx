@@ -1,9 +1,10 @@
 ---
 title: Getting Started
-slug: "guides/getting-started"
+slug: 'guides/getting-started'
 description: Install Ornata, define a small component contract, and mount it onto existing HTML.
 ---
-import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
 This guide takes you from installation to a working Ornata component in an HTML-first environment.
 
@@ -21,8 +22,10 @@ If you want to enhance a page without a bundler, load the browser build from a C
     const { defineComponent } = window.Ornata;
 </script>
 ```
+
 <Aside type="tip">
-    Pin a specific version in production so your deployed HTML always gets the same runtime.
+    Pin a specific version in production so your deployed HTML always gets the
+    same runtime.
 </Aside>
 
 ## Start with HTML
@@ -30,8 +33,9 @@ If you want to enhance a page without a bundler, load the browser build from a C
 Write the initial markup for the desired component.
 
 <Aside type="note">
-    Ornata treats markup as the integration surface. As the component author, you decide what
-    your component expects from that markup and how flexible that contract should be.
+    Ornata treats markup as the integration surface. As the component author,
+    you decide what your component expects from that markup and how flexible
+    that contract should be.
 </Aside>
 
 ```html
@@ -51,16 +55,16 @@ Write the initial markup for the desired component.
   <TabItem label="JavaScript">
 
 ```js
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 const Counter = defineComponent({
-    name: "Counter",
+    name: 'Counter',
     state: {
         count: { default: 0 },
     },
     elements: {
-        value: { query: "[data-count-value]" },
-        button: { query: "[data-count-button]" },
+        value: { query: '[data-count-value]' },
+        button: { query: '[data-count-button]' },
     },
     methods: {
         increment() {
@@ -88,11 +92,11 @@ const Counter = defineComponent({
   <TabItem label="TypeScript">
 
 ```ts
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 interface CounterState {
     count: number;
-};
+}
 
 const Counter = defineComponent<{
     state: CounterState;
@@ -104,13 +108,13 @@ const Counter = defineComponent<{
         increment(): void;
     };
 }>({
-    name: "Counter",
+    name: 'Counter',
     state: {
         count: { default: 0 },
     },
     elements: {
-        value: { query: "[data-count-value]" },
-        button: { query: "[data-count-button]" },
+        value: { query: '[data-count-value]' },
+        button: { query: '[data-count-button]' },
     },
     methods: {
         increment() {
@@ -146,7 +150,7 @@ const Counter = defineComponent<{
 </Aside>
 
 ```js
-Counter.mount("[data-counter]");
+Counter.mount('[data-counter]');
 ```
 
 ## What happens when it mounts

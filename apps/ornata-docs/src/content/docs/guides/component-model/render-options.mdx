@@ -1,9 +1,10 @@
 ---
 title: Render Options
-slug: "guides/render-options"
+slug: 'guides/render-options'
 description: Use render callbacks to map component state back into existing or generated DOM, including lists with index-aware rendering.
 ---
-import { Aside, Tabs, TabItem } from "@astrojs/starlight/components";
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
 `render` is how Ornata turns component state back into DOM output inside the component's HTML contract. Each render callback returns a `RenderOptions` object for one resolved element or one item in a resolved element list.
 
@@ -88,7 +89,9 @@ render: {
 Set `html` when you want to update `innerHTML`.
 
 <Aside type="caution" title="Use trusted HTML only">
-    `html` writes directly to `innerHTML`. Only use it with trusted content or content you have sanitized first. If you only need to show plain text, prefer `text` instead.
+    `html` writes directly to `innerHTML`. Only use it with trusted content or
+    content you have sanitized first. If you only need to show plain text,
+    prefer `text` instead.
 </Aside>
 
 <Tabs syncKey="code-language">

@@ -1,10 +1,10 @@
 ---
 title: Testing with Vitest
-slug: "guides/testing-with-vitest"
+slug: 'guides/testing-with-vitest'
 description: Learn how to test write unit tests for Ornata components
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+import { Aside } from '@astrojs/starlight/components';
 
 Testing an Ornata component is usually pretty simple: mount it onto real HTML, interact with it, make assertions, then clean it up.
 
@@ -45,7 +45,7 @@ document.body.innerHTML = `
 In most Ornata tests, you will start by putting the expected HTML into the document, then mounting the component onto that markup.
 
 ```ts
-const instance = Disclosure.mount("[data-disclosure]");
+const instance = Disclosure.mount('[data-disclosure]');
 ```
 
 This is usually the most useful way to start a test because it matches how Ornata is used in real pages. The component gets real markup, mounts to a real root element, and returns an instance you can use in the rest of the test.
@@ -63,17 +63,17 @@ You will usually check one of a few things.
 **Visible DOM output**
 
 ```ts
-Disclosure.mount("[data-disclosure]");
+Disclosure.mount('[data-disclosure]');
 
-await user.click(screen.getByRole("button", { name: "Toggle" }));
+await user.click(screen.getByRole('button', { name: 'Toggle' }));
 
-expect(screen.getByText("Open")).toBeInTheDocument();
+expect(screen.getByText('Open')).toBeInTheDocument();
 ```
 
 **Public state**
 
 ```ts
-const instance = Counter.mount("[data-counter]");
+const instance = Counter.mount('[data-counter]');
 
 instance.state.count = 1;
 
@@ -84,13 +84,13 @@ expect(instance.state.count).toBe(1);
 
 ```ts
 const listener = vi.fn();
-const instance = Counter.mount(document.createElement("div"));
+const instance = Counter.mount(document.createElement('div'));
 
-instance.addStateListener("count", listener);
+instance.addStateListener('count', listener);
 instance.state.count = 1;
 
 expect(listener).toHaveBeenCalledWith({
-    property: "count",
+    property: 'count',
     newValue: 1,
     oldValue: 0,
     target: instance,
@@ -104,7 +104,7 @@ If a file reuses the same component constructor across multiple tests, `unmountA
 ```ts
 afterEach(() => {
     Disclosure.unmountAll();
-    document.body.innerHTML = "";
+    document.body.innerHTML = '';
 });
 ```
 

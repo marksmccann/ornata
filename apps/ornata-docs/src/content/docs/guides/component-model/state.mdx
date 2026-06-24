@@ -1,9 +1,10 @@
 ---
 title: State
-slug: "guides/state"
+slug: 'guides/state'
 description: Understand how Ornata components define and use reactive state.
 ---
-import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
 State is one of the core building blocks in Ornata. It is designed to work well with HTML-first markup, progressive enhancement, and direct component updates.
 
@@ -32,11 +33,7 @@ That means mount-time JavaScript wins over HTML, and HTML wins over definition d
 For example:
 
 ```html
-<section
-    data-counter
-    data-count="5"
-    data-label="Server count"
-></section>
+<section data-counter data-count="5" data-label="Server count"></section>
 ```
 
 <Tabs syncKey="code-language">
@@ -46,11 +43,11 @@ For example:
 const Counter = defineComponent({
     state: {
         count: { default: 0, type: Number },
-        label: { default: "Clicks", type: String },
+        label: { default: 'Clicks', type: String },
     },
 });
 
-Counter.mount("[data-counter]", {
+Counter.mount('[data-counter]', {
     count: 10,
 });
 ```
@@ -69,11 +66,11 @@ const Counter = defineComponent<{
 }>({
     state: {
         count: { default: 0, type: Number },
-        label: { default: "Clicks", type: String },
+        label: { default: 'Clicks', type: String },
     },
 });
 
-Counter.mount("[data-counter]", {
+Counter.mount('[data-counter]', {
     count: 10,
 });
 ```
@@ -166,10 +163,7 @@ Depending on the configuration, Ornata can parse values as `string`, `number`, `
 When the built-in parsing behavior is not a good fit, use `parse()` to define custom parsing logic. For example, if you want to convert a comma-separated string into an array, you can do this:
 
 ```html
-<section
-    data-search
-    data-filters="red,blue,green"
-></section>
+<section data-search data-filters="red,blue,green"></section>
 ```
 
 ```js

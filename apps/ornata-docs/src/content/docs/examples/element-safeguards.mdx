@@ -2,7 +2,8 @@
 title: Element Safeguards
 description: See how Ornata's elements option can encode DOM expectations directly into a reusable component contract.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 This example demonstrates how Ornata's `elements` option can encode DOM expectations directly into a reusable component contract. This is useful for ensuring that the required HTML structure is present when a component first mounts.
 
@@ -119,7 +120,7 @@ import { defineComponent } from 'ornata';
 
 interface TabsState {
     activeIndex: number;
-};
+}
 
 export const Tabs = defineComponent<{
     state: TabsState;

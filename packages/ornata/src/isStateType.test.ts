@@ -13,9 +13,7 @@ describe('isStateType', () => {
     it('should match array, object, and function state types', () => {
         expect(isStateType([1, 2, 3], 'array')).toBe(true);
         expect(isStateType({ name: 'test' }, 'object')).toBe(true);
-        expect(
-            isStateType(() => 'test', 'function')
-        ).toBe(true);
+        expect(isStateType(() => 'test', 'function')).toBe(true);
     });
 
     it('should not treat arrays as objects', () => {

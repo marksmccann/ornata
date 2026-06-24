@@ -26,7 +26,12 @@ describe('resolveStateOptions', () => {
         const root = document.createElement('div');
         root.dataset.name = 'test';
 
-        const resolvedState = resolveStateOptions('Test', root, {}, stateOptions);
+        const resolvedState = resolveStateOptions(
+            'Test',
+            root,
+            {},
+            stateOptions
+        );
 
         expect(resolvedState).toStrictEqual({});
         expect(consoleError).not.toHaveBeenCalled();

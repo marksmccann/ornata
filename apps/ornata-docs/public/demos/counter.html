@@ -7,7 +7,7 @@
         <style>
             :root {
                 color-scheme: light;
-                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                font-family: 'Avenir Next', 'Segoe UI', sans-serif;
                 background: #f6f1e8;
                 color: #1f2933;
             }
@@ -22,8 +22,12 @@
                 display: grid;
                 place-items: center;
                 padding: 24px;
-                background:
-                    radial-gradient(circle at top, #fff8ef 0, #f6f1e8 45%, #efe5d4 100%);
+                background: radial-gradient(
+                    circle at top,
+                    #fff8ef 0,
+                    #f6f1e8 45%,
+                    #efe5d4 100%
+                );
             }
 
             .demo-shell {
@@ -89,13 +93,13 @@
             const { defineComponent } = window.Ornata;
 
             const Counter = defineComponent({
-                name: "Counter",
+                name: 'Counter',
                 state: {
                     count: { default: 0 },
                 },
                 elements: {
-                    value: { query: "[data-count-value]" },
-                    button: { query: "[data-count-button]" },
+                    value: { query: '[data-count-value]' },
+                    button: { query: '[data-count-button]' },
                 },
                 methods: {
                     increment() {
@@ -118,7 +122,7 @@
                 },
             });
 
-            Counter.mount("[data-counter]");
+            Counter.mount('[data-counter]');
         </script>
     </body>
 </html>

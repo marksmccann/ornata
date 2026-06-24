@@ -7,7 +7,7 @@
         <style>
             :root {
                 color-scheme: light;
-                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                font-family: 'Avenir Next', 'Segoe UI', sans-serif;
                 background: #eef7f8;
                 color: #173033;
             }
@@ -22,8 +22,12 @@
                 display: grid;
                 place-items: center;
                 padding: 24px;
-                background:
-                    radial-gradient(circle at top, #fbffff 0, #edf7f8 48%, #d8ecee 100%);
+                background: radial-gradient(
+                    circle at top,
+                    #fbffff 0,
+                    #edf7f8 48%,
+                    #d8ecee 100%
+                );
             }
 
             .demo-shell {
@@ -65,7 +69,10 @@
     <body>
         <main class="demo-shell">
             <h1>Persistent Data Demo</h1>
-            <p>This clock uses <code>data.intervalId</code> to keep the timer handle alive for the life of the instance.</p>
+            <p>
+                This clock uses <code>data.intervalId</code> to keep the timer
+                handle alive for the life of the instance.
+            </p>
 
             <section data-clock>
                 <div data-clock-value>Waiting…</div>
@@ -77,16 +84,17 @@
             const { defineComponent } = window.Ornata;
 
             const Clock = defineComponent({
-                name: "Clock",
+                name: 'Clock',
                 data: {
                     intervalId: null,
                 },
                 elements: {
-                    value: { query: "[data-clock-value]" },
+                    value: { query: '[data-clock-value]' },
                 },
                 methods: {
                     updateTime() {
-                        this.elements.value.textContent = new Date().toLocaleTimeString();
+                        this.elements.value.textContent =
+                            new Date().toLocaleTimeString();
                     },
                 },
                 lifecycle: {
@@ -104,7 +112,7 @@
                 },
             });
 
-            Clock.mount("[data-clock]");
+            Clock.mount('[data-clock]');
         </script>
     </body>
 </html>

@@ -1,4 +1,8 @@
-import type { InternalInstance, WatchCallback, WatchOptions } from './runtime.js';
+import type {
+    InternalInstance,
+    WatchCallback,
+    WatchOptions,
+} from './runtime.js';
 
 /**
  * Gets the watch callback for a given property.

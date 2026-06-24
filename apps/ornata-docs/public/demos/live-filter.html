@@ -7,7 +7,7 @@
         <style>
             :root {
                 color-scheme: light;
-                font-family: "Avenir Next", "Segoe UI", sans-serif;
+                font-family: 'Avenir Next', 'Segoe UI', sans-serif;
                 background: #eff7f2;
                 color: #193025;
             }
@@ -22,8 +22,12 @@
                 display: grid;
                 place-items: center;
                 padding: 24px;
-                background:
-                    radial-gradient(circle at top, #fbfffc 0, #edf7f0 48%, #dcefe1 100%);
+                background: radial-gradient(
+                    circle at top,
+                    #fbfffc 0,
+                    #edf7f0 48%,
+                    #dcefe1 100%
+                );
             }
 
             .demo-shell {
@@ -88,7 +92,10 @@
     <body>
         <main class="demo-shell">
             <h1>Live Filter Demo</h1>
-            <p>Type to filter existing list markup without replacing the list itself.</p>
+            <p>
+                Type to filter existing list markup without replacing the list
+                itself.
+            </p>
 
             <section data-filter>
                 <label>
@@ -109,17 +116,17 @@
             const { defineComponent } = window.Ornata;
 
             const LiveFilter = defineComponent({
-                name: "LiveFilter",
+                name: 'LiveFilter',
                 state: {
-                    query: { default: "" },
+                    query: { default: '' },
                 },
                 elements: {
                     input: {
                         resolve(root) {
-                            return root.querySelector("[data-filter-input]");
+                            return root.querySelector('[data-filter-input]');
                         },
                     },
-                    items: { queryAll: "[data-filter-item]" },
+                    items: { queryAll: '[data-filter-item]' },
                 },
                 render: {
                     input() {
@@ -134,8 +141,10 @@
                     },
                     items({ index }) {
                         const item = this.elements.items[index ?? 0];
-                        const text = item?.textContent?.toLowerCase() || "";
-                        const matches = text.includes(this.state.query.toLowerCase());
+                        const text = item?.textContent?.toLowerCase() || '';
+                        const matches = text.includes(
+                            this.state.query.toLowerCase()
+                        );
 
                         return {
                             attributes: {
@@ -146,7 +155,7 @@
                 },
             });
 
-            LiveFilter.mount("[data-filter]");
+            LiveFilter.mount('[data-filter]');
         </script>
     </body>
 </html>

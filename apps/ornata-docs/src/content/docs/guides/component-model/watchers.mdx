@@ -1,9 +1,10 @@
 ---
 title: Watchers
-slug: "guides/watchers"
+slug: 'guides/watchers'
 description: Use watch callbacks for internal reactions to state changes inside an Ornata component.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 `watch` lets a component react to changes in its own state.
 
@@ -84,7 +85,6 @@ watch: {
 
   </TabItem>
 </Tabs>
-
 
 ## Watchers versus render
 
@@ -185,7 +185,6 @@ Use `watch` for internal side effects such as:
 - timers
 - imperative integrations and DOM work
 - syncing non-render concerns to state changes
-
 
 ## A good mental model
 

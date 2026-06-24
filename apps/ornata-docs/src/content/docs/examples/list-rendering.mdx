@@ -2,8 +2,8 @@
 title: List Rendering
 description: Use render callbacks with index-aware list rendering for repeated DOM collections inside an existing HTML structure.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 This example shows how `index` helps when repeated HTML elements share one piece of state but still need individual DOM updates.
 
@@ -42,17 +42,17 @@ In this example, a group of related elements is retrieved from the DOM, but each
   <TabItem label="JavaScript">
 
 ```js
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 export const Stepper = defineComponent({
-    name: "Stepper",
+    name: 'Stepper',
     state: {
         activeIndex: { default: 0, type: Number },
     },
     elements: {
-        steps: { queryAll: "[data-step]", min: 2 },
-        prev: { query: "[data-prev]" },
-        next: { query: "[data-next]" },
+        steps: { queryAll: '[data-step]', min: 2 },
+        prev: { query: '[data-prev]' },
+        next: { query: '[data-next]' },
     },
     methods: {
         previous() {
@@ -74,11 +74,11 @@ export const Stepper = defineComponent({
 
             return {
                 attributes: {
-                    "aria-current": isActive ? "step" : null,
+                    'aria-current': isActive ? 'step' : null,
                 },
                 classes: {
-                    "is-active": isActive,
-                    "is-complete": isComplete,
+                    'is-active': isActive,
+                    'is-complete': isComplete,
                 },
             };
         },
@@ -98,7 +98,8 @@ export const Stepper = defineComponent({
                 attributes: {
                     type: 'button',
                     disabled:
-                        this.state.activeIndex === this.elements.steps.length - 1,
+                        this.state.activeIndex ===
+                        this.elements.steps.length - 1,
                 },
                 events: {
                     click: () => this.methods.next(),
@@ -113,11 +114,11 @@ export const Stepper = defineComponent({
   <TabItem label="TypeScript">
 
 ```ts
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 interface StepperState {
     activeIndex: number;
-};
+}
 
 export const Stepper = defineComponent<{
     state: StepperState;
@@ -131,14 +132,14 @@ export const Stepper = defineComponent<{
         next(): void;
     };
 }>({
-    name: "Stepper",
+    name: 'Stepper',
     state: {
         activeIndex: { default: 0, type: Number },
     },
     elements: {
-        steps: { queryAll: "[data-step]", min: 2 },
-        prev: { query: "[data-prev]" },
-        next: { query: "[data-next]" },
+        steps: { queryAll: '[data-step]', min: 2 },
+        prev: { query: '[data-prev]' },
+        next: { query: '[data-next]' },
     },
     methods: {
         previous() {
@@ -160,11 +161,11 @@ export const Stepper = defineComponent<{
 
             return {
                 attributes: {
-                    "aria-current": isActive ? "step" : null,
+                    'aria-current': isActive ? 'step' : null,
                 },
                 classes: {
-                    "is-active": isActive,
-                    "is-complete": isComplete,
+                    'is-active': isActive,
+                    'is-complete': isComplete,
                 },
             };
         },
@@ -184,7 +185,8 @@ export const Stepper = defineComponent<{
                 attributes: {
                     type: 'button',
                     disabled:
-                        this.state.activeIndex === this.elements.steps.length - 1,
+                        this.state.activeIndex ===
+                        this.elements.steps.length - 1,
                 },
                 events: {
                     click: () => this.methods.next(),

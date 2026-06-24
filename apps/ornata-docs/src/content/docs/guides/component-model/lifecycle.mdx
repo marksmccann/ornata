@@ -1,9 +1,10 @@
 ---
 title: Lifecycle
-slug: "guides/lifecycle"
-description: Use lifecycle hooks to respond to 
+slug: 'guides/lifecycle'
+description: Use lifecycle hooks to respond to key moments in a component's lifecycle.
 ---
-import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
 The `lifecycle` option lets you run code at key points in a component's lifecycle.
 
@@ -50,31 +51,38 @@ This is a good place for:
 
 ## A practical example
 
-In this example, a value declared in data is stored for the life of the component instance so it can be created in `mount()` and cleaned up in `unmount()`.
+This example shows lifecycle methods being used for markup setup and teardown.
 
-<Aside>
-This example also happens to demonstrate why `data` exists: some values need to persist across lifecycle hooks without becoming reactive state. See [Data](/ornata/guides/data/) for more information about that concept.
+- When the component mounts, it appends a generated element.
+- When the component unmounts, it removes that generated markup.
+
+<Aside type="tip">
+    This is a common lifecycle pattern: move or inject markup in `mount()`, then
+    undo that work in `unmount()`.
 </Aside>
 
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">
 
 ```js
-const Clock = defineComponent({
-    name: "Clock",
-    data: {
-        intervalId: null,
+const HelperMessage = defineComponent({
+    name: 'HelperMessage',
+    elements: {
+        message: { create: 'p' },
     },
     lifecycle: {
         mount() {
-            this.data.intervalId = window.setInterval(() => {
-                console.log("tick");
-            }, 1000);
+            this.root.append(this.elements.message);
         },
         unmount() {
-            if (this.data.intervalId !== null) {
-                window.clearInterval(this.data.intervalId);
-            }
+            this.elements.message.remove();
+        },
+    },
+    render: {
+        message() {
+            return {
+                text: 'Use arrow keys to navigate.',
+            };
         },
     },
 });
@@ -84,27 +92,30 @@ const Clock = defineComponent({
   <TabItem label="TypeScript">
 
 ```ts
-interface ClockData {
-    intervalId: number | null
+interface HelperMessageElements {
+    message: HTMLParagraphElement;
 }
 
-const Clock = defineComponent<{
-    data: ClockData
+const HelperMessage = defineComponent<{
+    elements: HelperMessageElements;
 }>({
-    name: "Clock",
-    data: {
-        intervalId: null,
+    name: 'HelperMessage',
+    elements: {
+        message: { create: 'p' },
     },
     lifecycle: {
         mount() {
-            this.data.intervalId = window.setInterval(() => {
-                console.log("tick");
-            }, 1000);
+            this.root.append(this.elements.message);
         },
         unmount() {
-            if (this.data.intervalId !== null) {
-                window.clearInterval(this.data.intervalId);
-            }
+            this.elements.message.remove();
+        },
+    },
+    render: {
+        message() {
+            return {
+                text: 'Use arrow keys to navigate.',
+            };
         },
     },
 });

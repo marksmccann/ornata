@@ -2,11 +2,12 @@
 title: HTML State
 description: See how component state can be initialized from HTML data attributes.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 This example shows one of Ornata's most useful HTML-first patterns: deriving initial component state from markup. It gives server-rendered data and configuration a direct path into component behavior at runtime.
 
-With the exception of more complex state properties, such as functions, component state can be initialized from corresponding data-* attributes on the component's root element. In this example, the server provides a count value in the HTML, which the Ornata component reads during initialization and uses as the starting point for its state.
+With the exception of more complex state properties, such as functions, component state can be initialized from corresponding data-\* attributes on the component's root element. In this example, the server provides a count value in the HTML, which the Ornata component reads during initialization and uses as the starting point for its state.
 
 ## Live Demo
 
@@ -38,16 +39,16 @@ With the exception of more complex state properties, such as functions, componen
   <TabItem label="JavaScript">
 
 ```js
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 export const Counter = defineComponent({
-    name: "Counter",
+    name: 'Counter',
     state: {
         count: { default: 0, type: Number },
     },
     elements: {
-        value: { query: "[data-count-value]" },
-        button: { query: "[data-count-button]" },
+        value: { query: '[data-count-value]' },
+        button: { query: '[data-count-button]' },
     },
     methods: {
         increment() {
@@ -63,7 +64,7 @@ export const Counter = defineComponent({
         button() {
             return {
                 attributes: {
-                    type: "button",
+                    type: 'button',
                 },
                 events: {
                     click: () => this.methods.increment(),
@@ -78,12 +79,12 @@ export const Counter = defineComponent({
   <TabItem label="TypeScript">
 
 ```ts
-import { defineComponent } from "ornata";
+import { defineComponent } from 'ornata';
 
 interface CounterState {
     count: number;
     label: string;
-};
+}
 
 export const Counter = defineComponent<{
     state: CounterState;
@@ -95,13 +96,13 @@ export const Counter = defineComponent<{
         increment(): void;
     };
 }>({
-    name: "Counter",
+    name: 'Counter',
     state: {
         count: { default: 0, type: Number },
     },
     elements: {
-        value: { query: "[data-count-value]" },
-        button: { query: "[data-count-button]" },
+        value: { query: '[data-count-value]' },
+        button: { query: '[data-count-button]' },
     },
     methods: {
         increment() {
@@ -117,7 +118,7 @@ export const Counter = defineComponent<{
         button() {
             return {
                 attributes: {
-                    type: "button",
+                    type: 'button',
                 },
                 events: {
                     click: () => this.methods.increment(),
@@ -134,7 +135,7 @@ export const Counter = defineComponent<{
 ## Mount
 
 ```js
-Counter.mount("[data-counter]");
+Counter.mount('[data-counter]');
 ```
 
 ## What happens
@@ -156,7 +157,7 @@ So the mounted instance starts with:
 If you mount with `initialState`, that wins over the HTML values:
 
 ```js
-Counter.mount("[data-counter]", {
+Counter.mount('[data-counter]', {
     count: 10,
 });
 ```
