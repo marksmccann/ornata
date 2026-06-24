@@ -1,0 +1,87 @@
+---
+title: Component Constructor
+slug: 'api/component-constructor'
+description: Work with the constructor returned by `defineComponent()`.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+The API for the component constructor returned by `defineComponent()`.
+
+This constructor, along with the instances it creates, is the main API surface that consumers work with.
+
+## What it creates
+
+The component constructor creates mounted component instances.
+
+Use the constructor when you need to create, find, or tear down instances from outside the component definition.
+
+For the mounted instance API itself, see [Component Instance](/ornata/api/component-instance/).
+
+## Constructor shape
+
+The public constructor currently exposes:
+
+### `displayName`
+
+`displayName` is the constructor's public name for debugging and reporting.
+
+This is the same value provided to `name` in the `defineComponent()` options.
+
+### `mount()`
+
+Use `mount()` to create one component instance directly from a root element or selector.
+
+```js
+const instance = Counter.mount('[data-counter]', { ... });
+```
+
+You can also pass `initialState` to the second argument.
+
+For a broader comparison of mounting approaches, see [Mounting Instances](/ornata/guides/mounting-instances/).
+
+### `getInstance()`
+
+Use `getInstance()` when you expect the instance to exist and want absence to throw.
+
+It identifies the instance via a direct reference to, or CSS selector for, the root element.
+
+```js
+const instance = Counter.getInstance('[data-counter]');
+```
+
+For a broader guide to retrieving and working with instances, see [Instance Management](/ornata/guides/instance-management/).
+
+### `findInstance()`
+
+Use `findInstance()` when absence is a normal branch and `null` is acceptable.
+
+It identifies the instance via a direct reference to, or CSS selector for, the root element.
+
+```js
+const maybeInstance = Counter.findInstance('[data-counter]');
+```
+
+For a broader guide to retrieving and working with instances, see [Instance Management](/ornata/guides/instance-management/).
+
+### `unmount()`
+
+Use `unmount()` when you want to dispose a specific instance by root reference.
+
+It identifies the instance via a direct reference to, or CSS selector for, the root element.
+
+```js
+Counter.unmount('[data-counter]');
+```
+
+For broader teardown guidance, see [Instance Management](/ornata/guides/instance-management/).
+
+### `unmountAll()`
+
+Use `unmountAll()` when you want to dispose every mounted instance for the same component constructor.
+
+```js
+Counter.unmountAll();
+```
+
+For broader teardown guidance, see [Instance Management](/ornata/guides/instance-management/).

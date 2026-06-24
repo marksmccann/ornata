@@ -144,8 +144,16 @@ export default defineConfig({
                         },
                         { label: "isComponent", slug: "api/is-component" },
                         {
+                            label: "Component Constructor",
+                            slug: "api/component-constructor",
+                        },
+                        {
                             label: "Component Instance",
                             slug: "api/component-instance",
+                        },
+                        {
+                            label: "TypeScript Types",
+                            slug: "api/typescript-types",
                         },
                     ],
                 },

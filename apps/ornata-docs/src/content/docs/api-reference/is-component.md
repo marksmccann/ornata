@@ -1,14 +1,17 @@
 ---
 title: isComponent
-slug: "api/is-component"
+slug: 'api/is-component'
 description: Check whether a value is an Ornata component constructor.
 ---
 
+The API for `isComponent()`; a runtime type guard for Ornata component constructors.
 
-`isComponent()` is a runtime type guard for Ornata component constructors.
+## Import
 
-```ts
-import { isComponent } from "ornata";
+```js
+import { isComponent } from 'ornata';
+
+const { isComponent } = window.Ornata;
 ```
 
 ## Example

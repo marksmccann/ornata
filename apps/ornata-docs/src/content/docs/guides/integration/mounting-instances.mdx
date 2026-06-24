@@ -1,9 +1,10 @@
 ---
 title: Mounting Instances
-slug: "guides/mounting-instances"
+slug: 'guides/mounting-instances'
 description: Compare `mount()` and `mountAll()` so you can choose the right mounting pattern for each page.
 ---
-import { Aside, Tabs, TabItem } from "@astrojs/starlight/components";
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
 Ornata has two main ways to create mounted component instances: `mount()` and `mountAll()`. Both methods create the same kind of mounted instance, but they take different paths to get there. Your particular use case and environment will likely dictate which one you choose, and some projects may use both.
 
@@ -15,16 +16,16 @@ Every Ornata component instance is tied to a single root element. That root defi
 
 The `mount()` method is the explicit API for creating an individual component instance. It mounts a component from JavaScript using a direct reference to the component constructor and a specific root element. This is the most straightforward way to create an instance.
 
-To create an instance, pass mount() a direct reference to the root as either an element or a selector:
+To create an instance, pass `mount()` a direct reference to the root as either an element or a selector:
 
 ```js
-const instanceA = Counter.mount(document.querySelector("[data-counter]"));
-const instanceB = Counter.mount("[data-counter]");
+const instanceA = Counter.mount(document.querySelector('[data-counter]'));
+const instanceB = Counter.mount('[data-counter]');
 ```
 
 ## Mount with `mountAll()`
 
-The `mountAll()` method is Ornata’s declarative HTML API. Instead of mounting one known root directly from JavaScript, it mounts components that have already been declared in the HTML. This makes it a good fit for instantiating multiple components in bulk.
+The `mountAll()` method is Ornata's declarative HTML API. Instead of mounting one known root directly from JavaScript, it mounts components that have already been declared in the HTML. This makes it a good fit for instantiating multiple components in bulk.
 
 Using this approach takes three simple steps:
 
@@ -49,13 +50,14 @@ Add a `data-ornata` attribute whose value matches the component name you want to
 Create a small registry that maps component names to their constructors.
 
 <Aside type="note">
-    The value of every `data-ornata` attribute in the HTML must match a key from this component registry.
-    If it does not, Ornata will report an error and skip that root.
+    The value of every `data-ornata` attribute in the HTML must match a key from
+    this component registry. If it does not, Ornata will report an error and
+    skip that root.
 </Aside>
 
 ```js
-import { Counter } from "./counter";
-import { Disclosure } from "./disclosure";
+import { Counter } from './counter';
+import { Disclosure } from './disclosure';
 
 export const components = {
     Counter,
@@ -68,8 +70,8 @@ export const components = {
 Pass the registry to `mountAll()` to mount every matching `data-ornata` root in the HTML at once.
 
 ```js
-import { mountAll } from "ornata";
-import { components } from "./components";
+import { mountAll } from 'ornata';
+import { components } from './components';
 
 const instances = mountAll(components);
 ```

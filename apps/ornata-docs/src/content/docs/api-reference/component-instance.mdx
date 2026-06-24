@@ -1,135 +1,60 @@
 ---
 title: Component Instance
-slug: "api/component-instance"
-description: Work with mounted component instances and constructor-level helpers when integration code needs direct control.
+slug: 'api/component-instance'
+description: Work with mounted component instances.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-When you mount a component, Ornata returns a component instance.
+The API for a mounted component instance.
 
-That instance becomes the integration point between the component and surrounding page code.
+## How instances are created
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
+Component instances are created from the component constructor via the `mount()` or `mountAll()` method.
 
-```js
-const instance = Counter.mount(root);
-```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-const instance = Counter.mount(root);
-```
-
-  </TabItem>
-</Tabs>
+For more information, see [Mounting Instances](/ornata/guides/mounting-instances/).
 
 ## Instance shape
 
 The public instance currently exposes:
 
-- `root`
-- `state`
-- `dispose()`
-- `addStateListener()`
-
-## `root`
+### `root`
 
 `root` is the resolved root element the component was mounted on.
 
-## `state`
+### `state`
 
 `state` is the public reactive state object.
 
+Properties marked `private` or `readonly` in state options are protected from external reads and/or writes.
+
 Updating writable public properties triggers the component update flow.
 
-Properties marked `private` or `readonly` in state options are protected from external writes.
+For broader guidance on reactive state behavior, see [State](/ornata/guides/state/) and [State Update Flow](/ornata/guides/update-flow/).
 
-When a public state write succeeds, Ornata validates the new value, updates computed values, re-runs render callbacks, calls matching watch callbacks, and notifies state listeners.
+### `dispose()`
 
-## `dispose()`
+`dispose()` unmounts the instance and runs cleanup behavior.
 
-`dispose()` unmounts the instance and runs cleanup behavior, including:
-
-- update cleanup
-- state listener cleanup
-- `lifecycle.unmount()`
-
-## `addStateListener()`
+### `addStateListener()`
 
 Use `addStateListener()` to subscribe to a specific state property.
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
 ```js
-const cleanup = instance.addStateListener("count", (event) => {
+const cleanup = instance.addStateListener('count', (event) => {
     console.log(event.newValue);
 });
 ```
 
-  </TabItem>
-  <TabItem label="TypeScript">
+The listener receives an event object with the following properties:
 
-```ts
-const cleanup = instance.addStateListener("count", (event) => {
-    console.log(event.newValue);
-});
-```
-
-  </TabItem>
-</Tabs>
-
-The listener receives:
-
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
-```js
-{
-    property,
-    newValue,
-    oldValue,
-    target,
-}
-```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-{
-    property,
-    newValue,
-    oldValue,
-    target,
-}
-```
-
-  </TabItem>
-</Tabs>
+| Property   | Description                                   |
+| ---------- | --------------------------------------------- |
+| `property` | The state property name that changed.         |
+| `newValue` | The incoming value for the update.            |
+| `oldValue` | The outgoing value for the update.            |
+| `target`   | The mounted instance that emitted the change. |
 
 The method returns a cleanup function that removes the listener.
 
-Use this when code outside the component needs to observe public state changes.
-
-For the conceptual difference between this and `watch`, see [State Listeners](/ornata/guides/state-listeners/) and [Watchers](/ornata/guides/watchers/).
-
-## Constructor helpers
-
-The component constructor also provides instance-management helpers:
-
-- `mount(root, initialState?)`
-- `getInstance(root)`
-- `findInstance(root)`
-- `unmount(root)`
-- `unmountAll()`
-
-Use `getInstance()` when absence should throw, and `findInstance()` when absence is an expected branch.
-
-Use `unmountAll()` when integration code needs to dispose every mounted instance for that component constructor, such as test cleanup or page-level teardown.
-
-For a fuller walkthrough, read [Instance Management](/ornata/guides/instance-management/).
+To learn more, see [State Listeners](/ornata/guides/state-listeners/).

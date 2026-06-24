@@ -1,56 +1,29 @@
 ---
 title: mountAll
-slug: "api/mount-all"
-description: Mount matching components from data-ornata attributes across the current document.
+slug: 'api/mount-all'
+description: The API for mountAll(); Ornata's declarative API for initializing components from the HTML.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-`mountAll()` mounts Ornata components from HTML immediately.
+The API for `mountAll()`; Ornata's declarative API for initializing components from the HTML.
 
-It is the API that lets the markup declare which components should enhance the page.
-
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
+## Import
 
 ```js
-import { mountAll } from "ornata";
+import { mountAll } from 'ornata';
+
+const { mountAll } = window.Ornata;
 ```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
-```ts
-import { mountAll } from "ornata";
-```
-
-  </TabItem>
-</Tabs>
 
 ## Basic usage
 
-<Tabs syncKey="code-language">
-  <TabItem label="JavaScript">
-
-```js
-const instances = mountAll({
-    Counter,
-    Disclosure,
-});
-```
-
-  </TabItem>
-  <TabItem label="TypeScript">
-
 ```ts
 const instances = mountAll({
     Counter,
     Disclosure,
 });
 ```
-
-  </TabItem>
-</Tabs>
 
 ## Expected HTML
 
@@ -96,7 +69,5 @@ const instances = mountAll({
 - each matching constructor is validated with `isComponent()`
 - each matching root is mounted with `component.mount(rootElement)`
 - the `data-ornata` attribute is removed after mounting
-
-This makes it a good fit for page-level bootstrap code in HTML-first environments.
 
 See [Mounting Instances](/ornata/guides/mounting-instances/) for a fuller guide.

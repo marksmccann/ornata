@@ -1,0 +1,226 @@
+---
+title: defineComponent
+slug: 'api/define-component'
+description: The API for defineComponent(); the primary authoring API for an Ornata component.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+The API for `defineComponent()`; the primary authoring API for an Ornata component.
+
+## Import
+
+```js
+import { defineComponent } from 'ornata';
+
+const { defineComponent } = window.Ornata;
+```
+
+## Basic shape
+
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
+const Counter = defineComponent({
+    name: 'Counter',
+    state: {
+        count: { default: 0 },
+    },
+    methods: {
+        increment() {
+            this.state.count += 1;
+        },
+    },
+});
+```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterState {
+    count: number;
+}
+
+const Counter = defineComponent<{
+    state: CounterState;
+    methods: {
+        increment(): void;
+    };
+}>({
+    name: 'Counter',
+    state: {
+        count: { default: 0 },
+    },
+    methods: {
+        increment() {
+            this.state.count += 1;
+        },
+    },
+});
+```
+
+  </TabItem>
+</Tabs>
+
+## What it returns
+
+It returns a component constructor:
+
+```ts
+const Counter = defineComponent({ ... });
+
+const instance = Counter.mount(root);
+const sameInstance = Counter.getInstance(root);
+const maybeInstance = Counter.findInstance(root);
+
+Counter.unmount(root);
+Counter.unmountAll();
+```
+
+For the full constructor API, see [Component Constructor](/ornata/api/component-constructor/).
+
+## Options
+
+### `name`
+
+Optional display name used in debugging and reporting.
+
+### `root`
+
+Root validation options. Currently supports:
+
+| Property  | Description                                                        |
+| --------- | ------------------------------------------------------------------ |
+| `matches` | Validates that the provided root matches an expected CSS selector. |
+
+Within component callbacks, the resolved root is available as `this.root` on the internal instance.
+
+For conceptual guidance, see [Component Anatomy](/ornata/guides/component-anatomy/).
+
+### `state`
+
+Reactive state configuration keyed by property name.
+
+Each property supports:
+
+| Property   | Description                                                                    |
+| ---------- | ------------------------------------------------------------------------------ |
+| `default`  | Provides the fallback value when no other state source supplies one.           |
+| `type`     | Declares the expected runtime type for validation and HTML parsing.            |
+| `parse`    | Converts raw HTML-derived string values into the desired shape.                |
+| `private`  | Hides the property from external reads and writes on the mounted public state. |
+| `readonly` | Allows external code to read the property but prevents external writes.        |
+
+Within component callbacks, the resolved reactive state is available as `this.state` on the internal instance.
+
+For conceptual guidance and examples, see [State](/ornata/guides/state/).
+
+### `elements`
+
+DOM resolution options keyed by property name.
+
+Each property supports:
+
+| Property   | Description                                                                    |
+| ---------- | ------------------------------------------------------------------------------ |
+| `query`    | Resolves the first matching element inside the root with a CSS selector.       |
+| `queryAll` | Resolves every matching element inside the root with a CSS selector.           |
+| `create`   | Creates a new element by tag name instead of querying existing markup.         |
+| `resolve`  | Uses custom logic to return an element or array of elements manually.          |
+| `min`      | Reports an error when fewer than the expected number of elements are resolved. |
+| `max`      | Reports an error when more than the expected number of elements are resolved.  |
+
+Each element entry should use a single resolution strategy; `query`, `queryAll`, `create`, and `resolve` are mutually exclusive.
+
+Resolved element references are available as `this.elements` on the internal instance.
+
+For conceptual guidance and examples, see [Elements](/ornata/guides/elements/).
+
+### `lifecycle`
+
+Lifecycle hooks:
+
+| Hook        | Description                                                         |
+| ----------- | ------------------------------------------------------------------- |
+| `mount()`   | Runs after the component instance has been created and initialized. |
+| `unmount()` | Runs when the component instance is being disposed and cleaned up.  |
+
+Lifecycle hooks run with `this` bound to the internal instance, so they can derive values from the component's current state and other internal data.
+
+For conceptual guidance and examples, see [Lifecycle](/ornata/guides/lifecycle/).
+
+### `watch`
+
+Watch callbacks keyed by state property name.
+
+Each callback receives a context object with these properties:
+
+| Property    | Description                                                  |
+| ----------- | ------------------------------------------------------------ |
+| `type`      | Identifies the callback context as a `watch` callback.       |
+| `newValue`  | The incoming value for the watched state property.           |
+| `oldValue`  | The outgoing value for the watched state property.           |
+| `isInitial` | Indicates whether this is the initialization-time watch run. |
+
+Watch callbacks run with `this` bound to the internal instance, so they can derive values from the component's current state and other internal data.
+
+For conceptual guidance and examples, see [Watchers](/ornata/guides/watchers/) and [State Listeners](/ornata/guides/state-listeners/).
+
+### `methods`
+
+Internal reusable actions bound to the component instance.
+
+Methods run with `this` bound to the internal instance, so they can derive values from the component's current state and other internal data.
+
+For conceptual guidance and examples, see [Methods](/ornata/guides/methods/).
+
+### `computed`
+
+Derived values keyed by property name.
+
+Each callback receives a context object with these properties:
+
+| Property          | Description                                                      |
+| ----------------- | ---------------------------------------------------------------- |
+| `type`            | Identifies the callback context as a `computed` callback.        |
+| `currentValue`    | The current computed value before recomputation.                 |
+| `changedProperty` | The state property that changed and triggered the recomputation. |
+
+Computed callbacks run with `this` bound to the internal instance, so they can derive values from the component's current state and other internal data.
+
+For conceptual guidance and examples, see [Computed](/ornata/guides/computed/).
+
+### `data`
+
+Additional user-defined internal data that does not trigger reactive updates.
+
+For conceptual guidance and examples, see [Data](/ornata/guides/data/).
+
+### `render`
+
+Render callbacks keyed by resolved element name.
+
+Each callback receives a context object with these properties:
+
+| Property | Description                                                |
+| -------- | ---------------------------------------------------------- |
+| `type`   | Identifies the callback context as a `render` callback.    |
+| `index`  | The current element index when rendering an element array. |
+
+Each callback returns `RenderOptions`, which may include:
+
+| Property     | Description                                                      |
+| ------------ | ---------------------------------------------------------------- |
+| `style`      | Sets or removes inline style properties on the rendered element. |
+| `classes`    | Adds or removes CSS classes by boolean flag.                     |
+| `attributes` | Sets, toggles, or removes HTML attributes on the element.        |
+| `dataset`    | Sets or removes `data-*` values through the element dataset.     |
+| `events`     | Attaches DOM event handlers to the element.                      |
+| `html`       | Sets `innerHTML` directly.                                       |
+| `text`       | Sets `textContent` directly.                                     |
+
+Render callbacks run with `this` bound to the internal instance, so they can derive values from the component's current state and other internal data.
+
+For conceptual guidance and examples, see [Render Options](/ornata/guides/render-options/).

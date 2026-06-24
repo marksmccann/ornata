@@ -1,14 +1,17 @@
 ---
 title: Component Anatomy
-slug: "guides/component-anatomy"
+slug: 'guides/component-anatomy'
 description: Learn how the `defineComponent` options form a component contract around state, DOM resolution, rendering, and lifecycle behavior.
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
 `defineComponent()` is the main authoring API in Ornata. It is where you describe how a reusable component fits into existing HTML, what it expects from the DOM, and how it reacts over time.
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 const Component = defineComponent({
     name: 'Example',
     root: {},
@@ -22,6 +25,36 @@ const Component = defineComponent({
     render: {},
 });
 ```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface ExampleState { ... }
+
+const Component = defineComponent<{
+    root: ...;
+    state: ExampleState;
+    elements: { ... };
+    methods: { ... };
+    computed: { ... };
+    data: { ... };
+}>({
+    name: "Example",
+    root: {},
+    state: {},
+    elements: {},
+    lifecycle: {},
+    watch: {},
+    methods: {},
+    computed: {},
+    data: {},
+    render: {},
+});
+```
+
+  </TabItem>
+</Tabs>
 
 You will not use every section in every component, but each one has a clear role.
 
@@ -41,11 +74,30 @@ It currently supports `matches`, which validates that the mounted root matches a
     The "matches" option is especially useful when a component only works correctly with a specific kind of root element. For example, a `TextInput` component may need its root to be an actual `<input>` element so it can reliably read and update the element's value.
 </Aside>
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 root: {
     matches: "input",
 }
 ```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface TextInputParts {
+    root: HTMLInputElement;
+}
+
+root: {
+    matches: "input",
+}
+```
+
+  </TabItem>
+</Tabs>
 
 ## `state`
 
@@ -55,12 +107,33 @@ root: {
 
 A state definition might look like this:
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 state: {
     count: { default: 0, type: Number },
     label: { default: "Clicks", readonly: true },
 }
 ```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterState {
+    count: number;
+    label: string;
+}
+
+state: {
+    count: { default: 0, type: Number },
+    label: { default: "Clicks", readonly: true },
+}
+```
+
+  </TabItem>
+</Tabs>
 
 State in Ornata can be initialized from component defaults, root HTML `data-*` attributes, or mount-time `initialState`. For a focused walkthrough, see [State](/ornata/guides/state/).
 
@@ -74,12 +147,33 @@ Use `min` and `max` when the component needs to enforce structural expectations 
 
 An elements definition might look like this:
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 elements: {
     button: { query: "[data-count-button]" },
     items: { queryAll: "[data-item]" },
 }
 ```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterElements {
+    button: HTMLButtonElement | null;
+    items: Element[];
+}
+
+elements: {
+    button: { query: "[data-count-button]" },
+    items: { queryAll: "[data-item]" },
+}
+```
+
+  </TabItem>
+</Tabs>
 
 This is one of Ornata’s most valuable features because it makes DOM resolution an explicit part of the component contract instead of scattering lookups across the implementation. For a dedicated walkthrough, see [Elements](/ornata/guides/elements/).
 
@@ -89,13 +183,38 @@ This is one of Ornata’s most valuable features because it makes DOM resolution
 
 Methods are bound to the internal instance, so they can safely reference instance data such as `this.state`, `this.elements`, `this.computed`, and `this.data`.
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 methods: {
     increment() {
         this.state.count += 1;
     },
 }
 ```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterState {
+    count: number;
+}
+
+interface CounterMethods {
+    increment(): void;
+}
+
+methods: {
+    increment() {
+        this.state.count += 1;
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
 
 Methods are useful for keeping render callbacks small and for centralizing named component actions. For a focused walkthrough, see [Methods](/ornata/guides/methods/).
 
@@ -105,13 +224,38 @@ Methods are useful for keeping render callbacks small and for centralizing named
 
 A computed definition might look like this:
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 computed: {
     total() {
         return this.state.count;
     },
 }
 ```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterState {
+    count: number;
+}
+
+interface CounterComputed {
+    total: number;
+}
+
+computed: {
+    total() {
+        return this.state.count;
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
 
 For callback details and usage patterns, see [Computed](/ornata/guides/computed/) and [defineComponent](/ornata/api/define-component/).
 
@@ -121,7 +265,10 @@ For callback details and usage patterns, see [Computed](/ornata/guides/computed/
 
 A watch definition might look like this:
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 watch: {
     count({ isInitial, newValue }) {
         if (!isInitial) {
@@ -131,6 +278,26 @@ watch: {
 }
 ```
 
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterState {
+    count: number;
+}
+
+watch: {
+    count({ isInitial, newValue }) {
+        if (!isInitial) {
+            console.log("Updated:", newValue);
+        }
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
 For callback details and usage patterns, see [Watchers](/ornata/guides/watchers/) and [defineComponent](/ornata/api/define-component/).
 
 ## `data`
@@ -139,11 +306,30 @@ For callback details and usage patterns, see [Watchers](/ornata/guides/watchers/
 
 Use it for values that do not need to be reactive.
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 data: {
     analyticsKey: "counter",
 }
 ```
+
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterData {
+    analyticsKey: string;
+}
+
+data: {
+    analyticsKey: "counter",
+}
+```
+
+  </TabItem>
+</Tabs>
 
 `data` is useful for persistent internal values like timer IDs, observer instances, caches, and third-party integration objects. For a focused walkthrough, see [Data](/ornata/guides/data/).
 
@@ -153,7 +339,10 @@ data: {
 
 A render definition might look like this:
 
-```ts
+<Tabs syncKey="code-language">
+  <TabItem label="JavaScript">
+
+```js
 render: {
     value() {
         return {
@@ -163,6 +352,30 @@ render: {
 }
 ```
 
+  </TabItem>
+  <TabItem label="TypeScript">
+
+```ts
+interface CounterState {
+    count: number;
+}
+
+interface CounterElements {
+    value: HTMLElement | null;
+}
+
+render: {
+    value() {
+        return {
+            text: String(this.state.count),
+        };
+    },
+}
+```
+
+  </TabItem>
+</Tabs>
+
 Render callbacks receive context such as `index` when rendering element arrays, and can return DOM update keys like `text`, `attributes`, `classes`, and `events`. For a deeper walkthrough, see [Render Options](/ornata/guides/render-options/) and [defineComponent](/ornata/api/define-component/).
 
 ## `lifecycle`
@@ -171,7 +384,7 @@ Render callbacks receive context such as `index` when rendering element arrays, 
 
 A lifecycle definition might look like this:
 
-```ts
+```js
 lifecycle: {
     mount() {
         console.log("Mounted");

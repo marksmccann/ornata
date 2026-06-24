@@ -1,9 +1,10 @@
 ---
 title: Instance Management
-slug: "guides/instance-management"
+slug: 'guides/instance-management'
 description: Retrieve, observe, and dispose mounted instances whether they came from `mount()` or `mountAll()`.
 ---
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 Once a component is mounted with `mount()` or `mountAll()`, the resulting instance becomes the main point of direct interaction. It can be stored, referenced, and manipulated as needed.
 
@@ -12,7 +13,7 @@ Once a component is mounted with `mount()` or `mountAll()`, the resulting instan
 Both mounting APIs return the mounted instance directly. This is the simplest way to work with an instance when you already have access to it in the same scope.
 
 ```js
-const one = Counter.mount("[data-counter]");
+const one = Counter.mount('[data-counter]');
 
 const many = mountAll({
     Counter,
@@ -22,18 +23,18 @@ const many = mountAll({
 
 ## Retrieving an instance
 
-Every component constructor provides methods for retrieving an already mounted component instance. This is useful when you need to access an instance from a different scope than the one where it was originally created.
+Every component constructor provides methods for retrieving an already mounted component instance. This is useful when you need to access an instance from a different scope than the one where it was originally created. The instance is identified by a direct reference to, or a query selector for, its root element.
 
 Use `getInstance()` when you expect the instance to exist and want its absence to throw.
 
 ```js
-const instance = Counter.getInstance("[data-counter]");
+const instance = Counter.getInstance('[data-counter]');
 ```
 
 Use `findInstance()` when the instance may or may not exist.
 
 ```js
-const maybeInstance = Counter.findInstance("[data-counter]");
+const maybeInstance = Counter.findInstance('[data-counter]');
 ```
 
 ## What can you do with an instance?
@@ -54,7 +55,7 @@ One of the main reasons to work with a mounted instance is access to its public 
 The instance's state object exposes the component's public reactive state from outside the component. This allows surrounding code to read current values and, when appropriate, update them directly.
 
 ```js
-const instance = Counter.mount("[data-counter]");
+const instance = Counter.mount('[data-counter]');
 
 console.log(instance.state.count);
 
@@ -68,9 +69,9 @@ When public state is updated successfully, Ornata runs the normal update flow fo
 Use `addStateListener()` to subscribe to changes for a specific public state property on a mounted instance. This enables surrounding code to react to state changes without owning the state update itself.
 
 ```js
-const instance = Counter.mount("[data-counter]");
+const instance = Counter.mount('[data-counter]');
 
-const cleanup = instance.addStateListener("count", (event) => {
+const cleanup = instance.addStateListener('count', (event) => {
     console.log(event.newValue);
 });
 ```
@@ -86,10 +87,12 @@ When a component is no longer needed, it can be unmounted in multiple different 
 When you know the root, you can unmount from the constructor:
 
 ```js
-Counter.unmount("[data-counter]");
+Counter.unmount('[data-counter]');
 ```
 
-When you need to tear down every mounted instance for the same component constructor, use `unmountAll()`:
+When you need to tear down every mounted instance for the same component constructor, use `unmountAll()`.
+
+This is especially useful for test cleanup or page-level teardown.
 
 ```js
 Counter.unmountAll();
@@ -98,7 +101,7 @@ Counter.unmountAll();
 When you already have the instance reference, you can dispose of it directly:
 
 ```js
-const instance = Counter.mount("[data-counter]");
+const instance = Counter.mount('[data-counter]');
 
 instance.dispose();
 ```
