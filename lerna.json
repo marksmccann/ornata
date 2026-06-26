@@ -2,7 +2,7 @@
     "$schema": "node_modules/lerna/schemas/lerna-schema.json",
     "npmClient": "npm",
     "packages": ["packages/*", "apps/*"],
-    "version": "0.5.1",
+    "version": "0.6.0",
     "command": {
         "version": {
             "conventionalCommits": true,

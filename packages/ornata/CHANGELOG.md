@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/marksmccann/ornata/compare/v0.5.1...v0.6.0) (2026-06-26)
+
+### Code Refactoring
+
+- **typescript:** simplify the public TypeScript API ([3e100e9](https://github.com/marksmccann/ornata/commit/3e100e95cfe125c0e64a71b622d54096eee54e06))
+
+### BREAKING CHANGES
+
+- **typescript:** The old defineComponent inference helpers are gone, untyped components now use
+  broader default instance types, and the docs now describe explicit typing as the supported path to
+  precise contracts.
+
 ## [0.5.1](https://github.com/marksmccann/ornata/compare/v0.5.0...v0.5.1) (2026-06-22)
 
 ### Bug Fixes
