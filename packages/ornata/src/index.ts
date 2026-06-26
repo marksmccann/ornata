@@ -13,7 +13,7 @@ namespace Ornata {
      * The state of the component.
      * @since v0.1.0
      */
-    export type ComponentState = Record<string, any>;
+    export type ComponentState = Record<string, unknown>;
 
     /**
      * An individual element or an array of elements for a component.
@@ -31,7 +31,7 @@ namespace Ornata {
      * An individual method for a component.
      * @since v0.1.0
      */
-    export type ComponentMethod = (...args: any[]) => any;
+    export type ComponentMethod = (...args: unknown[]) => unknown;
 
     /**
      * The methods of the component.
@@ -43,13 +43,13 @@ namespace Ornata {
      * The user-defined data of the component.
      * @since v0.1.0
      */
-    export type ComponentData = Record<string, any>;
+    export type ComponentData = Record<string, unknown>;
 
     /**
      * The computed data of the component.
      * @since v0.1.0
      */
-    export type ComponentComputed = Record<string, any>;
+    export type ComponentComputed = Record<string, unknown>;
 
     /**
      * The internal instance of the component.
@@ -68,7 +68,7 @@ namespace Ornata {
      * The configuration options for the root element for the `defineComponent` function.
      * @since v0.1.0
      */
-    export interface RootOptions<T extends InternalInstance> {
+    export interface RootOptions {
         /**
          * Inform the user when the root element they supplied to the constructor
          * does not match the expected type via a CSS selector.
@@ -231,7 +231,7 @@ namespace Ornata {
      * Context passed to render callbacks.
      * @since v0.2.0
      */
-    export interface RenderContext<TElement = ComponentElement> {
+    export interface RenderContext {
         /**
          * Identifies the framework callback context.
          */
@@ -334,7 +334,7 @@ namespace Ornata {
     export type RenderCallback<
         T extends InternalInstance,
         K extends keyof T['elements'],
-    > = (this: T, context: RenderContext<T['elements'][K]>) => RenderOptions;
+    > = (this: T, context: RenderContext) => RenderOptions;
 
     /**
      * The callback function for a method defined on the component.
@@ -362,7 +362,7 @@ namespace Ornata {
          * Configure the settings for the root element of the component.
          * @since v0.1.0
          */
-        root?: RootOptions<T>;
+        root?: RootOptions;
 
         /**
          * Name and configure the state properties of the component.
@@ -610,34 +610,16 @@ namespace Ornata {
     > = T extends ComponentConstructor<infer U> ? ComponentInstance<U> : never;
 
     /**
-     * The optional typed parts of a component definition.
-     * @since v0.2.0
+     * Infers the public state type from a component constructor.
+     * @since v0.6.0
      */
-    export interface ComponentParts {
-        root?: Element;
-        state?: object;
-        elements?: object;
-        methods?: object;
-        data?: object;
-        computed?: object;
-    }
-
-    /**
-     * Builds a fully-typed internal instance shape from the typed parts of a component definition.
-     * @since v0.2.0
-     */
-    export type NormalizeComponentParts<T extends ComponentParts> = {
-        root: 'root' extends keyof T ? NonNullable<T['root']> : Element;
-        state: 'state' extends keyof T ? NonNullable<T['state']> : {};
-        elements: 'elements' extends keyof T ? NonNullable<T['elements']> : {};
-        methods: 'methods' extends keyof T ? NonNullable<T['methods']> : {};
-        data: 'data' extends keyof T ? NonNullable<T['data']> : {};
-        computed: 'computed' extends keyof T ? NonNullable<T['computed']> : {};
-    };
+    export type InferComponentState<
+        T extends ComponentConstructor<InternalInstance>,
+    > = InferComponentInstance<T>['state'];
 }
 
 /**
- * A progressive enhancement framework for server-rendered websites
+ * A type-safe framework for building and distributing interactive UI components on HTML-first applications
  */
 const Ornata: Ornata = {
     defineComponent,

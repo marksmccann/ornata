@@ -29,15 +29,13 @@ describe('defineComponent', () => {
     });
 
     it('should give each instance its own nested data defaults', () => {
-        interface TestData {
-            cache: {
-                entries: string[];
-            };
-        }
-
         const caches: Array<{ entries: string[] }> = [];
         const Test = defineComponent<{
-            data: TestData;
+            data: {
+                cache: {
+                    entries: string[];
+                };
+            };
         }>({
             name: 'Test',
             data: {
@@ -111,7 +109,7 @@ describe('defineComponent', () => {
         instanceB.dispose();
     });
 
-    it('should infer typed state for mount and instance.state', () => {
+    it('should default untyped components to broad Ornata types', () => {
         const Test = defineComponent({
             name: 'Test',
             state: {
@@ -122,38 +120,45 @@ describe('defineComponent', () => {
                     default: '',
                 },
             },
+            methods: {
+                increment(step?: unknown) {
+                    expectTypeOf(this.state).toEqualTypeOf<Ornata.ComponentState>();
+                    expectTypeOf(this.methods).toEqualTypeOf<
+                        Ornata.ComponentMethods
+                    >();
+                    expectTypeOf(this.data).toEqualTypeOf<Ornata.ComponentData>();
+                    expectTypeOf(this.computed).toEqualTypeOf<
+                        Ornata.ComponentComputed
+                    >();
+
+                    this.state.count =
+                        (this.state.count as number) +
+                        ((step as number | undefined) ?? 1);
+                },
+            },
+            computed: {
+                total() {
+                    return this.state.count;
+                },
+            },
+            data: {
+                step: 1,
+            },
         });
 
         const instance = Test.mount(document.createElement('div'), {
             count: 1,
             label: 'ready',
         });
-        const elementOrQuery: string | Element | null | undefined =
-            document.createElement('div');
+        const cleanup = instance.addStateListener('count', () => undefined);
 
-        Test.mount(elementOrQuery, {
-            count: 2,
-        });
-
-        Test.mount(document.createElement('div'), {
-            // @ts-expect-error - count must be a number
-            count: 'wrong',
-        });
-
-        Test.mount(document.createElement('div'), {
-            // @ts-expect-error - label must be a string
-            label: 123,
-        });
-
-        expectTypeOf(instance.state.count).toEqualTypeOf<number>();
-        expectTypeOf(instance.state.label).toEqualTypeOf<string>();
-        expectTypeOf(
-            instance.addStateListener('count', () => undefined)
-        ).toEqualTypeOf<Ornata.StateListenerCleanup>();
+        expectTypeOf(instance.state).toEqualTypeOf<Ornata.ComponentState>();
+        expectTypeOf(instance.state.count).toEqualTypeOf<unknown>();
+        expectTypeOf(cleanup).toEqualTypeOf<Ornata.StateListenerCleanup>();
         instance.addStateListener('count', (event) => {
             expectTypeOf(event.property).toEqualTypeOf<'count'>();
-            expectTypeOf(event.newValue).toEqualTypeOf<number>();
-            expectTypeOf(event.oldValue).toEqualTypeOf<number>();
+            expectTypeOf(event.newValue).toEqualTypeOf<unknown>();
+            expectTypeOf(event.oldValue).toEqualTypeOf<unknown>();
             expectTypeOf(event.target).toEqualTypeOf<typeof instance>();
         });
 
@@ -179,16 +184,31 @@ describe('defineComponent', () => {
             count: 1,
         });
 
-        expectTypeOf(Test).toEqualTypeOf<
-            Ornata.ComponentConstructor<
-                Ornata.NormalizeComponentParts<{
-                    state: TestState;
-                }>
-            >
-        >();
+        expectTypeOf(instance.state).toEqualTypeOf<TestState>();
         expectTypeOf(instance.state.count).toEqualTypeOf<number>();
 
         instance.dispose();
+    });
+
+    it('should infer public state from a component constructor', () => {
+        interface TestState {
+            count: number;
+        }
+
+        const Test = defineComponent<{
+            state: TestState;
+        }>({
+            name: 'Test',
+            state: {
+                count: {
+                    default: 0,
+                },
+            },
+        });
+
+        expectTypeOf<Ornata.InferComponentState<typeof Test>>().toEqualTypeOf<
+            TestState
+        >();
     });
 
     it('should support sparse explicit component parts typing', () => {
@@ -196,13 +216,11 @@ describe('defineComponent', () => {
             count: number;
         }
 
-        interface TestMethods {
-            increment(): void;
-        }
-
         defineComponent<{
             state: TestState;
-            methods: TestMethods;
+            methods: {
+                increment(): void;
+            };
         }>({
             name: 'Test',
             state: {
@@ -409,7 +427,12 @@ describe('defineComponent', () => {
                     },
                 },
                 watch: {
-                    count(context) {
+                    count(
+                        context: Ornata.WatchContext<
+                            Ornata.ComponentState,
+                            string
+                        >
+                    ) {
                         watch(context);
                     },
                 },
@@ -468,16 +491,14 @@ describe('defineComponent', () => {
                 count: number;
             }
 
-            interface TestComputed {
-                total: number;
-            }
-
             const computed = vi.fn(({ changedProperty }) => {
                 return changedProperty === 'count' ? 1 : 0;
             });
             const Test = defineComponent<{
                 state: TestState;
-                computed: TestComputed;
+                computed: {
+                    total: number;
+                };
             }>({
                 name: 'Test',
                 state: {
@@ -514,13 +535,11 @@ describe('defineComponent', () => {
                 count: number;
             }
 
-            interface TestComputed {
-                total: number;
-            }
-
             const Test = defineComponent<{
                 state: TestState;
-                computed: TestComputed;
+                computed: {
+                    total: number;
+                };
             }>({
                 name: 'Test',
                 state: {
@@ -543,21 +562,19 @@ describe('defineComponent', () => {
                 },
             });
 
-            expectTypeOf(Test).toEqualTypeOf<
-                Ornata.ComponentConstructor<
-                    Ornata.NormalizeComponentParts<{
-                        state: TestState;
-                        computed: TestComputed;
-                    }>
-                >
-            >();
+            const instance = Test.mount(document.createElement('div'));
+
+            expectTypeOf(instance.state).toEqualTypeOf<TestState>();
+            expectTypeOf(instance.dispose).toBeFunction();
+
+            instance.dispose();
         });
     });
 
     describe('render option', () => {
         it('should call render with undefined index for single elements', () => {
             const render = vi.fn(
-                (_context: Ornata.RenderContext<Element | null>) => ({
+                (_context: Ornata.RenderContext) => ({
                     text: 'ready',
                 })
             );
@@ -630,13 +647,11 @@ describe('defineComponent', () => {
         });
 
         it('should infer typed render context from explicit component parts', () => {
-            interface TestElements {
-                button: Element | null;
-                items: Element[];
-            }
-
             defineComponent<{
-                elements: TestElements;
+                elements: {
+                    button: Element | null;
+                    items: Element[];
+                };
             }>({
                 name: 'Test',
                 elements: {
@@ -673,18 +688,14 @@ describe('defineComponent', () => {
                 count: number;
             }
 
-            interface TestData {
-                step: number;
-            }
-
-            interface TestMethods {
-                increment(): void;
-            }
-
             defineComponent<{
                 state: TestState;
-                data: TestData;
-                methods: TestMethods;
+                data: {
+                    step: number;
+                };
+                methods: {
+                    increment(): void;
+                };
             }>({
                 name: 'Test',
                 state: {
@@ -868,7 +879,12 @@ describe('defineComponent', () => {
 
     describe('methods option', () => {
         it('should not throw when methods are defined', () => {
-            const Test = defineComponent({
+            const Test = defineComponent<{
+                methods: {
+                    greet(): string;
+                    calculate(n: number): number;
+                };
+            }>({
                 name: 'Test',
                 methods: {
                     greet() {

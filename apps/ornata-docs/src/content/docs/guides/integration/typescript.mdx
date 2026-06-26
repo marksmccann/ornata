@@ -6,7 +6,7 @@ description: Use Ornata with explicit component types for state, elements, metho
 
 import { Aside } from '@astrojs/starlight/components';
 
-Ornata was designed to be TypeScript-friendly. For the best TypeScript experience, define the component’s typed parts explicitly.
+Ornata was designed to be TypeScript-friendly. For the best TypeScript experience, define the component's typed parts explicitly.
 
 ## Type component parts explicitly
 
@@ -78,6 +78,16 @@ That means well-typed state and good JSDoc comments can improve:
 - authoring inside the component through clearer `this.state` access
 - mounted instance usage through better `instance.state` autocomplete and docs
 - state listener usage through clearer property names and value types
+
+## Extract types from a constructor
+
+Use the following utilites to extract the instance or state type from a component.
+
+```ts
+type DisclosureInstance = Ornata.InferComponentInstance<typeof Disclosure>;
+
+type DisclosureState = Ornata.InferComponentState<typeof Disclosure>;
+```
 
 ## Typing `elements` with `resolve()`
 

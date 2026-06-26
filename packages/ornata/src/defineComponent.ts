@@ -2,11 +2,6 @@ import type Ornata from './index';
 import reporter from './reporter';
 import describeElement from './describeElement';
 import getRootElement from './getRootElement';
-import type {
-    InferComponentInstance,
-    InferredComponentOptions,
-    LooseComponentOptions,
-} from './defineComponent.types.js';
 import resolveRootOptions from './resolveRootOptions';
 import resolveStateOptions from './resolveStateOptions';
 import validateState from './validateState';
@@ -33,49 +28,54 @@ import type {
 import { ORNATA_COMPONENT_CONSTRUCTOR } from './symbols';
 
 /**
+ * The optional internal instance sections that can be explicitly declared when
+ * defining a component.
+ * @private
+ */
+type PartialInternalInstance = {
+    root?: Element;
+    state?: object;
+    elements?: object;
+    methods?: object;
+    data?: object;
+    computed?: object;
+};
+
+/**
+ * Normalizes a partial internal instance declaration into the full internal
+ * instance shape used by the typed `defineComponent` overload.
+ * @private
+ */
+type NormalizeInternalInstance<T extends PartialInternalInstance> = {
+    root: 'root' extends keyof T ? NonNullable<T['root']> : Element;
+    state: 'state' extends keyof T
+        ? NonNullable<T['state']>
+        : Ornata.ComponentState;
+    elements: 'elements' extends keyof T
+        ? NonNullable<T['elements']>
+        : Ornata.ComponentElements;
+    methods: 'methods' extends keyof T
+        ? NonNullable<T['methods']>
+        : Ornata.ComponentMethods;
+    data: 'data' extends keyof T
+        ? NonNullable<T['data']>
+        : Ornata.ComponentData;
+    computed: 'computed' extends keyof T
+        ? NonNullable<T['computed']>
+        : Ornata.ComponentComputed;
+};
+
+/**
  * Defines an Ornata component constructor from a set of typed component options.
  * @param options The configuration used to define the component's state, elements, methods, lifecycle, and rendering behavior.
  * @returns A component constructor that can create and manage component instances.
- * @example
- * ```ts
- * const Counter = defineComponent({
- *     name: "Counter",
- *     state: {
- *         count: {
- *             default: 0,
- *         },
- *     },
- * });
- * ```
- *
- * @example
- * ```ts
- * interface CounterState {
- *     // The current visible count.
- *     count: number;
- * }
- *
- * const Counter = defineComponent<{
- *     state: CounterState;
- * }>({
- *     name: "Counter",
- *     state: {
- *         count: {
- *             default: 0,
- *         },
- *     },
- * });
- * ```
  * @since v0.1.0
  */
-function defineComponent<TOptions extends LooseComponentOptions>(
-    options: TOptions & InferredComponentOptions<TOptions>
-): Ornata.ComponentConstructor<InferComponentInstance<TOptions>>;
-function defineComponent<TParts extends Ornata.ComponentParts>(
+function defineComponent<TParts extends PartialInternalInstance = {}>(
     options: Ornata.ComponentOptions<
-        Ornata.NormalizeComponentParts<NoInfer<TParts>>
+        NormalizeInternalInstance<NoInfer<TParts>>
     >
-): Ornata.ComponentConstructor<Ornata.NormalizeComponentParts<TParts>>;
+): Ornata.ComponentConstructor<NormalizeInternalInstance<TParts>>;
 function defineComponent<T extends Ornata.InternalInstance>(
     options: Ornata.ComponentOptions<T>
 ): Ornata.ComponentConstructor<T> {
