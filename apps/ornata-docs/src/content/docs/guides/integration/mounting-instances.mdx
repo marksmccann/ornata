@@ -6,7 +6,7 @@ description: Compare `mount()` and `mountAll()` so you can choose the right moun
 
 import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
-Ornata has two main ways to create mounted component instances: `mount()` and `mountAll()`. Both methods create the same kind of mounted instance, but they take different paths to get there. Your particular use case and environment will likely dictate which one you choose, and some projects may use both.
+Ornata has two main ways to create mounted component instances: `mount()` and `mountAll()`. Both methods create the same kind of mounted instance, but they take different paths to get there. Your use case and environment will likely dictate which one you choose, and some projects may use both.
 
 ## Every instance has a root
 
@@ -19,8 +19,8 @@ The `mount()` method is the explicit API for creating an individual component in
 To create an instance, pass `mount()` a direct reference to the root as either an element or a selector:
 
 ```js
-const instanceA = Counter.mount(document.querySelector('[data-counter]'));
-const instanceB = Counter.mount('[data-counter]');
+const headerCounter = Counter.mount(document.querySelector('#header-counter'));
+const footerCounter = Counter.mount('#footer-counter');
 ```
 
 ## Mount with `mountAll()`
@@ -45,7 +45,7 @@ Add a `data-ornata` attribute whose value matches the component name you want to
 </section>
 ```
 
-## 2. Build a component registry
+### 2. Build a component registry
 
 Create a small registry that maps component names to their constructors.
 
@@ -69,6 +69,11 @@ export const components = {
 
 Pass the registry to `mountAll()` to mount every matching `data-ornata` root in the HTML at once.
 
+<Aside type="note">
+    The `data-ornata` attribute is removed automatically after a successful
+    mount to ensure DOM hygiene and prevent accidental duplicate initialization.
+</Aside>
+
 ```js
 import { mountAll } from 'ornata';
 import { components } from './components';
@@ -83,7 +88,7 @@ const instances = mountAll(components);
 - validates that the name maps to a real Ornata component constructor
 - mounts each root
 - removes the `data-ornata` attribute afterward
-- returns the mounted instances
+- returns an array of all successfully mounted instances
 
 ## A good mental model
 

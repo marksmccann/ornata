@@ -4,7 +4,7 @@ slug: 'mental-model'
 description: Understand how Ornata thinks about components, HTML-first environments, and reusable UI libraries.
 ---
 
-Understand how Ornata thinks about components, HTML-first environments, and reusable UI libraries.
+To build robust UI components outside a framework-managed DOM, you have to shift how you view the relationship between JavaScript and HTML. Here is how Ornata models that relationship.
 
 ## In short
 
@@ -22,11 +22,9 @@ As the component author, you decide what the component expects from the surround
 
 ## Components are built around contracts
 
-An Ornata component defines a contract between interactive behavior and the HTML it enhances.
+An Ornata component defines an explicit contract between interactive behavior and the HTML it enhances.
 
-That contract may include which elements must already exist, which configuration can come from markup, and which parts of the DOM the component is allowed to create or manage. Some components only enhance existing HTML. Others add supporting structure around authored content.
-
-The important part is that these expectations are intentional and visible in the component definition.
+That contract dictates how configuration is read from `data-*` attributes, which child elements must already exist in the DOM, and which parts of the markup the component is allowed to dynamically generate.
 
 ## Every component has a root
 
@@ -34,15 +32,11 @@ Each Ornata component instance is tied to a single root element.
 
 The root is the HTML element a component mounts to. It defines the boundary of the instance and scopes the markup the component uses.
 
-That relationship lasts for the lifetime of the instance. Ornata uses the same root when mounting, finding, getting, and unmounting the instance. State can be initialized from it, element lookups are scoped within it, and lifecycle behavior is anchored to it.
+That relationship lasts for the lifetime of the instance. Ornata uses the same root when mounting, querying internal elements, resolving instances, and unmounting. State can be initialized from it, element lookups are scoped within it, and lifecycle behavior is anchored to it.
 
 ## Conventions make components repeatable
 
-One-off progressive enhancements can be organized however the author chooses.
-
-Reusable UI libraries need stronger patterns.
-
-Ornata gives components a consistent shape so state, behavior, rendering, lifecycle, DOM references, and events each have a clear place. That repeatability makes components easier to understand individually and easier to maintain as part of a larger library.
+While one-off progressive enhancements can be structured arbitrarily, reusable UI libraries demand strict architectural consistency. Ornata establishes a rigid, repeatable shape for component definitions—ensuring that state, rendering, and lifecycle events always live in predictable places.
 
 ## Progressive enhancement is the foundation
 

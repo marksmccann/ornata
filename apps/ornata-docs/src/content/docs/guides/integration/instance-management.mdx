@@ -4,7 +4,7 @@ slug: 'guides/instance-management'
 description: Retrieve, observe, and dispose mounted instances whether they came from `mount()` or `mountAll()`.
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
 Once a component is mounted with `mount()` or `mountAll()`, the resulting instance becomes the main point of direct interaction. It can be stored, referenced, and manipulated as needed.
 
@@ -35,7 +35,18 @@ Use `findInstance()` when the instance may or may not exist.
 
 ```js
 const maybeInstance = Counter.findInstance('[data-counter]');
+
+if (maybeInstance) {
+    maybeInstance.state.count += 1;
+}
 ```
+
+<Aside title="Tip" type="note">
+    Use `getInstance()` inside tracking or utility code where a missing
+    component means an absolute system failure. Use `findInstance()` when
+    checking for components that are optional or conditionally present on the
+    page.
+</Aside>
 
 ## What can you do with an instance?
 
@@ -43,10 +54,10 @@ Once you have access to an instance, it becomes the main way to interact with th
 
 The public instance exposes:
 
-- `root` is the resolved element the component was mounted on.
-- `state` is the public reactive state object
-- `dispose()` disposes of a component when it is no longer needed
-- `addStateListener()` can be used to subscribe to state changes
+- `root`: Access the resolved element the component was mounted on.
+- `state`: Read and mutate the public reactive state object.
+- `dispose()`: Subscribe to public state changes from outside code.
+- `addStateListener()`: Tear down the component instance and free up memory.
 
 ## Read and update public state
 
@@ -82,7 +93,7 @@ The returned `cleanup()` function can be used to remove the listener when it is 
 
 ## Tear instances down
 
-When a component is no longer needed, it can be unmounted in multiple different ways.
+When a component is no longer needed, it can be unmounted in a few different ways.
 
 When you know the root, you can unmount from the constructor:
 
@@ -105,6 +116,8 @@ const instance = Counter.mount('[data-counter]');
 
 instance.dispose();
 ```
+
+Note: Tearing down an instance automatically unbinds all internal DOM events and cleans up any active state listeners created by `addStateListener()`.
 
 ## A good mental model
 

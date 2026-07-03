@@ -10,7 +10,7 @@ export default defineConfig({
         starlight({
             title: 'Ornata',
             description:
-                'A progressive enhancement framework for HTML-first applications',
+                'A type-safe framework for building distributable interactive UI components for HTML-first applications',
             favicon: '/favicon.ico',
             social: [
                 {

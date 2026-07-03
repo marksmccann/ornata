@@ -49,17 +49,7 @@ export const Tabs = defineComponent({
     elements: {
         // 👇 Find the one direct div child expected to contain the tab buttons
         tablist: {
-            resolve(root) {
-                return (
-                    Array.from(root.children).find((child) => {
-                        if (!(child instanceof HTMLDivElement)) return false;
-
-                        return Array.from(child.children).some((grandchild) => {
-                            return grandchild.hasAttribute('data-tab');
-                        });
-                    }) ?? null
-                );
-            },
+            query: ':scope > div:has(> [data-tab])',
             min: 1,
             max: 1,
         },

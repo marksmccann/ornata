@@ -10,7 +10,7 @@ Understand the problems Ornata is designed to solve and where it fits in the fro
 
 Ornata exists to bring the benefits of component-driven development to environments where components do not necessarily produce the HTML they enhance.
 
-It helps component authors package state, behavior, lifecycle, rendering, DOM references, and integration contracts into reusable components that can enhance existing HTML and render their own structure where needed.
+It helps component authors encapsulate local state, reactive rendering, and DOM lifecycle events into a single reusable package.
 
 Ornata is not a replacement for existing front-end tools. It exists for a focused purpose: making reusable interactive UI libraries easier to author, distribute, and evolve across environments.
 
@@ -24,17 +24,13 @@ That model has proven useful across projects of many sizes and levels of complex
 
 Components make it easier to organize complex interfaces, reuse behavior, manage state, define boundaries, and evolve UI over time.
 
-## But not every environment fits that model
+## When Components Don't Control the Markup
 
-Many modern UI technologies work best when components define the markup structure they interact with. That is a good model when an application controls how its HTML is produced.
-
-But many real-world environments work differently.
+Many modern UI frameworks assume complete control over the HTML they interact with. While this model works beautifully when an application owns its entire stack, real-world enterprise environments often demand a different approach.
 
 Content management systems, server-rendered applications, template-driven platforms, design systems, and multi-framework environments often produce the initial HTML outside the interactive component itself. In those environments, component authors may still be able to influence markup through attributes, classes, conventions, and documentation. But they may not control the full system that produces the HTML.
 
-That creates a gap.
-
-Teams still want the benefits of component-driven development: encapsulation, portability, state, lifecycle, structure, and repeatable authoring patterns. But they also need to work within HTML-first architectures where markup may come from another system.
+This creates a distinct gap: teams still want the architectural benefits of component-driven development—encapsulation, portability, and lifecycle management—but they must operate within an HTML-first reality where markup is dictated by external systems.
 
 ## Existing options solve parts of the problem
 
@@ -50,14 +46,14 @@ Ornata was designed specifically for teams that need both a familiar component m
 
 ## Where Ornata fits
 
-| Tool                 | Best at                                                     | Tradeoff                                                                     |
-| -------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| React / Vue / Svelte | Building rich application UIs with component-defined markup | Usually works best when components define the structure they interact with   |
-| Alpine               | Adding lightweight interactivity directly in markup         | Less suited for packaging complex, encapsulated component libraries          |
-| Stimulus             | Attaching behavior to existing HTML                         | Leaves more architecture, composition, and distribution decisions to authors |
-| Vanilla JavaScript   | Maximum flexibility with no framework dependency            | Provides few conventions for scaling reusable UI libraries                   |
-| Web Components       | Native custom elements and browser-level encapsulation      | Requires adopting the custom element model and its integration constraints   |
-| Ornata               | Building portable UI libraries for HTML-first environments  | Focused on a narrower use case than full application frameworks              |
+| Tool                 | Best at                                                     | Tradeoff                                                                                                                                 |
+| -------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| React / Vue / Svelte | Building rich application UIs with component-defined markup | Usually works best when components define the structure they interact with                                                               |
+| Alpine               | Adding lightweight interactivity directly in markup         | Interactivity is scattered across HTML strings; lacks deep type-safety and structural encapsulation for large libraries.                 |
+| Stimulus             | Attaching behavior to existing HTML                         | Relies heavily on DOM-state string attributes; leaves component architecture, typing, and rendering lifecycle entirely up to the author. |
+| Vanilla JavaScript   | Maximum flexibility with no framework dependency            | Provides few conventions for scaling reusable UI libraries                                                                               |
+| Web Components       | Native custom elements and browser-level encapsulation      | Requires adopting the custom element model and its integration constraints                                                               |
+| Ornata               | Building portable UI libraries for HTML-first environments  | Focused on a narrower use case than full application frameworks                                                                          |
 
 ## What Ornata provides
 
@@ -74,7 +70,7 @@ Ornata may be a good fit when...
 - You are building a reusable UI library, not just one-off page behavior.
 - Your components need to work across applications, teams, or frameworks.
 - Your HTML may come from a CMS, server template, static page, or another framework.
-- You want progressive enhancement with stronger structure and TypeScript support.
+- You need progressive enhancement with stronger structure and TypeScript support.
 - You need components that are encapsulated, portable, and maintainable over time.
 
 Ornata may not be necessary when...

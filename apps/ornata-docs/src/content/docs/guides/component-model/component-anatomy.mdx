@@ -229,8 +229,8 @@ A computed definition might look like this:
 
 ```js
 computed: {
-    total() {
-        return this.state.count;
+    hasCount() {
+        return this.state.count > 0;
     },
 }
 ```
@@ -248,8 +248,8 @@ interface CounterComputed {
 }
 
 computed: {
-    total() {
-        return this.state.count;
+    hasCount() {
+        return this.state.count > 0;
     },
 }
 ```
@@ -337,7 +337,7 @@ data: {
 
 `render` maps resolved elements to DOM updates.
 
-A render definition might look like this:
+Render keys map directly to the names defined in your `elements` contract. For example, a `value()` render callback automatically updates the `value` element:
 
 <Tabs syncKey="code-language">
   <TabItem label="JavaScript">

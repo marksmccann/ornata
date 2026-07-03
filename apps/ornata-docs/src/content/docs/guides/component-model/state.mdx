@@ -22,15 +22,15 @@ That makes state flexible in an HTML-first environment because a server template
 
 When Ornata resolves initial state, later sources win.
 
-The current order is:
+The order of priority is (lowest to highest):
 
-1. component `default` values
-2. parsed values from the root element dataset
-3. `initialState` passed to `mount()`
+1. Component definition defaults
+2. Root element `data-*` attributes
+3. `initialState` passed to `mount()` [Highest Priority]
 
 That means mount-time JavaScript wins over HTML, and HTML wins over definition defaults.
 
-For example:
+Ornata automatically maps `kebab-case` HTML data attributes to your `camelCase` state properties:
 
 ```html
 <section data-counter data-count="5" data-label="Server count"></section>
@@ -89,11 +89,11 @@ When state changes after mount, Ornata runs its update flow automatically.
 
 That includes:
 
-- validating the new value
-- recomputing computed values
-- re-running render callbacks
-- calling matching watch callbacks
-- notifying external state listeners
+- Validates the new value
+- Recalculates `computed` values
+- Triggers UI render callbacks
+- Fires matching `watch` hooks
+- Notifies external state listeners
 
 For the full sequence, see [State Update Flow](/ornata/guides/update-flow/).
 
@@ -143,8 +143,8 @@ In practice, those safeguards might look like this:
 ```js
 state: {
     count: { default: 0, type: Number },
-    token: { private: true },
-    label: { default: "Clicks", readonly: true },
+    token: { private: true }, // `instance.state.token` equals `undefined` externally
+    label: { default: "Clicks", readonly: true }, // `instance.state.label = 'New'` errors and is ignored
 }
 ```
 
@@ -169,6 +169,7 @@ When the built-in parsing behavior is not a good fit, use `parse()` to define cu
 ```js
 state: {
     filters: {
+        type: Array,
         parse(value) {
             return value.split(",");
         },
